@@ -27,27 +27,93 @@ def get(url):
         raise RuntimeError(f"HTTP {response.status_code}: {url}")
     return BeautifulSoup(response.text,"html.parser")
 
+def extract_links(page, kind):
+    for a in page.select("a[href]"):
+        url = urljoin(BASE, a["href"])
+        path = urlsplit(url).path.lower()
+        if urlsplit(url).netloc != urlsplit(BASE).netloc:
+            continue
+        if kind == "publication" and "/publication/details/" not in path:
+            continue
+        if kind == "thesis" and not re.search(r"/(?:thesis|theses|advising|supervisedthesis)/", path):
+            continue
+        title = re.sub(r"^\d+\.\s*", "", a.get_text(" ", strip=True))
+        if title:
+            yield url, title
+
+def metadata(page):
+    result = {}
+    for a in page.select("a[href]"):
+        url = urlsplit(a["href"])
+        if url.hostname in ("doi.org", "dx.doi.org"):
+            result["doi"] = url.path.lstrip("/")
+            break
+    for li in page.select("li"):
+        value = li.get_text(" ", strip=True)
+        match = re.fullmatch(r"(?:Publication Date|Yayın Tarihi)\s*:\s*(\d{4})", value, re.I)
+        if match:
+            result["year"] = int(match[1])
+        if re.match(r"^(Keywords|Anahtar Kelimeler)\s*:", value, re.I):
+            result["keywords"] = value.split(":", 1)[1].strip()
+    # Abstract redistribution is disabled until reuse rights are confirmed.
+    return result
+
+def discover():
+    profiles = set(json.loads((ROOT/"data/profiles.json").read_text()))
+    source = "https://phys.eng.ankara.edu.tr"
+    rp = RobotFileParser()
+    resp = session.get(source+"/robots.txt", timeout=20, allow_redirects=False)
+    if resp.status_code != 200 or "<html" in resp.text.lower():
+        raise RuntimeError("Department robots unavailable")
+    rp.parse(resp.text.splitlines())
+    for path in ("/tr/ogretim-uyeleri/", "/tr/personel/akademik-son/"):
+        url = source+path
+        if not rp.can_fetch(AGENT,url):
+            raise RuntimeError("Department discovery not permitted")
+        time.sleep(max(2,rp.crawl_delay(AGENT) or 0))
+        resp = session.get(url,timeout=30,allow_redirects=False)
+        if resp.status_code != 200:
+            raise RuntimeError("Department page unavailable")
+        soup = BeautifulSoup(resp.text,"html.parser")
+        for a in soup.select("a[href]"):
+            u = urlsplit(a["href"])
+            if u.hostname == "avesis.ankara.edu.tr":
+                slug = u.path.strip("/").split("/")[0]
+                if re.fullmatch(r"[a-zA-Z0-9_.-]+",slug):
+                    profiles.add(slug)
+    if len(profiles) <= 1:
+        raise RuntimeError('Department discovery returned no additional profiles')
+    return sorted(profiles)
+
 rows = []
-for slug in json.loads((ROOT/"data/profiles.json").read_text()):
-    if not re.fullmatch(r"[a-zA-Z0-9_-]+",slug):
+report = []
+cache = {}
+for slug in discover():
+    if not re.fullmatch(r"[a-zA-Z0-9_.-]+", slug):
         raise ValueError("Invalid profile slug")
     page = get(BASE+slug+"/yayinlar")
     heading = page.find("h1")
     if not heading:
         raise RuntimeError("Profile heading missing")
-    name = heading.get_text(" ",strip=True)
+    name = heading.get_text(" ", strip=True)
     seen = set()
-    for a in page.select("a[href]"):
-        url = urljoin(BASE,a["href"])
-        if "/publication/details/" not in urlsplit(url).path.lower() or url in seen:
-            continue
-        title = re.sub(r"^\d+\.\s*","",a.get_text(" ",strip=True))
-        if not title:
-            continue
-        seen.add(url)
-        rows.append(dict(faculty=name,title=title,url=url,kind="publication"))
-    if not seen:
+    counts = {}
+    for kind, listing in (("publication", page), ("thesis", get(BASE+slug+"/deneyim"))):
+        counts[kind] = 0
+        for url, title in extract_links(listing, kind):
+            if url in seen:
+                continue
+            seen.add(url)
+            if url not in cache:
+                cache[url] = metadata(get(url))
+            rows.append(dict(faculty=name,title=title,url=url,kind=kind,**cache[url]))
+            counts[kind] += 1
+    if not counts["publication"]:
         raise RuntimeError("No publication links found: "+slug)
+    report.append(dict(profile=slug, faculty=name, counts=counts))
 target = ROOT/"data/academics.json"
-target.write_text(json.dumps(rows,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+tmp = target.with_suffix(".tmp")
+tmp.write_text(json.dumps(rows,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+tmp.replace(target)
+(ROOT/"data/collection-report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(f"Collected {len(rows)} records")
