@@ -102,6 +102,50 @@
     .flow li { background: var(--background); border: 1px solid var(--line); border-radius: 10px; padding: 13px; }
     .flow p { margin-top: 4px; color: var(--muted); font-size: .86rem; }
     .architecture .model-links { margin-top: 14px; font-size: .87rem; }
+    .model-diagram {
+      background: #eff5fa;
+      border: 1px solid #d8e5f0;
+      border-radius: 12px;
+      margin: 16px 0;
+      padding: 16px;
+    }
+    .model-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .model-diagram h3 { margin-bottom: 10px; }
+    .model-card {
+      min-width: 0;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 11px 12px;
+    }
+    .model-card strong { display: block; color: #245374; font-size: .81rem; }
+    .model-diagram .model-card p { margin-top: 4px; font-size: .9rem; overflow-wrap: anywhere; }
+    .model-connector { color: var(--blue); font-size: 1.15rem; text-align: center; line-height: 1.4; }
+    .model-engine, .model-compare {
+      width: fit-content;
+      max-width: 100%;
+      margin-inline: auto;
+      border-radius: 8px;
+      padding: 8px 15px;
+      text-align: center;
+    }
+    .model-engine { background: #112840; color: white; }
+    .model-engine span, .model-compare span { display: block; font-size: .79rem; }
+    .model-engine span { color: #c3ddf2; }
+    .model-compare { background: #e3f1eb; color: #1e5142; border: 1px solid #cde0d9; }
+    .vector {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(0, 1fr);
+      align-items: end;
+      gap: 4px;
+      height: 25px;
+      margin-top: 5px;
+      color: #1d7390;
+    }
+    .vector-record { color: #455aa5; }
+    .vector span { height: var(--height); background: currentColor; border-radius: 2px 2px 0 0; }
+    .model-diagram figcaption { margin-top: 10px; color: var(--muted); font-size: .79rem; text-align: center; }
     code { font-size: .88em; overflow-wrap: anywhere; }
     @media (max-width: 720px) {
       .workspace { grid-template-columns: minmax(0, 1fr); grid-template-areas: "search" "data" "results"; gap: 14px; }
@@ -111,6 +155,9 @@
       .wrap { width: calc(100% - 28px); }
       .panel, article { padding: 16px; }
       .search-fields { flex-direction: column; }
+      .model-diagram { padding: 10px; }
+      .model-pair { gap: 7px; }
+      .model-card { padding: 8px; }
     }
   </style>
 </head>
@@ -176,7 +223,53 @@
     </section>
     <section class="panel" aria-labelledby="model-title">
       <h2 id="model-title">Yapay zekâ modeli</h2>
-      <p><strong>Multilingual E5 Small</strong>, Türkçe ve İngilizce metinler dahil farklı dillerde çalışabilen bir arama modelidir. Metnin anlamını 384 sayıdan oluşan bir vektörle temsil eder. Uygulama araştırma konusunu <code>query:</code>, kayıt başlığı ile varsa özetini <code>passage:</code> önekiyle modele verir.</p>
+      <p><strong>Multilingual E5 Small</strong>, farklı dillerdeki metinlerin anlamını ortak bir sayısal temsile dönüştürür. Böylece Türkçe bir sorgu, ilgili bir İngilizce yayını bulabilir.</p>
+      <figure class="model-diagram" aria-labelledby="model-example">
+        <h3 id="model-example">Bir sorgu ve bir yayın nasıl karşılaştırılır?</h3>
+        <div class="model-pair">
+          <div class="model-card">
+            <strong>Türkçe sorgu</strong>
+            <p>GaN transistörleri</p>
+          </div>
+          <div class="model-card">
+            <strong>İngilizce yayın başlığı</strong>
+            <p>Normally-off AlGaN/GaN MIS-HEMT with low gate leakage current…</p>
+          </div>
+        </div>
+        <div class="model-connector" aria-hidden="true">↓</div>
+        <div class="model-engine">
+          <strong>Multilingual E5 Small</strong>
+          <span>Her metin için 384 sayılık vektör</span>
+        </div>
+        <div class="model-connector" aria-hidden="true">↓</div>
+        <div class="model-pair">
+          <div class="model-card">
+            <strong>Sorgu vektörü</strong>
+            <div class="vector" aria-hidden="true">
+              <span style="--height: 32%"></span><span style="--height: 65%"></span>
+              <span style="--height: 87%"></span><span style="--height: 46%"></span>
+              <span style="--height: 53%"></span><span style="--height: 24%"></span>
+              <span style="--height: 71%"></span><span style="--height: 44%"></span>
+            </div>
+          </div>
+          <div class="model-card">
+            <strong>Yayın vektörü</strong>
+            <div class="vector vector-record" aria-hidden="true">
+              <span style="--height: 26%"></span><span style="--height: 55%"></span>
+              <span style="--height: 81%"></span><span style="--height: 54%"></span>
+              <span style="--height: 45%"></span><span style="--height: 32%"></span>
+              <span style="--height: 78%"></span><span style="--height: 37%"></span>
+            </div>
+          </div>
+        </div>
+        <div class="model-connector" aria-hidden="true">↓</div>
+        <div class="model-compare">
+          <strong>Kosinüs benzerliği</strong>
+          <span>Vektörlerin yönleri ne kadar yakınsa skor o kadar yüksek.</span>
+        </div>
+        <figcaption>Çubuklar vektörleri şematik olarak gösterir.</figcaption>
+      </figure>
+      <p>Uygulama araştırma konusunu <code>query:</code>, kayıt başlığını ve varsa özetini <code>passage:</code> önekiyle modele verir.</p>
       <p>İlk aramada Transformers.js ve model dosyaları indirilir. Modelin 8 bitlik ONNX sürümü WebAssembly ile tarayıcıda çalışır. Arama metni ve yüklediğiniz kayıtlar cihazınızda işlenir.</p>
       <p class="model-links"><a href="https://huggingface.co/intfloat/multilingual-e5-small">Model kartı</a> · <a href="https://huggingface.co/Xenova/multilingual-e5-small">Tarayıcıda kullanılan ONNX sürümü</a></p>
     </section>
