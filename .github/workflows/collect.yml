@@ -1,6 +1,11 @@
 name: Collect AVESIS metadata
 on:
   workflow_dispatch:
+    inputs:
+      discover_department:
+        description: 'Discover department profiles (only if robots.txt permits)'
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -17,6 +22,8 @@ jobs:
           python-version: '3.12'
       - run: pip install -r requirements.txt
       - run: python scripts/collect.py
+        env:
+          DISCOVER_DEPARTMENT: ${{ inputs.discover_department }}
       - uses: actions/upload-artifact@v4
         with:
           name: academics
