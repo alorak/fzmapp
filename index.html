@@ -2275,14 +2275,21 @@
       });
     }
 
-    // The dimensions that add most to the similarity: both vectors are large there and point the same way.
-    const highlightCount = 40;
-    function agreement(query, match) {
-      return Array.from(query, (value, i) => [i, value * match[i]])
-        .filter(([, product]) => product > 0)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, highlightCount)
-        .map(([i]) => i);
+    // A dimension "overlaps" when both vectors (relative to the average record) are noticeable there,
+    // point the same way and have a similar size. Identical meanings overlap almost everywhere, unrelated ones rarely.
+    function overlap(query, match) {
+      const sorted = [...query, ...match].map(Math.abs).sort((a, b) => a - b);
+      const noticeable = .2 * (sorted[Math.floor(sorted.length * .98)] || 1);
+      const shared = [];
+      let counted = 0;
+      query.forEach((a, i) => {
+        const b = match[i];
+        const larger = Math.max(Math.abs(a), Math.abs(b));
+        if (larger < noticeable) return;
+        counted++;
+        if (a * b > 0 && Math.min(Math.abs(a), Math.abs(b)) >= .5 * larger) shared.push(i);
+      });
+      return {shared, counted};
     }
 
     function drawFingerprint(id, values, color, highlighted = []) {
@@ -2313,17 +2320,20 @@
       svg.replaceChildren(...bands, ...bars);
     }
 
-    function showFingerprint({queryText, queryVector, match}) {
+    function showFingerprint({queryText, queryVector, match, average}) {
       if (!queryVector || !match) return;
-      const shared = agreement(queryVector, match.vector);
-      drawFingerprint('fp-query', queryVector, '#e0a100', shared);
-      drawFingerprint('fp-match', match.vector, '#1b4f9c', shared);
+      const centre = vector => average ? vector.map((value, i) => value - average[i]) : vector;
+      const query = centre(queryVector);
+      const record = centre(match.vector);
+      const {shared, counted} = overlap(query, record);
+      drawFingerprint('fp-query', query, '#e0a100', shared);
+      drawFingerprint('fp-match', record, '#1b4f9c', shared);
       const note = $('fp-note');
       note.replaceChildren(
         `Model “${queryText}” sorgusunu ${queryVector.length} sayıya çevirdi. Desene en çok benzeyen kayıt: `,
         element('strong', match.title),
         ` (uygunluk ${formatPercent.format(relevance(match.score))}). `,
-        element('span', `Yeşil şeritler, iki desenin aynı yönde güçlü olduğu ve benzerliğe en çok katkı veren ${highlightCount} sayıyı gösterir.`, 'fp-legend'),
+        element('span', `Yeşil: iki desenin aynı yönde ve benzer büyüklükte olduğu yerler. Örtüşme: ${shared.length} / ${counted} belirgin sayı (${formatPercent.format(counted ? shared.length / counted : 0)}). Desenler, her metinde ortak olan kısım çıkarılarak çizilir.`, 'fp-legend'),
       );
       $('fingerprint').hidden = false;
     }
@@ -2338,12 +2348,12 @@
       clearResults();
       setStatus('Arama hazırlanıyor…');
       try {
-        const {results: sorted, queryVector, match, baseline} = await searchInBackground(queryText);
+        const {results: sorted, queryVector, match, baseline, average} = await searchInBackground(queryText);
         lastSearch = {queryText, baseline, byFaculty: new Map(sorted.map(group => [group.name, group.items]))};
         const weak = !sorted.length || relevance(sorted[0].score) < weakRelevance;
         $('weak-note').hidden = !weak;
         $('results').append(...sorted.map(renderResult));
-        showFingerprint({queryText, queryVector, match});
+        showFingerprint({queryText, queryVector, match, average});
         setStatus(weak
           ? `“${queryText}” için belirgin bir eşleşme bulunamadı.`
           : `${sorted.length} akademisyen sıralandı. Yüzde, çalışmanın bu aramada bölümdeki diğer kayıtlara göre ne kadar öne çıktığını gösterir.`);
