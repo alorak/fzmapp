@@ -4,177 +4,521 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Akademik uzmanlık arama | Ankara Üniversitesi</title>
+  <meta name="description" content="Ankara Üniversitesi Fizik Mühendisliği akademisyenlerini araştırma konusuna göre bulun.">
+  <link rel="preload" href="fonts/source-sans-3-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <style>
+    /* Fonts: Source Serif 4 and Source Sans 3 (SIL OFL 1.1, see fonts/OFL.txt) */
+    @font-face {
+      font-family: 'Source Serif 4'; font-style: normal; font-display: swap; font-weight: 200 900;
+      src: url(fonts/source-serif-4-latin-ext-wght-normal.woff2) format('woff2-variations');
+      unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF;
+    }
+    @font-face {
+      font-family: 'Source Serif 4'; font-style: normal; font-display: swap; font-weight: 200 900;
+      src: url(fonts/source-serif-4-latin-wght-normal.woff2) format('woff2-variations');
+      unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+    }
+    @font-face {
+      font-family: 'Source Sans 3'; font-style: normal; font-display: swap; font-weight: 200 900;
+      src: url(fonts/source-sans-3-latin-ext-wght-normal.woff2) format('woff2-variations');
+      unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF;
+    }
+    @font-face {
+      font-family: 'Source Sans 3'; font-style: normal; font-display: swap; font-weight: 200 900;
+      src: url(fonts/source-sans-3-latin-wght-normal.woff2) format('woff2-variations');
+      unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+    }
+
     :root {
       color-scheme: light;
-      --ink: #14283f;
-      --muted: #506278;
-      --blue: #15549b;
-      --line: #dce4ed;
+      --ink: #0f2742;
+      --ink-2: #2b4462;
+      --muted: #56687d;
+      --paper: #f4f7fb;
       --surface: #fff;
-      --background: #f3f6f9;
+      --line: #d8e1eb;
+      --line-strong: #a9b8c9;
+      --blue: #1b4f9c;
+      --blue-soft: #e7eef8;
+      --amber: #e0a100;
+      --amber-ink: #6e4b00;
+      --amber-soft: #fdf3d7;
+      --green: #1e6b52;
+      --green-soft: #e3f1eb;
+      --red: #a0242c;
+      --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+      --sans: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --radius-lg: 16px;
+      --radius: 10px;
+      --radius-sm: 6px;
     }
     * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
     body {
       margin: 0;
-      background: var(--background);
+      background: var(--paper);
       color: var(--ink);
-      font: 16px/1.55 system-ui, sans-serif;
+      font: 17px/1.6 var(--sans);
+      font-kerning: normal;
     }
-    .wrap { width: min(1040px, calc(100% - 40px)); margin-inline: auto; }
-    .masthead { background: #112840; color: var(--surface); padding: 38px 0 59px; }
-    .masthead-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px 20px; margin-bottom: 14px; }
-    .institution { margin: 0; color: #b6d4ee; font-size: .88rem; font-weight: 650; }
-    .navigation { display: flex; flex-wrap: wrap; gap: 6px; }
-    .navigation a { color: #dceafa; padding: 6px 10px; border-radius: 6px; font-size: .84rem; font-weight: 650; }
-    .navigation a[aria-current="page"] { background: #29445f; color: white; text-decoration: none; }
-    h1 { margin: 0; font-size: clamp(1.95rem, 5vw, 3.1rem); letter-spacing: -.045em; line-height: 1.12; }
+    .wrap { width: min(1080px, calc(100% - 48px)); margin-inline: auto; }
+    a { color: var(--blue); text-underline-offset: .18em; text-decoration-thickness: 1px; }
+    a:hover { text-decoration-thickness: 2px; }
+    :focus-visible { outline: 3px solid #4f8fdb; outline-offset: 3px; }
+    code { font: .86em/1 ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace; background: var(--blue-soft); padding: .12em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+    h1, h2 { font-family: var(--serif); font-weight: 600; }
+    h1 { margin: 0; font-size: clamp(2.25rem, 5.4vw, 3.6rem); line-height: 1.06; letter-spacing: -.018em; }
     h1:focus { outline: none; }
-    h2 { margin: 0; font-size: 1.15rem; letter-spacing: -.015em; }
-    h3 { margin: 0; font-size: 1rem; }
+    h2 { margin: 0; font-size: clamp(1.55rem, 3vw, 2.05rem); line-height: 1.18; letter-spacing: -.01em; }
+    h3 { margin: 0; font-size: 1.08rem; line-height: 1.3; }
+    p { margin: 0; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+    /* Masthead with a millimetre-paper grid */
+    .masthead {
+      color: #fff;
+      background-color: var(--ink);
+      background-image:
+        linear-gradient(rgba(255,255,255,.065) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.065) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px);
+      background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+      background-position: -1px -1px;
+      padding: 26px 0 96px;
+    }
+    .masthead-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px 24px; margin-bottom: 52px; }
+    .institution { display: flex; align-items: center; gap: 10px; color: #c6dbf1; font-size: .95rem; font-weight: 600; }
+    .institution svg { flex: none; }
+    .navigation { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.08); }
+    .navigation a { color: #dceafa; padding: 6px 16px; border-radius: 999px; font-size: .95rem; font-weight: 600; text-decoration: none; }
+    .navigation a:hover { background: rgba(255,255,255,.1); }
+    .navigation a[aria-current="page"] { background: #fff; color: var(--ink); }
+    .lead { margin-top: 14px; max-width: 58ch; color: #c6dbf1; font-size: 1.15rem; line-height: 1.5; }
+
+    /* ---------- Search page ---------- */
     .workspace {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 280px;
+      grid-template-columns: minmax(0, 1fr) 300px;
       grid-template-areas: "search data" "results data";
       align-items: start;
-      gap: 22px;
-      margin-block: -30px 40px;
+      gap: 24px 28px;
+      margin-block: -64px 64px;
     }
-    .panel, article {
+    .workspace[hidden], .architecture[hidden] { display: none; }
+    .panel {
       background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 22px;
+      border-radius: var(--radius-lg);
+      padding: 26px;
     }
-    .search-panel { grid-area: search; }
+    .search-panel { grid-area: search; box-shadow: 0 18px 40px -24px rgba(15,39,66,.45); }
     .data-panel { grid-area: data; }
-    #results { grid-area: results; display: grid; gap: 12px; }
-    .search-fields { display: flex; gap: 10px; margin-top: 8px; }
-    label { display: block; font-size: .9rem; font-weight: 650; }
+    .results-area { grid-area: results; min-width: 0; }
+    label { display: block; font-size: 1rem; font-weight: 700; }
     button, input { font: inherit; }
+    .search-fields {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 6px;
+      border: 1.5px solid var(--line-strong);
+      border-radius: 12px;
+      background: #fff;
+    }
+    .search-fields:focus-within { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(27,79,156,.14); }
+    .search-fields:has(input:focus-visible) { outline: none; }
     input[type="search"] {
       min-width: 0;
       flex: 1;
-      border: 1px solid #aab9ca;
-      border-radius: 8px;
+      border: 0;
+      background: transparent;
       color: var(--ink);
-      padding: 11px 12px;
+      font-size: 1.15rem;
+      padding: 8px 10px;
     }
+    input[type="search"]:focus { outline: none; }
+    input::placeholder { color: #7d8ea2; }
     button {
       border: 1px solid var(--blue);
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
       background: var(--blue);
-      color: white;
+      color: #fff;
       cursor: pointer;
       font-weight: 650;
-      padding: 10px 15px;
+      padding: 9px 16px;
     }
-    button:disabled { opacity: .52; cursor: default; }
-    .data-actions { display: grid; justify-items: start; gap: 10px; }
-    .data-actions button { font-size: .85rem; }
-    .secondary { background: white; border-color: #aab9ca; color: var(--ink); }
-    :focus-visible { outline: 3px solid #377dcc; outline-offset: 3px; }
-    #status, #source { margin: 12px 0 0; color: var(--muted); font-size: .88rem; }
-    #status[data-error="true"] { color: #a0242c; }
-    .model-status {
-      margin-top: 15px;
-      border-top: 1px solid var(--line);
-      padding-top: 12px;
-      font-size: .84rem;
+    button:hover:not(:disabled) { background: #163f7d; border-color: #163f7d; }
+    button:disabled { opacity: .5; cursor: default; }
+    #go { padding-inline: 22px; border-radius: 8px; }
+    .examples { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; font-size: .95rem; color: var(--muted); }
+    .examples button {
+      background: var(--blue-soft);
+      border-color: transparent;
+      color: var(--blue);
+      font-weight: 600;
+      padding: 3px 12px;
+      border-radius: 999px;
     }
-    .model-status-line { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; }
-    #model-state, #model-transfer { color: var(--muted); }
-    #model-state[data-state="ready"] { color: #1e5142; font-weight: 650; }
-    #model-state[data-state="error"] { color: #a0242c; }
-    .model-size { color: var(--muted); }
-    progress { width: 100%; height: 7px; margin: 4px 0; accent-color: var(--blue); }
+    .examples button:hover:not(:disabled) { background: #d6e3f4; border-color: transparent; }
+    #status { margin-top: 14px; color: var(--muted); font-size: .97rem; }
+    #status[data-error="true"] { color: var(--red); }
+    progress { width: 100%; height: 6px; margin: 8px 0 0; accent-color: var(--blue); }
     progress[hidden] { display: none; }
-    #count { margin: 12px 0 2px; font-size: 1rem; font-weight: 700; }
-    #breakdown { margin: 0 0 16px; color: var(--muted); font-size: .87rem; }
-    #source { margin-top: 0; }
-    .roster { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 12px; font-size: .87rem; }
-    .roster summary { cursor: pointer; color: var(--blue); font-weight: 650; }
-    .roster ul { margin: 8px 0 0; padding-inline-start: 18px; }
-    .roster li + li { margin-top: 5px; }
-    .result-heading, .record-meta { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
-    .result-heading { justify-content: space-between; }
-    .score { color: var(--muted); font-size: .82rem; font-variant-numeric: tabular-nums; }
-    .record-list { list-style: none; margin: 11px 0 0; padding: 0; }
-    .record-list li { border-top: 1px solid var(--line); padding: 11px 0; overflow-wrap: anywhere; }
-    .record-list li:last-child { padding-bottom: 0; }
-    .record-kind { color: var(--muted); font-size: .78rem; font-weight: 680; }
-    .record-title { margin: 3px 0 0; }
-    a { color: var(--blue); text-underline-offset: .17em; }
-    .architecture { margin-block: -30px 40px; display: grid; gap: 16px; }
-    .workspace[hidden], .architecture[hidden] { display: none; }
-    .architecture p { max-width: 72ch; margin: 8px 0 0; }
-    .flow {
+    .model-status {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      margin: 14px 0 0;
-      padding: 0;
-      list-style: none;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 0 12px;
+      margin-top: 18px;
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+      font-size: .93rem;
     }
-    .flow li { background: var(--background); border: 1px solid var(--line); border-radius: 10px; padding: 13px; }
-    .flow p { margin-top: 4px; color: var(--muted); font-size: .86rem; }
-    .architecture .model-links { margin-top: 14px; font-size: .87rem; }
-    .model-diagram {
-      background: #eff5fa;
-      border: 1px solid #d8e5f0;
-      border-radius: 12px;
-      margin: 16px 0;
-      padding: 16px;
-    }
-    .model-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .model-diagram h3 { margin-bottom: 10px; }
-    .model-card {
-      min-width: 0;
+    .model-chip { grid-row: span 3; width: 38px; height: 38px; border-radius: 9px; background: var(--blue-soft); color: var(--blue); display: grid; place-items: center; }
+    .model-status-line { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; }
+    #model-state { color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+    #model-state::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--line-strong); }
+    #model-state[data-state="ready"] { color: var(--green); font-weight: 650; }
+    #model-state[data-state="ready"]::before, #model-state[data-state="cached"]::before { background: var(--green); }
+    #model-state[data-state="downloading"]::before, #model-state[data-state="loading"]::before, #model-state[data-state="initializing"]::before { background: var(--amber); }
+    #model-state[data-state="error"] { color: var(--red); }
+    #model-state[data-state="error"]::before { background: var(--red); }
+    .model-meta { color: var(--muted); }
+    .model-meta a { color: inherit; }
+    #model-transfer { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+    .data-panel h2 { font-size: 1.3rem; }
+    #source { margin-top: 4px; color: var(--muted); font-size: .95rem; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0 6px; }
+    .stat { background: var(--paper); border-radius: var(--radius); padding: 10px 12px; }
+    .stat strong { display: block; font: 600 1.6rem/1.1 var(--serif); font-variant-numeric: lining-nums tabular-nums; }
+    .stat span { color: var(--muted); font-size: .9rem; }
+    #count { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    #breakdown { margin: 0 0 18px; color: var(--muted); font-size: .93rem; }
+    .data-actions { display: grid; gap: 8px; }
+    .data-actions button { font-size: .95rem; text-align: left; }
+    .secondary { background: #fff; border-color: var(--line-strong); color: var(--ink); }
+    button.secondary:hover:not(:disabled) { background: var(--paper); border-color: var(--line-strong); }
+    .roster { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 14px; font-size: .95rem; }
+    .roster summary { cursor: pointer; color: var(--blue); font-weight: 650; }
+    .roster ul { margin: 10px 0 0; padding: 0; list-style: none; columns: 1; }
+    .roster li { padding: 5px 0; border-bottom: 1px dashed var(--line); }
+
+    /* Results */
+    #results { display: grid; gap: 14px; counter-reset: rank; }
+    #results article {
+      counter-increment: rank;
+      position: relative;
       background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 11px 12px;
+      border-radius: var(--radius-lg);
+      padding: 22px 24px 18px 76px;
     }
-    .model-card strong { display: block; color: #245374; font-size: .81rem; }
-    .model-diagram .model-card p { margin-top: 4px; font-size: .9rem; overflow-wrap: anywhere; }
-    .model-connector { color: var(--blue); font-size: 1.15rem; text-align: center; line-height: 1.4; }
-    .model-engine, .model-compare {
-      width: fit-content;
-      max-width: 100%;
-      margin-inline: auto;
-      border-radius: 8px;
-      padding: 8px 15px;
-      text-align: center;
-    }
-    .model-engine { background: #112840; color: white; }
-    .model-engine span, .model-compare span { display: block; font-size: .79rem; }
-    .model-engine span { color: #c3ddf2; }
-    .model-compare { background: #e3f1eb; color: #1e5142; border: 1px solid #cde0d9; }
-    .vector {
+    #results article::before {
+      content: counter(rank);
+      position: absolute;
+      left: 22px;
+      top: 18px;
+      width: 38px;
+      height: 38px;
       display: grid;
-      grid-auto-flow: column;
-      grid-auto-columns: minmax(0, 1fr);
-      align-items: end;
-      gap: 4px;
-      height: 25px;
-      margin-top: 5px;
-      color: #1d7390;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font: 600 1.15rem/1 var(--serif);
     }
-    .vector-record { color: #455aa5; }
-    .vector span { height: var(--height); background: currentColor; border-radius: 2px 2px 0 0; }
-    .model-diagram figcaption { margin-top: 10px; color: var(--muted); font-size: .79rem; text-align: center; }
-    code { font-size: .88em; overflow-wrap: anywhere; }
-    @media (max-width: 720px) {
-      .workspace { grid-template-columns: minmax(0, 1fr); grid-template-areas: "search" "data" "results"; gap: 14px; }
-      .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #results article:first-child::before { background: var(--blue); color: #fff; }
+    .result-heading, .record-meta { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+    .result-heading { justify-content: space-between; }
+    .result-heading h2 { font-size: 1.3rem; }
+    .score { color: var(--muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
+    .result-heading .score { background: var(--paper); padding: 2px 10px; border-radius: 999px; }
+    .record-list { list-style: none; margin: 12px 0 0; padding: 0; }
+    .record-list li { border-top: 1px solid var(--line); padding: 11px 0; overflow-wrap: anywhere; }
+    .record-list li:last-child { padding-bottom: 0; }
+    .record-kind { font-size: .8rem; font-weight: 700; color: var(--blue); background: var(--blue-soft); padding: 1px 8px; border-radius: 4px; }
+    .record-kind[data-kind="thesis"] { color: var(--amber-ink); background: var(--amber-soft); }
+    .record-title { margin: 4px 0 0; line-height: 1.45; }
+    .record-title a { color: var(--ink); text-decoration-color: var(--line-strong); }
+    .record-title a:hover { color: var(--blue); text-decoration-color: currentColor; }
+
+    .empty-hint {
+      border: 1.5px dashed var(--line-strong);
+      border-radius: var(--radius-lg);
+      padding: 26px;
     }
-    @media (max-width: 420px) {
-      .wrap { width: calc(100% - 28px); }
-      .panel, article { padding: 16px; }
+    #results:not(:empty) + .empty-hint { display: none; }
+    .empty-hint h2 { font-size: 1.3rem; }
+    .mini-steps { list-style: none; margin: 18px 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; counter-reset: mini; }
+    .mini-steps li { counter-increment: mini; display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; color: var(--ink-2); font-size: .97rem; line-height: 1.45; }
+    .mini-steps li::before { content: counter(mini); width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--blue-soft); color: var(--blue); font: 600 .95rem/1 var(--serif); }
+
+    /* ---------- How it works page ---------- */
+    .architecture { margin-block: -64px 80px; }
+    .journey {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 26px 26px 22px;
+      box-shadow: 0 18px 40px -24px rgba(15,39,66,.45);
+    }
+    .journey h2 { font-size: 1.35rem; }
+    .journey-steps { list-style: none; margin: 20px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+    .journey-steps li { position: relative; padding: 0 22px 0 0; }
+    .journey-steps li:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 27px;
+      left: 66px;
+      right: 14px;
+      border-top: 2px dashed var(--line-strong);
+    }
+    .journey-steps li:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      top: 22px;
+      right: 12px;
+      border: 6px solid transparent;
+      border-left: 8px solid var(--line-strong);
+    }
+    .journey-icon { width: 56px; height: 56px; border-radius: 14px; display: grid; place-items: center; background: var(--blue-soft); color: var(--blue); margin-bottom: 12px; position: relative; z-index: 1; }
+    .journey-steps li:nth-child(3) .journey-icon { background: var(--ink); color: #fff; }
+    .journey-steps p { margin-top: 4px; color: var(--muted); font-size: .95rem; line-height: 1.45; }
+    .journey-note { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: .95rem; }
+
+    .chapter { margin-top: 72px; }
+    .chapter > header { max-width: 680px; }
+    .chapter > header p { margin-top: 12px; font-size: 1.12rem; color: var(--ink-2); }
+    .prose { max-width: 680px; }
+    .prose p { margin-top: 14px; }
+    .kicker { display: block; margin-bottom: 8px; color: var(--blue); font-weight: 700; font-size: .98rem; }
+
+    figure { margin: 0; }
+    .figure {
+      margin-top: 28px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+    .figure figcaption { margin-top: 16px; color: var(--muted); font-size: .92rem; line-height: 1.5; }
+    .figure h3 { margin-bottom: 14px; }
+
+    /* Keyword vs meaning */
+    .versus { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+    .versus-col { border-radius: var(--radius); padding: 18px; background: var(--paper); }
+    .versus-col h3 { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .versus-pair { display: grid; gap: 6px; }
+    .text-q, .text-d {
+      border-radius: 8px;
+      padding: 8px 12px;
+      background: #fff;
+      border: 1px solid var(--line);
+      font-size: .98rem;
+      line-height: 1.4;
+    }
+    .text-q { border-left: 4px solid var(--amber); }
+    .text-d { border-left: 4px solid var(--blue); }
+    .text-q small, .text-d small { display: block; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    .verdict { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; font-size: .97rem; line-height: 1.45; }
+    .verdict svg { flex: none; margin-top: 2px; }
+    .verdict.bad { color: var(--red); }
+    .verdict.good { color: var(--green); }
+    .verdict span { color: var(--ink-2); }
+    .tag { display: inline-block; padding: 0 4px; border-radius: 3px; background: #f6d9db; text-decoration: line-through; text-decoration-color: rgba(160,36,44,.5); }
+    .tag-ok { background: var(--green-soft); text-decoration: none; }
+
+    /* Steps */
+    .steps { list-style: none; margin: 36px 0 0; padding: 0; display: grid; gap: 22px; counter-reset: step; }
+    .step {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 28px;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+    }
+    .step-text h3 { display: flex; align-items: center; gap: 12px; font-family: var(--serif); font-size: 1.32rem; font-weight: 600; }
+    .step-text h3::before {
+      content: counter(step);
+      flex: none;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      background: var(--ink);
+      color: #fff;
+      font: 600 1.05rem/1 var(--serif);
+    }
+    .step-text p { margin-top: 10px; color: var(--ink-2); }
+    .step-text .aside { margin-top: 12px; font-size: .93rem; color: var(--muted); }
+    .step-visual { min-width: 0; background: var(--paper); border-radius: var(--radius); padding: 20px; }
+    .step-visual svg { display: block; width: 100%; height: auto; }
+    .vis-label { color: var(--muted); font-size: .85rem; font-weight: 600; }
+    .vis-note { margin-top: 10px; color: var(--muted); font-size: .85rem; text-align: center; }
+
+    .sentence { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .sentence-in { font: 600 1.35rem/1.2 var(--serif); padding: 8px 14px; background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--amber); border-radius: 8px; }
+    .scissors { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: .9rem; margin: 12px 0; }
+    .scissors::before, .scissors::after { content: ""; flex: 1; border-top: 2px dashed var(--line-strong); }
+    .tokens { display: flex; flex-wrap: wrap; gap: 6px; }
+    .token { font: 600 1.02rem/1 var(--sans); padding: 9px 11px; border-radius: 7px; background: #fff; border: 1.5px solid var(--blue); color: var(--blue); }
+    .token.prefix { border-style: dashed; border-color: var(--amber); color: var(--amber-ink); background: var(--amber-soft); }
+    .token.alt { border-color: #5b7fbf; color: #3d5f9e; }
+
+    .wave { display: block; width: 100%; height: 56px; }
+    .wave-row { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; align-items: center; }
+    .wave-row + .wave-row { margin-top: 10px; }
+    .wave-row .vis-label { line-height: 1.25; }
+    .pool { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .pool-col { display: grid; justify-items: center; gap: 6px; }
+    .pool-bars { display: flex; align-items: flex-end; gap: 2px; height: 46px; padding: 4px 6px; background: #fff; border: 1px solid var(--line); border-radius: 6px; }
+    .pool-bars i { display: block; width: 5px; background: #8aa6d1; border-radius: 1px; }
+    .pool-col span { font-size: .82rem; color: var(--muted); font-weight: 600; }
+    .merge { display: grid; justify-items: center; color: var(--muted); font-size: .88rem; font-weight: 600; margin: 8px 0; }
+    .merge svg { width: 100%; max-width: 360px; height: 34px; }
+    .numbers { margin-top: 10px; font: .82rem/1.4 ui-monospace, Menlo, Consolas, monospace; color: var(--ink-2); text-align: center; overflow-wrap: anywhere; }
+
+    .compare-out { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-top: 6px; font-size: .9rem; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-weight: 650; }
+    .pill.good { background: var(--green-soft); color: var(--green); }
+    .pill.bad { background: #f3e3e4; color: var(--red); }
+
+    /* Meaning map: the centrepiece */
+    .map-figure { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
+    .map-controls { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .map-controls > span { color: var(--muted); font-size: .95rem; margin-right: 4px; }
+    .map-controls button { background: #fff; color: var(--ink); border: 1.5px solid var(--line-strong); border-radius: 999px; padding: 5px 14px; font-weight: 600; }
+    .map-controls button:hover { background: var(--paper); border-color: var(--line-strong); }
+    .map-controls button[aria-pressed="true"] { background: var(--amber-soft); border-color: var(--amber); color: var(--amber-ink); }
+    .map-canvas { position: relative; border-radius: var(--radius); overflow: hidden; background: #fbfcfe; border: 1px solid var(--line); }
+    .map-canvas svg { display: block; width: 100%; height: auto; }
+    .map-grid line { stroke: #e9eff6; }
+    .cluster-blob { fill: var(--blue); opacity: .06; }
+    .cluster-name { font: 700 13px var(--sans); fill: #50688a; }
+    .doc-dot { fill: #fff; stroke: var(--blue); stroke-width: 2.5; transition: r .3s, fill .3s; }
+    .doc-dot.near { fill: var(--blue); }
+    .near-line { stroke: var(--amber); stroke-width: 2; stroke-dasharray: 5 4; transition: opacity .3s; }
+    .query-mark { transition: transform .7s cubic-bezier(.3,.9,.3,1.1); }
+    .query-star { fill: var(--amber); stroke: #fff; stroke-width: 2; }
+    .map-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 8px 14px; border-top: 1px solid var(--line); background: #fff; color: var(--muted); font-size: .88rem; font-weight: 600; }
+    .map-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; border: 2.5px solid var(--blue); background: #fff; }
+    .legend-dot.near { background: var(--blue); }
+    .near-list h3 { font-size: 1rem; }
+    .near-list ol { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; counter-reset: near; }
+    .near-list li { counter-increment: near; display: grid; grid-template-columns: auto 1fr; gap: 10px; font-size: .93rem; line-height: 1.4; }
+    .near-list li::before { content: counter(near); width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--blue); color: #fff; font: 600 .85rem/1 var(--serif); }
+    .near-list small { display: block; color: var(--muted); margin-top: 2px; }
+    .near-list .lang { display: inline-block; font-size: .75rem; font-weight: 700; color: var(--muted); border: 1px solid var(--line-strong); border-radius: 3px; padding: 0 4px; margin-right: 4px; }
+
+    /* Cosine angles */
+    .angles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .angle { background: var(--paper); border-radius: var(--radius); padding: 14px 14px 16px; text-align: center; }
+    .angle svg { width: 100%; max-width: 200px; height: auto; display: block; margin: 0 auto; }
+    .angle strong { display: block; margin-top: 4px; }
+    .angle span { display: block; color: var(--muted); font-size: .9rem; }
+    .meter { height: 8px; margin: 10px auto 0; max-width: 160px; border-radius: 4px; background: #dfe6ee; overflow: hidden; }
+    .meter i { display: block; height: 100%; background: var(--green); border-radius: 4px; }
+    .callout { margin-top: 18px; display: grid; grid-template-columns: auto 1fr; gap: 12px; padding: 14px 16px; border-radius: var(--radius); background: var(--amber-soft); color: #4a3500; font-size: .96rem; }
+
+    /* Device diagram */
+    .device { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 0; align-items: stretch; }
+    .cloud-col { display: grid; gap: 12px; align-content: center; padding-right: 0; }
+    .ext { position: relative; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; font-size: .92rem; line-height: 1.35; }
+    .ext strong { display: block; }
+    .ext span { color: var(--muted); }
+    .ext::after { content: ""; position: absolute; right: -40px; top: 50%; width: 38px; border-top: 2px solid var(--blue); }
+    .ext::before { content: ""; position: absolute; right: -42px; top: calc(50% - 5px); border: 6px solid transparent; border-left: 8px solid var(--blue); }
+    .device-box { margin-left: 44px; border: 2px solid var(--ink); border-radius: 14px; overflow: hidden; background: #fff; }
+    .device-bar { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--ink); color: #fff; font-size: .9rem; font-weight: 600; }
+    .device-bar i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.35); }
+    .device-bar i:nth-of-type(3) { margin-right: 6px; }
+    .device-body { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 16px; }
+    .dev-part { border-radius: var(--radius); padding: 12px; background: var(--paper); font-size: .92rem; line-height: 1.4; }
+    .dev-part strong { display: block; margin-bottom: 2px; }
+    .dev-part span { color: var(--muted); }
+    .dev-part.model { background: var(--ink); color: #fff; }
+    .dev-part.model span { color: #c6dbf1; }
+    .device-foot svg { flex: none; }
+    .device-foot { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-top: 1px solid var(--line); color: var(--green); font-weight: 650; font-size: .95rem; }
+
+    /* Ranking example */
+    .rank-example { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: center; }
+    .bars { display: grid; gap: 7px; }
+    .bar-row { display: grid; grid-template-columns: 72px minmax(0, 1fr) 48px; gap: 10px; align-items: center; font-size: .9rem; }
+    .bar-row > span:first-child { color: var(--muted); }
+    .bar-track { height: 18px; background: #e9eef4; border-radius: 4px; overflow: hidden; }
+    .bar-track i { display: block; height: 100%; background: #8aa6d1; border-radius: 4px; }
+    .bar-row.best .bar-track i { background: var(--blue); }
+    .bar-row.skip { opacity: .45; }
+    .bar-row.skip .bar-track i { background: #b9c5d3; }
+    .bar-row b { font-variant-numeric: tabular-nums; font-weight: 650; text-align: right; }
+    .formula { display: grid; gap: 10px; }
+    .formula-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 1.02rem; }
+    .formula-box { padding: 8px 12px; border-radius: 8px; background: var(--paper); line-height: 1.3; }
+    .formula-box small { display: block; color: var(--muted); font-size: .8rem; }
+    .formula-box.best { background: var(--blue-soft); }
+    .formula-total { margin-top: 6px; padding: 14px 16px; border-radius: var(--radius); background: var(--ink); color: #fff; }
+    .formula-total strong { font: 600 1.6rem/1 var(--serif); }
+    .formula-total span { display: block; color: #c6dbf1; font-size: .9rem; margin-top: 4px; }
+
+    .links { margin-top: 18px; font-size: .97rem; }
+    .site-footer { border-top: 1px solid var(--line); padding: 22px 0 40px; color: var(--muted); font-size: .9rem; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .query-mark, .doc-dot, .near-line { transition: none; }
+    }
+    @media (max-width: 900px) {
+      .step { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+      .map-figure { grid-template-columns: minmax(0, 1fr); }
+      .rank-example { grid-template-columns: minmax(0, 1fr); }
+      .device { grid-template-columns: minmax(0, 1fr); }
+      .cloud-col { grid-template-columns: 1fr 1fr; margin-bottom: 40px; }
+      .ext::after { right: auto; left: 50%; top: auto; bottom: -38px; width: 0; height: 36px; border-top: 0; border-left: 2px solid var(--blue); }
+      .ext::before { right: auto; left: calc(50% - 5px); top: auto; bottom: -44px; border: 6px solid transparent; border-top: 8px solid var(--blue); }
+      .device-box { margin-left: 0; }
+    }
+    @media (max-width: 760px) {
+      body { font-size: 16px; }
+      .wrap { width: calc(100% - 32px); }
+      .masthead { padding-bottom: 84px; }
+      .masthead-top { margin-bottom: 36px; }
+      .workspace { grid-template-columns: minmax(0, 1fr); grid-template-areas: "search" "results" "data"; gap: 16px; }
+      .journey-steps { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+      .journey-steps li { display: grid; grid-template-columns: 56px 1fr; gap: 0 14px; padding: 0; }
+      .journey-steps li .journey-icon { grid-row: span 2; margin: 0; }
+      .journey-steps li:not(:last-child)::after { top: 60px; bottom: -16px; left: 27px; right: auto; border-top: 0; border-left: 2px dashed var(--line-strong); }
+      .journey-steps li:not(:last-child)::before { display: none; }
+      .versus { grid-template-columns: minmax(0, 1fr); }
+      .angles { grid-template-columns: minmax(0, 1fr); }
+      .angle { display: grid; grid-template-columns: 110px 1fr; gap: 0 14px; align-items: center; text-align: left; }
+      .angle svg { grid-row: span 3; }
+      .angle .meter { margin-inline: 0; }
+      .device-body { grid-template-columns: minmax(0, 1fr); }
+      .mini-steps { grid-template-columns: minmax(0, 1fr); }
+      .chapter { margin-top: 56px; }
+      .cluster-name { font-size: 24px; }
+      .doc-dot { stroke-width: 3.5; }
+      .pool { gap: 6px; flex-wrap: nowrap; }
+      .pool-bars { gap: 1.5px; padding: 3px 4px; height: 40px; }
+      .pool-bars i { width: 4px; }
+    }
+    @media (max-width: 460px) {
+      .panel, .figure, .step, .journey { padding: 18px; }
+      .step-visual { padding: 14px; }
       .search-fields { flex-direction: column; }
-      .model-diagram { padding: 10px; }
-      .model-pair { gap: 7px; }
-      .model-card { padding: 8px; }
+      #go { padding-block: 11px; }
+      #results article { padding: 18px 18px 14px 60px; }
+      #results article::before { left: 14px; top: 16px; width: 32px; height: 32px; font-size: 1rem; }
+      .wave-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+      .cloud-col { grid-template-columns: minmax(0, 1fr); }
+      .cloud-col .ext:first-child::after, .cloud-col .ext:first-child::before { display: none; }
+      .navigation a { padding-inline: 12px; }
     }
   </style>
 </head>
@@ -182,39 +526,58 @@
   <header class="masthead">
     <div class="wrap">
       <div class="masthead-top">
-        <p class="institution">Ankara Üniversitesi · Fizik Mühendisliği</p>
+        <p class="institution">
+          <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="13" cy="13" rx="11" ry="4.2"/><ellipse cx="13" cy="13" rx="11" ry="4.2" transform="rotate(60 13 13)"/><ellipse cx="13" cy="13" rx="11" ry="4.2" transform="rotate(120 13 13)"/><circle cx="13" cy="13" r="1.8" fill="currentColor" stroke="none"/></svg>
+          Ankara Üniversitesi · Fizik Mühendisliği
+        </p>
         <nav class="navigation" aria-label="Ana gezinme">
           <a id="search-link" href="#arama" aria-current="page">Arama</a>
           <a id="architecture-link" href="#nasil-calisir">Nasıl çalışır?</a>
         </nav>
       </div>
       <h1 id="page-title" tabindex="-1">Akademik uzmanlık arama</h1>
+      <p class="lead" id="page-lead">Bir araştırma konusu yazın; bölümde o konuda yayın veya tez çalışması olan akademisyenleri bulun.</p>
     </div>
   </header>
+
   <main id="search-page" class="workspace wrap">
     <section class="panel search-panel" aria-label="Konu arama">
       <form id="search">
         <label for="q">Araştırma konusu</label>
         <div class="search-fields">
-          <input id="q" type="search" required placeholder="Örn. GaN transistörleri" aria-describedby="status">
+          <input id="q" type="search" required placeholder="Örn. GaN transistörleri" aria-describedby="status" autocomplete="off">
           <button id="go" disabled>AI ile ara</button>
         </div>
       </form>
+      <div class="examples" id="examples">
+        <span>Deneyin:</span>
+        <button type="button" disabled>GaN transistörleri</button>
+        <button type="button" disabled>güneş nötrinoları</button>
+        <button type="button" disabled>radyoterapi</button>
+        <button type="button" disabled>doğrusal olmayan optik</button>
+      </div>
       <p id="status" role="status">Veri yükleniyor…</p>
       <progress id="index-progress" aria-label="Kayıt dizini hazırlanıyor" hidden></progress>
       <div class="model-status" aria-label="AI modeli">
+        <span class="model-chip" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>
+        </span>
         <div class="model-status-line">
           <strong>Multilingual E5 Small</strong>
           <span id="model-state" data-state="idle" role="status">Henüz yüklenmedi</span>
         </div>
-        <a class="model-size" href="https://huggingface.co/Xenova/multilingual-e5-small/blob/main/onnx/model_quantized.onnx">Model ağırlıkları ≈118 MB</a>
-        <span id="model-transfer"></span>
+        <span class="model-meta">İlk aramada tarayıcınıza indirilir: <a class="model-size" href="https://huggingface.co/Xenova/multilingual-e5-small/blob/main/onnx/model_quantized.onnx">≈118 MB</a><span id="model-transfer"></span></span>
         <progress id="model-progress" aria-label="Model ağırlıkları yükleniyor" hidden></progress>
       </div>
     </section>
+
     <aside class="panel data-panel" aria-labelledby="data-title">
       <h2 id="data-title">Veri kaynağı</h2>
       <p id="source"></p>
+      <div class="stats" aria-hidden="true">
+        <div class="stat"><strong id="stat-records">–</strong><span>kayıt</span></div>
+        <div class="stat"><strong id="stat-faculty">–</strong><span>akademisyen</span></div>
+      </div>
       <p id="count"></p>
       <p id="breakdown"></p>
       <div class="data-actions">
@@ -228,92 +591,474 @@
         <ul id="faculty-list"></ul>
       </details>
     </aside>
-    <section id="results" aria-label="Arama sonuçları"></section>
+
+    <div class="results-area">
+      <section id="results" aria-label="Arama sonuçları"></section>
+      <section class="empty-hint" aria-labelledby="hint-title">
+        <h2 id="hint-title">Arama kelimeleri değil, anlamı eşleştirir</h2>
+        <ol class="mini-steps">
+          <li>Konuyu Türkçe veya İngilizce, kendi kelimelerinizle yazın.</li>
+          <li>Yapay zekâ modeli sorgunuzu ve her yayın başlığını sayılara çevirir.</li>
+          <li>Anlamca en yakın çalışmaları olan akademisyenler en üstte listelenir.</li>
+        </ol>
+        <a href="#nasil-calisir">Arama nasıl çalışır, adım adım görün</a>
+      </section>
+    </div>
   </main>
+
   <main id="architecture-page" class="architecture wrap" hidden>
-    <section class="panel" aria-labelledby="flow-title">
-      <h2 id="flow-title">Veri akışı</h2>
-      <ol class="flow" role="list">
+    <!-- Overview -->
+    <section class="journey" aria-labelledby="flow-title">
+      <h2 id="flow-title">Bir aramanın yolculuğu</h2>
+      <ol class="journey-steps" role="list">
         <li>
+          <span class="journey-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.8 3.8 5.8 3.8 9s-1.2 6.2-3.8 9c-2.6-2.8-3.8-5.8-3.8-9s1.2-6.2 3.8-9z"/></svg>
+          </span>
           <h3>AVESİS</h3>
           <p>Toplayıcı, tarama kurallarının izin verdiği herkese açık yayın ve tez sayfalarını okur.</p>
         </li>
         <li>
+          <span class="journey-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 2.5h8l4 4V21a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 6 21z"/><path d="M14 2.5V7h4"/><path d="M10.5 11c-1 0-1.2.6-1.2 1.4s-.3 1.3-.9 1.3c.6 0 .9.5.9 1.3s.2 1.5 1.2 1.5M13.5 11c1 0 1.2.6 1.2 1.4s.3 1.3.9 1.3c-.6 0-.9.5-.9 1.3s-.2 1.5-1.2 1.5"/></svg>
+          </span>
           <h3>JSON dosyası</h3>
           <p>Elle başlatılan veri toplama çalıştırması, akademik kayıtları bir dosyaya yazar.</p>
         </li>
         <li>
+          <span class="journey-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>
+          </span>
           <h3>Tarayıcıdaki model</h3>
-          <p>Model, sorguyu ve kayıtların metnini birer sayısal vektöre dönüştürür.</p>
+          <p>Model, sorguyu ve kayıtların metnini birer sayı dizisine (vektöre) dönüştürür.</p>
         </li>
         <li>
+          <span class="journey-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 6h11M9 12h8M9 18h5"/><circle cx="4.5" cy="6" r="1.5"/><circle cx="4.5" cy="12" r="1.5"/><circle cx="4.5" cy="18" r="1.5"/></svg>
+          </span>
           <h3>Arama sonuçları</h3>
           <p>Uygulama, sorguya en yakın kayıtları akademisyene göre gruplar ve sıralar.</p>
         </li>
       </ol>
-      <p>Uygulama ilk açılışta bölümün <code>academics.json</code> dosyasını otomatik yükler. Kendi dosyanızı içe aktarabilir ve “Bölüm verisini yükle” düğmesiyle bölümün kayıtlarına dönebilirsiniz.</p>
+      <p class="journey-note">Uygulama ilk açılışta bölümün <code>academics.json</code> dosyasını otomatik yükler. Kendi dosyanızı içe aktarabilir ve “Bölüm verisini yükle” düğmesiyle bölümün kayıtlarına dönebilirsiniz.</p>
     </section>
-    <section class="panel" aria-labelledby="model-title">
-      <h2 id="model-title">Yapay zekâ modeli</h2>
-      <p><strong>Multilingual E5 Small</strong>, farklı dillerdeki metinlerin anlamını ortak bir sayısal temsile dönüştürür. Böylece Türkçe bir sorgu, ilgili bir İngilizce yayını bulabilir.</p>
-      <figure class="model-diagram" aria-labelledby="model-example">
-        <h3 id="model-example">Bir sorgu ve bir yayın nasıl karşılaştırılır?</h3>
-        <div class="model-pair">
-          <div class="model-card">
-            <strong>Türkçe sorgu</strong>
-            <p>GaN transistörleri</p>
-          </div>
-          <div class="model-card">
-            <strong>İngilizce yayın başlığı</strong>
-            <p>Normally-off AlGaN/GaN MIS-HEMT with low gate leakage current…</p>
-          </div>
-        </div>
-        <div class="model-connector" aria-hidden="true">↓</div>
-        <div class="model-engine">
-          <strong>Multilingual E5 Small</strong>
-          <span>Her metin için 384 sayılık vektör</span>
-        </div>
-        <div class="model-connector" aria-hidden="true">↓</div>
-        <div class="model-pair">
-          <div class="model-card">
-            <strong>Sorgu vektörü</strong>
-            <div class="vector" aria-hidden="true">
-              <span style="--height: 32%"></span><span style="--height: 65%"></span>
-              <span style="--height: 87%"></span><span style="--height: 46%"></span>
-              <span style="--height: 53%"></span><span style="--height: 24%"></span>
-              <span style="--height: 71%"></span><span style="--height: 44%"></span>
+
+    <!-- The model -->
+    <section class="chapter" aria-labelledby="model-title">
+      <header>
+        <h2 id="model-title">Yapay zekâ modeli nasıl çalışır?</h2>
+        <p>Arama kutusuna yazdığınız kelimeleri yayın başlıklarında tek tek aramıyoruz. Bunun yerine iki metnin <strong>ne anlattığını</strong> karşılaştırıyoruz. Bu işi <strong>Multilingual E5 Small</strong> adlı küçük bir dil modeli yapıyor.</p>
+      </header>
+
+      <figure class="figure" aria-labelledby="versus-title">
+        <h3 id="versus-title">Neden kelime araması yetmez?</h3>
+        <div class="versus">
+          <div class="versus-col">
+            <h3>Klasik kelime araması</h3>
+            <div class="versus-pair">
+              <div class="text-q"><small>Sorgunuz</small><span class="tag">güneş</span> <span class="tag">nötrinoları</span></div>
+              <div class="text-d"><small>Bölümdeki bir yayın</small>Combined Effect of NSI and SFP on Solar Electron Neutrino Oscillation</div>
             </div>
+            <p class="verdict bad">
+              <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="currentColor"/><path d="M6.5 6.5l7 7M13.5 6.5l-7 7" stroke="#fff" stroke-width="2"/></svg>
+              <span><strong style="color:var(--red)">Bulunamaz.</strong> Başlıkta “güneş” ya da “nötrinoları” kelimesi geçmiyor; ortak kelime yok.</span>
+            </p>
           </div>
-          <div class="model-card">
-            <strong>Yayın vektörü</strong>
-            <div class="vector vector-record" aria-hidden="true">
-              <span style="--height: 26%"></span><span style="--height: 55%"></span>
-              <span style="--height: 81%"></span><span style="--height: 54%"></span>
-              <span style="--height: 45%"></span><span style="--height: 32%"></span>
-              <span style="--height: 78%"></span><span style="--height: 37%"></span>
+          <div class="versus-col">
+            <h3>Anlam araması (bu uygulama)</h3>
+            <div class="versus-pair">
+              <div class="text-q"><small>Sorgunuz</small><span class="tag tag-ok">güneş</span> <span class="tag tag-ok">nötrinoları</span></div>
+              <div class="text-d"><small>Bölümdeki bir yayın</small><span class="tag tag-ok">Solar</span> Electron <span class="tag tag-ok">Neutrino</span> Oscillation…</div>
             </div>
+            <p class="verdict good">
+              <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="currentColor"/><path d="M5.5 10.5l3 3 6-7" stroke="#fff" stroke-width="2" fill="none"/></svg>
+              <span><strong style="color:var(--green)">Bulunur.</strong> Model “güneş”in <em>solar</em>, “nötrino”nun <em>neutrino</em> ile aynı şeyi anlattığını bilir.</span>
+            </p>
           </div>
         </div>
-        <div class="model-connector" aria-hidden="true">↓</div>
-        <div class="model-compare">
-          <strong>Kosinüs benzerliği</strong>
-          <span>Vektörlerin yönleri ne kadar yakınsa skor o kadar yüksek.</span>
-        </div>
-        <figcaption>Çubuklar vektörleri şematik olarak gösterir.</figcaption>
+        <figcaption>Model yüzden fazla dilde yazılmış çok büyük miktarda metinle eğitildiği için farklı dillerdeki aynı fikirleri birbirine bağlayabilir.</figcaption>
       </figure>
-      <p>Uygulama araştırma konusunu <code>query:</code>, kayıt başlığını ve varsa özetini <code>passage:</code> önekiyle modele verir.</p>
-      <p>İlk aramada Transformers.js ve yaklaşık 118 MB’lık model ağırlıkları yüklenir. Modelin 8 bitlik ONNX sürümü WebAssembly ile tarayıcının ayrı bir işlem alanında çalışır. Arama metni ve yüklediğiniz kayıtlar cihazınızda işlenir.</p>
-      <p class="model-links"><a href="https://huggingface.co/intfloat/multilingual-e5-small">Model kartı</a> · <a href="https://huggingface.co/Xenova/multilingual-e5-small">Tarayıcıda kullanılan ONNX sürümü</a></p>
+
+      <ol class="steps" aria-label="Modelin çalışma adımları">
+        <li class="step">
+          <div class="step-text">
+            <h3>Metni küçük parçalara böler</h3>
+            <p>Model kelimeleri olduğu gibi okumaz; onları önceden tanıdığı küçük parçalara ayırır. Böylece Türkçe ekleri, İngilizce terimleri ve <em>HEMT</em> gibi kısaltmaları aynı yöntemle işleyebilir.</p>
+            <p class="aside">Başa eklenen <code>query:</code> etiketi, modele “bu bir arama sorusu” der. Yayın başlıklarının başına ise <code>passage:</code> eklenir. Model bu etiketlerle eğitildiği için onlarla daha iyi sonuç verir.</p>
+          </div>
+          <div class="step-visual" aria-hidden="true">
+            <div class="sentence"><span class="sentence-in">güneş nötrinoları</span></div>
+            <div class="scissors">parçalara ayrılır</div>
+            <div class="tokens">
+              <span class="token prefix">query:</span>
+              <span class="token">güneş</span>
+              <span class="token alt">nötr</span>
+              <span class="token alt">ino</span>
+              <span class="token alt">ları</span>
+            </div>
+            <p class="vis-note">Parçalara ayırma örneği temsilidir.</p>
+          </div>
+        </li>
+
+        <li class="step">
+          <div class="step-text">
+            <h3>Parçalar birbirine bakarak anlam kazanır</h3>
+            <p>Her parça önce 384 sayıdan oluşan bir listeye çevrilir. Sonra model, art arda 12 katmanda her parçanın diğer parçalara bakmasını sağlar.</p>
+            <p>“nötr”, “ino” ve “ları” yan yana gelince <em>nötrinolar</em> anlamı oluşur. Yanlarında “güneş” olunca da Güneş’ten gelen nötrinolardan söz edildiği anlaşılır.</p>
+          </div>
+          <div class="step-visual" aria-hidden="true">
+            <svg viewBox="0 0 470 136" role="presentation">
+              <defs>
+                <marker id="dot-end" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="6" markerHeight="6"><circle cx="4" cy="4" r="3" fill="#e0a100"/></marker>
+              </defs>
+              <g fill="none" stroke-linecap="round">
+                <path d="M140 92 C 175 30, 300 30, 330 92" stroke="#e0a100" stroke-width="2.5" marker-end="url(#dot-end)"/>
+                <path d="M140 92 C 165 55, 215 55, 235 92" stroke="#e0a100" stroke-width="2" opacity=".75"/>
+                <path d="M140 92 C 180 10, 395 10, 425 92" stroke="#e0a100" stroke-width="1.6" opacity=".55"/>
+                <path d="M235 92 C 255 62, 310 62, 330 92" stroke="#1b4f9c" stroke-width="2.5"/>
+                <path d="M330 92 C 350 62, 405 62, 425 92" stroke="#1b4f9c" stroke-width="2"/>
+                <path d="M235 92 C 270 42, 390 42, 425 92" stroke="#1b4f9c" stroke-width="1.4" opacity=".6"/>
+              </g>
+              <g font-family="Source Sans 3, system-ui, sans-serif" font-weight="600" font-size="16" text-anchor="middle">
+                <rect x="10" y="94" width="80" height="34" rx="7" fill="#fdf3d7" stroke="#e0a100" stroke-width="1.5" stroke-dasharray="4 3"/>
+                <text x="50" y="116" fill="#6e4b00">query:</text>
+                <rect x="100" y="94" width="80" height="34" rx="7" fill="#fff" stroke="#1b4f9c" stroke-width="1.5"/>
+                <text x="140" y="116" fill="#1b4f9c">güneş</text>
+                <rect x="195" y="94" width="80" height="34" rx="7" fill="#fff" stroke="#5b7fbf" stroke-width="1.5"/>
+                <text x="235" y="116" fill="#3d5f9e">nötr</text>
+                <rect x="290" y="94" width="80" height="34" rx="7" fill="#fff" stroke="#5b7fbf" stroke-width="1.5"/>
+                <text x="330" y="116" fill="#3d5f9e">ino</text>
+                <rect x="385" y="94" width="80" height="34" rx="7" fill="#fff" stroke="#5b7fbf" stroke-width="1.5"/>
+                <text x="425" y="116" fill="#3d5f9e">ları</text>
+              </g>
+            </svg>
+            <p class="vis-note">Çizgiler hangi parçanın hangisine “baktığını” gösterir. Bu işlem 12 kez tekrarlanır.</p>
+          </div>
+        </li>
+
+        <li class="step">
+          <div class="step-text">
+            <h3>Tek bir “anlam parmak izi” çıkarır</h3>
+            <p>Bütün parçaların sayı listelerinin ortalaması alınır. Ortaya, metnin tamamını temsil eden <strong>384 sayılık tek bir liste</strong> çıkar. Buna <em>vektör</em> denir.</p>
+            <p>Bu vektörü metnin parmak izi gibi düşünebilirsiniz: Kelimeleri farklı olsa da aynı konuyu anlatan metinlerin parmak izleri birbirine benzer.</p>
+          </div>
+          <div class="step-visual" aria-hidden="true">
+            <div class="pool" id="pool"></div>
+            <div class="merge">
+              <svg viewBox="0 0 360 34" preserveAspectRatio="none"><path d="M30 2 L180 30 M105 2 L180 30 M180 2 L180 30 M255 2 L180 30 M330 2 L180 30" stroke="#a9b8c9" stroke-width="1.5" fill="none"/></svg>
+              ortalaması alınır
+            </div>
+            <svg class="wave" id="wave-pooled" viewBox="0 0 384 56" preserveAspectRatio="none"></svg>
+            <p class="numbers">0,021 · −0,047 · 0,113 · 0,006 · −0,082 · … (toplam 384 sayı)</p>
+            <p class="vis-note">384 sayının ilk 48’i çubuk olarak gösteriliyor. Sayılar ve çizim temsilidir.</p>
+          </div>
+        </li>
+
+        <li class="step">
+          <div class="step-text">
+            <h3>Parmak izlerini karşılaştırır</h3>
+            <p>Sorgunuzun parmak izi, bölümdeki her yayın ve tezin parmak iziyle karşılaştırılır. Desenleri birbirine en çok benzeyen kayıtlar en üste çıkar.</p>
+            <p class="aside">Kayıtların parmak izleri yalnızca bir kez hesaplanır ve tarayıcınızda saklanır. Sonraki aramalarda sadece sorgunuz yeniden hesaplanır; bu yüzden aramalar hızlanır.</p>
+          </div>
+          <div class="step-visual" aria-hidden="true">
+            <div class="wave-row"><span class="vis-label">Sorgu<br>“güneş nötrinoları”</span><svg class="wave" id="wave-query" viewBox="0 0 384 56" preserveAspectRatio="none"></svg></div>
+            <div class="wave-row"><span class="vis-label">Solar Electron Neutrino…</span><svg class="wave" id="wave-near" viewBox="0 0 384 56" preserveAspectRatio="none"></svg></div>
+            <div class="wave-row"><span class="vis-label">Prostate Radiotherapy…</span><svg class="wave" id="wave-far" viewBox="0 0 384 56" preserveAspectRatio="none"></svg></div>
+            <div class="compare-out">
+              <span class="pill good">Benzer desen: üst sıralarda</span>
+              <span class="pill bad">Farklı desen: alt sıralarda</span>
+            </div>
+          </div>
+        </li>
+      </ol>
+
+      <figure class="figure" aria-labelledby="map-title">
+        <h3 id="map-title">Anlam haritasında arama</h3>
+        <p class="prose" style="margin-bottom:18px;color:var(--ink-2)">Her yayını, anlamına göre bir haritaya yerleştirilmiş bir nokta gibi düşünün. Aynı konudaki çalışmalar yan yana durur. Arama yaptığınızda sorgunuz da bu haritaya düşer ve <strong>en yakın komşuları</strong> sonuç olur. Bir sorgu seçin:</p>
+        <div class="map-figure">
+          <div class="map-controls" id="map-controls" role="group" aria-label="Örnek sorgu seçin"></div>
+          <div class="map-canvas">
+            <svg id="meaning-map" viewBox="0 0 640 400" role="img" aria-labelledby="map-title map-desc">
+              <desc id="map-desc">Dört konu kümesi içeren temsili bir harita. Seçilen sorgu, anlamca en yakın kümeye yerleşir ve en yakın üç yayına çizgiyle bağlanır.</desc>
+            </svg>
+            <div class="map-legend" aria-hidden="true">
+              <span><svg width="16" height="16" viewBox="-10 -10 20 20"><path class="query-star" d="M0 -9 L2.6 -2.9 L9 -2.8 L4 1.3 L5.7 7.7 L0 4 L-5.7 7.7 L-4 1.3 L-9 -2.8 L-2.6 -2.9 Z"/></svg>sorgunuz</span>
+              <span><i class="legend-dot near"></i>en yakın kayıtlar</span>
+              <span><i class="legend-dot"></i>diğer kayıtlar</span>
+            </div>
+          </div>
+          <div class="near-list" aria-live="polite">
+            <h3 id="near-title">En yakın 3 kayıt</h3>
+            <ol id="near-list"></ol>
+          </div>
+        </div>
+        <figcaption>Temsili çizim. Gerçekte her nokta 384 boyutlu bir uzayda durur; burada anlamca yakın metinlerin birbirine yakın durduğunu iki boyutta gösteriyoruz. Listelenen başlıklar bölüm verisinden alınmıştır.</figcaption>
+      </figure>
+
+      <figure class="figure" aria-labelledby="cos-title">
+        <h3 id="cos-title">Yakınlık nasıl ölçülür?</h3>
+        <p class="prose" style="margin-bottom:18px;color:var(--ink-2)">Her vektörü başlangıç noktasından çıkan bir ok gibi düşünün. İki ok aynı yöne bakıyorsa metinler aynı şeyden söz ediyordur. Okların arasındaki açıya bakan bu ölçüye <strong>kosinüs benzerliği</strong> denir.</p>
+        <div class="angles">
+          <div class="angle">
+            <svg viewBox="0 0 200 130" aria-hidden="true"><g stroke-linecap="round" stroke-width="4" fill="none"><path d="M20 115 L180 115" stroke="#d8e1eb" stroke-width="1.5"/><path d="M20 115 L178 66" stroke="#e0a100"/><path d="M20 115 L180 88" stroke="#1b4f9c"/><path d="M71.3 106.3 A 52 52 0 0 0 69.7 99.6" stroke="#56687d" stroke-width="1.5"/></g><circle cx="20" cy="115" r="4" fill="#0f2742"/></svg>
+            <strong>Küçük açı</strong>
+            <span>Aynı konu: yüksek skor</span>
+            <div class="meter"><i style="width:92%"></i></div>
+          </div>
+          <div class="angle">
+            <svg viewBox="0 0 200 130" aria-hidden="true"><g stroke-linecap="round" stroke-width="4" fill="none"><path d="M20 115 L180 115" stroke="#d8e1eb" stroke-width="1.5"/><path d="M20 115 L120 18" stroke="#e0a100"/><path d="M20 115 L180 100" stroke="#1b4f9c"/><path d="M72 110 A 52 52 0 0 0 57 78" stroke="#56687d" stroke-width="1.5"/></g><circle cx="20" cy="115" r="4" fill="#0f2742"/></svg>
+            <strong>Orta açı</strong>
+            <span>Kısmen ilgili: orta skor</span>
+            <div class="meter"><i style="width:55%"></i></div>
+          </div>
+          <div class="angle">
+            <svg viewBox="0 0 200 130" aria-hidden="true"><g stroke-linecap="round" stroke-width="4" fill="none"><path d="M20 115 L180 115" stroke="#d8e1eb" stroke-width="1.5"/><path d="M20 115 L28 10" stroke="#e0a100"/><path d="M20 115 L180 108" stroke="#1b4f9c"/><path d="M72 113 A 52 52 0 0 0 24 63" stroke="#56687d" stroke-width="1.5"/></g><circle cx="20" cy="115" r="4" fill="#0f2742"/></svg>
+            <strong>Büyük açı</strong>
+            <span>İlgisiz: düşük skor</span>
+            <div class="meter"><i style="width:15%"></i></div>
+          </div>
+        </div>
+        <div class="callout">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v.5M12 11v5"/></svg>
+          <p>Sonuç kartlarındaki <strong>Benzerlik</strong> değeri bu ölçüdür. Bu modelde skorlar genellikle 0,7 ile 1,0 arasında çıkar; ilgisiz metinler bile 0,7 civarında görünebilir. Bu yüzden skorun kendisinden çok <strong>sıralama</strong> önemlidir: 0,80 ile 0,86 arasındaki fark bile anlamlıdır.</p>
+        </div>
+      </figure>
+
+      <figure class="figure" aria-labelledby="device-title">
+        <h3 id="device-title">Model nerede çalışır?</h3>
+        <div class="device">
+          <div class="cloud-col">
+            <div class="ext"><strong>jsDelivr</strong><span>Transformers.js kütüphanesi</span></div>
+            <div class="ext"><strong>Hugging Face</strong><span>Model ağırlıkları, ≈118 MB</span></div>
+          </div>
+          <div class="device-box">
+            <div class="device-bar"><i></i><i></i><i></i>Sizin tarayıcınız</div>
+            <div class="device-body">
+              <div class="dev-part"><strong>Arama sayfası</strong><span>Sorgunuzu alır, sonuçları gösterir.</span></div>
+              <div class="dev-part model"><strong>Model</strong><span>8 bitlik ONNX sürümü, WebAssembly ile ayrı bir arka plan işleminde çalışır.</span></div>
+              <div class="dev-part"><strong>Yerel veritabanı</strong><span>Kayıtlar ve vektörler IndexedDB’de saklanır.</span></div>
+            </div>
+            <div class="device-foot">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+              Arama metniniz ve yüklediğiniz kayıtlar cihazınızdan dışarı gönderilmez.
+            </div>
+          </div>
+        </div>
+        <figcaption>Kütüphane ve model ağırlıkları ilk aramada bir kez indirilir; sonraki ziyaretlerde tarayıcı önbelleğinden gelir. Bütün hesaplama sizin cihazınızda yapılır.</figcaption>
+      </figure>
+
+      <p class="links"><a href="https://huggingface.co/intfloat/multilingual-e5-small">Model kartı</a> · <a href="https://huggingface.co/Xenova/multilingual-e5-small">Tarayıcıda kullanılan ONNX sürümü</a></p>
     </section>
-    <section class="panel" aria-labelledby="ranking-title">
-      <h2 id="ranking-title">Sonuçlar nasıl sıralanır?</h2>
-      <p>Uygulama, sorgu vektörü ile her kayıt vektörü arasındaki kosinüs benzerliğini hesaplar. Bir akademisyenin skoru, en yakın kaydının skorunun %60’ı ile en yakın en fazla beş kaydının ortalama skorunun %40’ının toplamıdır. Her akademisyenin kartında sorguya en yakın üç kayıt gösterilir.</p>
+
+    <!-- Ranking -->
+    <section class="chapter" aria-labelledby="ranking-title">
+      <header>
+        <h2 id="ranking-title">Sonuçlar nasıl sıralanır?</h2>
+        <p>Uygulama önce her kaydın sorguya benzerliğini hesaplar, sonra kayıtları akademisyene göre gruplar. Bir akademisyenin skoru iki şeyi birlikte ödüllendirir: konuya <strong>çok yakın tek bir çalışma</strong> ve konuda <strong>birden fazla çalışma</strong> olması.</p>
+      </header>
+      <figure class="figure" aria-labelledby="rank-fig-title">
+        <h3 id="rank-fig-title">Örnek: bir akademisyenin skoru</h3>
+        <div class="rank-example">
+          <div class="bars" aria-hidden="true">
+            <div class="bar-row best"><span>1. kayıt</span><span class="bar-track"><i style="width:88%"></i></span><b>0,88</b></div>
+            <div class="bar-row"><span>2. kayıt</span><span class="bar-track"><i style="width:85%"></i></span><b>0,85</b></div>
+            <div class="bar-row"><span>3. kayıt</span><span class="bar-track"><i style="width:84%"></i></span><b>0,84</b></div>
+            <div class="bar-row"><span>4. kayıt</span><span class="bar-track"><i style="width:81%"></i></span><b>0,81</b></div>
+            <div class="bar-row"><span>5. kayıt</span><span class="bar-track"><i style="width:80%"></i></span><b>0,80</b></div>
+            <div class="bar-row skip"><span>6. kayıt</span><span class="bar-track"><i style="width:76%"></i></span><b>0,76</b></div>
+            <div class="bar-row skip"><span>…</span><span class="bar-track"><i style="width:72%"></i></span><b></b></div>
+          </div>
+          <div class="formula">
+            <p>Kayıtlar benzerliğe göre dizilir. Yalnızca en yakın beş kayıt hesaba katılır.</p>
+            <div class="formula-line">
+              <span class="formula-box best"><small>en yakın kayıt</small>0,88 × %60</span>
+              <span>+</span>
+              <span class="formula-box"><small>ilk 5 kaydın ortalaması</small>0,836 × %40</span>
+            </div>
+            <div class="formula-total"><strong>0,862</strong><span>Akademisyenin skoru. Kartında en yakın üç kaydı gösterilir.</span></div>
+          </div>
+        </div>
+        <figcaption>Örnek değerler temsilidir. Formül: skor = 0,6 × en yüksek benzerlik + 0,4 × en yakın en fazla beş kaydın ortalama benzerliği.</figcaption>
+      </figure>
     </section>
-    <section class="panel" aria-labelledby="storage-title">
-      <h2 id="storage-title">Veri nerede tutulur?</h2>
-      <p>İçe aktarılan kayıtlar ve hesaplanan kayıt vektörleri tarayıcının yerel veritabanında (IndexedDB) saklanır. Veri veya model sürümü değişince vektörler yeniden hesaplanır. Arama ekranındaki “Yerel veriyi sil” düğmesi bu kayıtları ve vektörleri temizler.</p>
+
+    <!-- Storage -->
+    <section class="chapter" aria-labelledby="storage-title">
+      <header>
+        <h2 id="storage-title">Veri nerede tutulur?</h2>
+      </header>
+      <div class="prose">
+        <p>İçe aktarılan kayıtlar ve hesaplanan kayıt vektörleri tarayıcının yerel veritabanında (IndexedDB) saklanır. Veri veya model sürümü değişince vektörler yeniden hesaplanır. Arama ekranındaki “Yerel veriyi sil” düğmesi bu kayıtları ve vektörleri temizler.</p>
+      </div>
     </section>
   </main>
+
+  <footer class="site-footer">
+    <div class="wrap">Ankara Üniversitesi Fizik Mühendisliği · Veriler AVESİS’teki herkese açık sayfalardan derlenmiştir.</div>
+  </footer>
+
+  <script>
+    // Illustrations for the "Nasıl çalışır?" page. Values are schematic, not model output.
+    (() => {
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const make = (tag, attrs = {}, text) => {
+        const node = document.createElementNS(svgNS, tag);
+        for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
+        if (text) node.textContent = text;
+        return node;
+      };
+      function random(seed) {
+        return () => {
+          seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+          let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+          t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+          return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        };
+      }
+      function vector(seed) {
+        const next = random(seed);
+        // 48 of the 384 numbers are drawn so that the pattern stays readable.
+        return Array.from({length: 48}, () => (next() + next() - 1) * 1.15);
+      }
+      function blend(a, b, amount) { return a.map((value, i) => value * (1 - amount) + b[i] * amount); }
+      function drawWave(id, values, color) {
+        const svg = document.getElementById(id);
+        if (!svg) return;
+        svg.append(make('line', {x1: 0, x2: 384, y1: 28, y2: 28, stroke: '#d8e1eb', 'stroke-width': 1}));
+        values.forEach((value, i) => {
+          const h = Math.max(1, Math.min(1, Math.abs(value)) * 26);
+          svg.append(make('rect', {x: i * 8 + 1, width: 6, y: value > 0 ? 28 - h : 28, height: h, rx: 1.5, fill: color}));
+        });
+      }
+      const query = vector(7);
+      drawWave('wave-pooled', query, '#e0a100');
+      drawWave('wave-query', query, '#e0a100');
+      drawWave('wave-near', blend(query, vector(21), .22), '#1b4f9c');
+      drawWave('wave-far', vector(99), '#8a9bb0');
+
+      const pool = document.getElementById('pool');
+      if (pool) {
+        ['query:', 'güneş', 'nötr', 'ino', 'ları'].forEach((label, index) => {
+          const next = random(index + 3);
+          const column = document.createElement('div');
+          column.className = 'pool-col';
+          const bars = document.createElement('div');
+          bars.className = 'pool-bars';
+          for (let i = 0; i < 7; i++) {
+            const bar = document.createElement('i');
+            bar.style.height = (18 + next() * 82) + '%';
+            if (index === 0) bar.style.background = '#e0a100';
+            bars.append(bar);
+          }
+          const name = document.createElement('span');
+          name.textContent = label;
+          column.append(bars, name);
+          pool.append(column);
+        });
+      }
+
+      // Meaning map
+      const map = document.getElementById('meaning-map');
+      if (!map) return;
+      const clusters = [
+        {name: 'Yarı iletken aygıtlar', x: 165, y: 115, rx: 120, ry: 78},
+        {name: 'Nötrino ve parçacık fiziği', x: 478, y: 110, rx: 125, ry: 80},
+        {name: 'Lazer ve optik', x: 165, y: 310, rx: 115, ry: 74},
+        {name: 'Tıbbi radyasyon fiziği', x: 478, y: 312, rx: 120, ry: 74},
+      ];
+      const docs = [
+        {x: 132, y: 96, lang: 'EN', title: 'Normally-off AlGaN/GaN MIS-HEMT with low gate leakage current…', who: 'Prof. Dr. MEHMET KABAK'},
+        {x: 192, y: 132, lang: 'EN', title: 'Investigation of a Hybrid Approach for Normally-Off GaN HEMTs…', who: 'Prof. Dr. MEHMET KABAK'},
+        {x: 112, y: 146, lang: 'EN', title: 'Structural and optical properties of an InxGa1-xN/GaN nanostructure', who: 'Prof. Dr. BARIŞ AKAOĞLU'},
+        {x: 222, y: 88, lang: 'EN', title: 'Tuning carrier transport and optical properties of Co3O4 thin films…', who: 'Prof. Dr. BARIŞ AKAOĞLU'},
+        {x: 450, y: 118, lang: 'EN', title: 'Combined Effect of NSI and SFP on Solar Electron Neutrino Oscillation', who: 'Doç. Dr. DENİZ YILMAZ'},
+        {x: 488, y: 140, lang: 'TR', title: 'Güneş Nötrinolarının Salınımında Çeşni Evrenselliğini Bozan…', who: 'Doç. Dr. DENİZ YILMAZ'},
+        {x: 548, y: 78, lang: 'EN', title: 'Higgs production at next generation e+e− colliders', who: 'Doç. Dr. DENİZ YILMAZ'},
+        {x: 420, y: 80, lang: 'EN', title: 'Sensitivity of the SHiP experiment to light dark matter', who: 'Doç. Dr. DENİZ YILMAZ'},
+        {x: 140, y: 300, lang: 'EN', title: 'Nonlinear optical performance and optical limiting of germanate glasses…', who: 'Doç. Dr. AHMET KARATAY'},
+        {x: 196, y: 326, lang: 'EN', title: 'Tuning refractive index of PDMS by CO2 laser engraving…', who: 'Doç. Dr. AHMET KARATAY'},
+        {x: 110, y: 340, lang: 'EN', title: 'Amino-functionalized nitrogen-doped graphene quantum dots…', who: 'Doç. Dr. AHMET KARATAY'},
+        {x: 456, y: 300, lang: 'EN', title: 'A Comparison of Treatment Planning Algorithms for Prostate Radiotherapy…', who: 'Prof. Dr. ÖMER YAVAŞ'},
+        {x: 512, y: 330, lang: 'EN', title: 'Medical imaging systems used in radiology, patient and staff radiation doses', who: 'Prof. Dr. TURAN OLĞAR'},
+        {x: 540, y: 290, lang: 'EN', title: 'Design of beam instrumentation … in a 30 MeV medical cyclotron', who: 'Prof. Dr. ÖMER YAVAŞ'},
+      ];
+      const queries = [
+        {text: 'GaN transistörleri', x: 158, y: 120},
+        {text: 'güneş nötrinoları', x: 472, y: 100},
+        {text: 'lazer ile cam işleme', x: 168, y: 318},
+        {text: 'kanserde radyoterapi', x: 486, y: 306},
+      ];
+
+      const grid = make('g', {class: 'map-grid'});
+      for (let x = 40; x < 640; x += 40) grid.append(make('line', {x1: x, x2: x, y1: 0, y2: 400}));
+      for (let y = 40; y < 400; y += 40) grid.append(make('line', {x1: 0, x2: 640, y1: y, y2: y}));
+      map.append(grid);
+      for (const cluster of clusters) {
+        map.append(make('ellipse', {class: 'cluster-blob', cx: cluster.x, cy: cluster.y, rx: cluster.rx, ry: cluster.ry}));
+        map.append(make('text', {class: 'cluster-name', x: cluster.x, y: cluster.y - cluster.ry + 20, 'text-anchor': 'middle'}, cluster.name));
+      }
+      const lines = make('g');
+      map.append(lines);
+      const dots = docs.map(doc => {
+        const dot = make('circle', {class: 'doc-dot', cx: doc.x, cy: doc.y, r: 7});
+        map.append(dot);
+        return dot;
+      });
+      const mark = make('g', {class: 'query-mark'});
+      mark.append(
+        make('path', {class: 'query-star', d: 'M0 -14 L4 -4.5 L14 -4.3 L6.2 2 L8.8 12 L0 6.2 L-8.8 12 L-6.2 2 L-14 -4.3 L-4 -4.5 Z'}),
+      );
+      map.append(mark);
+
+      const controls = document.getElementById('map-controls');
+      const list = document.getElementById('near-list');
+      const label = document.createElement('span');
+      label.textContent = 'Sorgu:';
+      controls.append(label);
+      const buttons = queries.map((q, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = q.text;
+        button.setAttribute('aria-pressed', 'false');
+        button.addEventListener('click', () => select(index));
+        controls.append(button);
+        return button;
+      });
+
+      function select(index) {
+        const q = queries[index];
+        buttons.forEach((button, i) => button.setAttribute('aria-pressed', String(i === index)));
+        mark.style.transform = `translate(${q.x}px, ${q.y}px)`;
+        mark.setAttribute('transform', `translate(${q.x} ${q.y})`);
+        const nearest = docs
+          .map((doc, i) => ({i, d: Math.hypot(doc.x - q.x, doc.y - q.y)}))
+          .sort((a, b) => a.d - b.d)
+          .slice(0, 3);
+        const near = new Set(nearest.map(n => n.i));
+        dots.forEach((dot, i) => {
+          dot.classList.toggle('near', near.has(i));
+          dot.setAttribute('r', near.has(i) ? 9 : 7);
+        });
+        lines.replaceChildren(...nearest.map(({i}) =>
+          make('line', {class: 'near-line', x1: q.x, y1: q.y, x2: docs[i].x, y2: docs[i].y})));
+        list.replaceChildren(...nearest.map(({i}) => {
+          const item = document.createElement('li');
+          const body = document.createElement('div');
+          const lang = document.createElement('span');
+          lang.className = 'lang';
+          lang.textContent = docs[i].lang;
+          const who = document.createElement('small');
+          who.textContent = docs[i].who;
+          body.append(lang, ' ', docs[i].title, who);
+          item.append(body);
+          return item;
+        }));
+      }
+      mark.style.transition = 'none';
+      select(1);
+      requestAnimationFrame(() => requestAnimationFrame(() => { mark.style.transition = ''; }));
+    })();
+  </script>
 
   <script type="module">
     const $ = id => document.getElementById(id);
@@ -321,19 +1066,33 @@
     const weightsFile = 'onnx/model_quantized.onnx';
     const bytesInMB = 1_000_000;
     const formatMB = new Intl.NumberFormat('tr', {maximumFractionDigits: 1});
+    const formatScore = new Intl.NumberFormat('tr', {minimumFractionDigits: 3, maximumFractionDigits: 3});
+    const formatCount = new Intl.NumberFormat('tr');
     const facultyOrder = new Intl.Collator('tr');
     let records = [];
     let searchWorker;
     let busy = false;
     let hasLocalData = false;
 
+    const pages = {
+      search: {
+        title: 'Akademik uzmanlık arama',
+        lead: 'Bir araştırma konusu yazın; bölümde o konuda yayın veya tez çalışması olan akademisyenleri bulun.',
+      },
+      architecture: {
+        title: 'Arama nasıl çalışır?',
+        lead: 'Yayınların nereden geldiğini, yapay zekâ modelinin metinleri nasıl karşılaştırdığını ve sonuçların nasıl sıralandığını adım adım anlatıyoruz.',
+      },
+    };
+
     function showPage(moveFocus = false) {
       const architecture = location.hash === '#nasil-calisir';
-      const title = architecture ? 'Arama nasıl çalışır?' : 'Akademik uzmanlık arama';
+      const page = pages[architecture ? 'architecture' : 'search'];
       $('search-page').hidden = architecture;
       $('architecture-page').hidden = !architecture;
-      $('page-title').textContent = title;
-      document.title = title + ' | Ankara Üniversitesi';
+      $('page-title').textContent = page.title;
+      $('page-lead').textContent = page.lead;
+      document.title = page.title + ' | Ankara Üniversitesi';
       $('search-link').removeAttribute('aria-current');
       $('architecture-link').removeAttribute('aria-current');
       $(architecture ? 'architecture-link' : 'search-link').setAttribute('aria-current', 'page');
@@ -438,12 +1197,15 @@
       const faculty = [...new Set(records.map(record => record.faculty))].sort(facultyOrder.compare);
       const publications = records.filter(record => record.kind === 'publication').length;
       const theses = records.filter(record => record.kind === 'thesis').length;
-      $('source').textContent = hasLocalData ? 'İçe aktarılan dosya' : records.length ? 'Bölüm verisi' : '';
+      $('source').textContent = hasLocalData ? 'İçe aktarılan dosya' : records.length ? 'Bölüm verisi' : 'Henüz veri yok';
       $('count').textContent = `${records.length} kayıt · ${faculty.length} akademisyen`;
-      $('breakdown').textContent = records.length ? `${publications} yayın · ${theses} tez` : '';
+      $('stat-records').textContent = formatCount.format(records.length);
+      $('stat-faculty').textContent = formatCount.format(faculty.length);
+      $('breakdown').textContent = records.length ? `${formatCount.format(publications)} yayın ve ${formatCount.format(theses)} tez` : '';
       $('faculty-roster').hidden = !faculty.length;
       $('faculty-list').replaceChildren(...faculty.map(name => element('li', name)));
       $('go').disabled = busy || !records.length;
+      for (const example of $('examples').querySelectorAll('button')) example.disabled = busy || !records.length;
       $('load-bundled').disabled = busy;
       $('choose').disabled = busy;
       $('reset').disabled = busy;
@@ -524,6 +1286,13 @@
       }
     };
 
+    for (const example of $('examples').querySelectorAll('button')) {
+      example.onclick = () => {
+        $('q').value = example.textContent;
+        $('search').requestSubmit();
+      };
+    }
+
     function element(tag, text, className) {
       const item = document.createElement(tag);
       if (text) item.textContent = text;
@@ -536,14 +1305,16 @@
       const heading = element('div', '', 'result-heading');
       heading.append(
         element('h2', group.name),
-        element('span', `Benzerlik ${group.score.toFixed(3)}`, 'score'),
+        element('span', `Benzerlik ${formatScore.format(group.score)}`, 'score'),
       );
       const list = element('ul', '', 'record-list');
       for (const record of group.items.slice(0, 3)) {
         const item = element('li');
         const details = element('div', '', 'record-meta');
         const kind = record.kind === 'publication' ? 'Yayın' : record.kind === 'thesis' ? 'Tez' : 'Kayıt';
-        details.append(element('span', kind, 'record-kind'), element('span', record.score.toFixed(3), 'score'));
+        const badge = element('span', kind, 'record-kind');
+        badge.dataset.kind = record.kind;
+        details.append(badge, element('span', formatScore.format(record.score), 'score'));
         const title = element('p', '', 'record-title');
         try {
           const url = new URL(record.url);
