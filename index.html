@@ -326,6 +326,56 @@
     #person-empty { margin-top: 14px; color: var(--muted); }
     #person-empty[hidden] { display: none; }
     h1.is-person { font-size: clamp(1.9rem, 4.2vw, 2.9rem); }
+    h1.is-article { font-size: clamp(1.45rem, 3vw, 2.15rem); line-height: 1.2; max-width: 34ch; }
+    .crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-bottom: 10px; color: #9fb9d6; font-size: .95rem; }
+    .crumbs[hidden] { display: none; }
+    .crumbs a { color: #dceafa; }
+    .ask-link { margin-left: auto; display: inline-flex; align-items: center; gap: 5px; font-size: .88rem; font-weight: 650; text-decoration: none; padding: 1px 8px; border-radius: 999px; }
+    .ask-link::before { content: ""; width: 14px; height: 14px; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linejoin='round'%3E%3Cpath d='M4 5h16v11H9l-5 4z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linejoin='round'%3E%3Cpath d='M4 5h16v11H9l-5 4z'/%3E%3C/svg%3E") center / contain no-repeat; }
+    .ask-link:hover { background: var(--blue-soft); text-decoration: none; }
+
+    /* Article page */
+    .article-page { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 24px 28px; align-items: start; margin-block: -64px 64px; }
+    .article-page[hidden] { display: none; }
+    .article-card, .chat-panel { box-shadow: 0 18px 40px -24px rgba(15,39,66,.45); }
+    .article-person { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 18px; color: var(--ink); font-weight: 650; text-decoration: none; }
+    .article-person:hover span:last-child { text-decoration: underline; }
+    .mini-avatar { position: relative; flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; overflow: hidden; background: var(--blue-soft); color: var(--blue); font: 600 .95rem/1 var(--serif); }
+    .mini-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
+    .mini-avatar img[hidden] { display: none; }
+    .article-card h2, .chat-panel h2 { font-size: 1.3rem; }
+    .abstract-body { margin-top: 10px; line-height: 1.65; color: var(--ink-2); }
+    .abstract-body p + p { margin-top: 10px; }
+    .abstract-body .muted { color: var(--muted); }
+    .abstract-source { margin-top: 12px; color: var(--muted); font-size: .88rem; }
+    .abstract-source:empty { display: none; }
+    .article-keywords { margin-top: 14px; font-size: .92rem; color: var(--muted); }
+    .article-keywords[hidden] { display: none; }
+    .article-links { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); font-weight: 600; font-size: .95rem; }
+    .chat-model { margin-top: 2px; color: var(--muted); font-size: .9rem; }
+    .chat-setup { margin-top: 16px; padding: 14px 16px; border-radius: var(--radius); background: var(--paper); font-size: .95rem; }
+    .chat-setup[hidden] { display: none; }
+    .chat-setup button { margin-top: 10px; }
+    .chat-load-status { margin-top: 8px; color: var(--muted); font-size: .9rem; }
+    .chat-load-status:empty { display: none; }
+    .chat-load-status[data-error="true"] { color: var(--red); }
+    .chat-quick { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+    .chat-quick button { background: var(--blue-soft); border-color: transparent; color: var(--blue); border-radius: 999px; padding: 4px 12px; font-size: .92rem; }
+    .chat-quick button:hover:not(:disabled) { background: #d6e3f4; border-color: transparent; }
+    .chat-log { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 12px; }
+    .chat-log:empty { display: none; }
+    .chat-log li { max-width: 92%; padding: 10px 14px; border-radius: 14px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .chat-log .from-user { justify-self: end; background: var(--blue); color: #fff; border-bottom-right-radius: 4px; }
+    .chat-log .from-model { justify-self: start; background: var(--paper); border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+    .chat-log .from-model.is-pending::after { content: "▍"; color: var(--blue); animation: blink 1s steps(1) infinite; }
+    .chat-log .from-model[data-error="true"] { color: var(--red); }
+    @keyframes blink { 50% { opacity: 0; } }
+    .chat-form { margin-top: 16px; display: grid; gap: 8px; }
+    .chat-form textarea { width: 100%; resize: vertical; min-height: 64px; border: 1.5px solid var(--line-strong); border-radius: 10px; padding: 10px 12px; font: inherit; color: var(--ink); }
+    .chat-form textarea:focus { border-color: var(--blue); outline: none; box-shadow: 0 0 0 3px rgba(27,79,156,.14); }
+    .chat-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .chat-actions [hidden] { display: none; }
+    .chat-disclaimer { margin-top: 12px; color: var(--muted); font-size: .85rem; line-height: 1.45; }
     .faculty-list a { color: var(--ink); text-decoration-color: var(--line-strong); }
     .faculty-list a:hover { color: var(--blue); }
 
@@ -557,6 +607,7 @@
 
     @media (prefers-reduced-motion: reduce) {
       .query-mark, .doc-dot, .near-line { transition: none; }
+      .chat-log .from-model.is-pending::after { animation: none; }
     }
     @media (max-width: 900px) {
       .step { grid-template-columns: minmax(0, 1fr); gap: 18px; }
@@ -576,6 +627,7 @@
       .workspace { grid-template-columns: minmax(0, 1fr); grid-template-areas: "search" "model" "results"; gap: 16px; }
       .data-page { grid-template-columns: minmax(0, 1fr); gap: 16px; }
       .person-page { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+      .article-page { grid-template-columns: minmax(0, 1fr); gap: 16px; }
       .person-avatar { width: 120px; height: 150px; font-size: 2.4rem; }
       .result-photo { right: 64px; width: 40%; opacity: .16; }
       .faculty-list { grid-template-columns: minmax(0, 1fr); }
@@ -628,6 +680,13 @@
           <a id="architecture-link" href="#nasil-calisir">Nasıl çalışır?</a>
         </nav>
       </div>
+      <nav class="crumbs" id="crumbs" aria-label="Konum" hidden>
+        <a href="#arama">Arama</a>
+        <span aria-hidden="true">/</span>
+        <a id="crumb-person" href="#arama"></a>
+        <span aria-hidden="true">/</span>
+        <span id="crumb-kind">Makale</span>
+      </nav>
       <h1 id="page-title" tabindex="-1">Akademik uzmanlık arama</h1>
       <p class="lead" id="page-lead">Bir araştırma konusu yazın; bölümde o konuda yayın veya tez çalışması olan akademisyenleri bulun.</p>
     </div>
@@ -766,6 +825,51 @@
       <p id="person-order"></p>
       <ul id="person-list" class="record-list person-list"></ul>
       <p id="person-empty" hidden>Bu filtreye uyan kayıt yok.</p>
+    </section>
+  </main>
+
+  <main id="article-page" class="article-page wrap" hidden>
+    <section class="panel article-card" aria-labelledby="abstract-title">
+      <a class="article-person" id="article-person" href="#arama">
+        <span class="mini-avatar"><span id="article-initials"></span><img id="article-photo" alt="" hidden></span>
+        <span id="article-person-name"></span>
+      </a>
+      <h2 id="abstract-title">Özet</h2>
+      <div id="abstract-body" class="abstract-body" aria-live="polite"></div>
+      <p id="abstract-source" class="abstract-source"></p>
+      <p id="article-keywords" class="article-keywords" hidden></p>
+      <p class="article-links" id="article-links"></p>
+    </section>
+
+    <section class="panel chat-panel" aria-labelledby="chat-title">
+      <div class="chat-head">
+        <div>
+          <h2 id="chat-title">Yapay zekâya sor</h2>
+          <p class="chat-model">Qwen3 0.6B · tarayıcınızda çalışır · yalnızca özete göre cevap verir</p>
+        </div>
+      </div>
+      <div class="chat-setup" id="chat-setup">
+        <p id="chat-setup-text">Model ilk kullanımda bir kez indirilir (≈570 MB), sonra tarayıcınızın önbelleğinden gelir.</p>
+        <button type="button" id="chat-load">Modeli yükle ve başla</button>
+        <progress id="chat-progress" aria-label="Sohbet modeli yükleniyor" hidden></progress>
+        <p id="chat-load-status" class="chat-load-status" role="status"></p>
+      </div>
+      <div class="chat-quick" id="chat-quick" role="group" aria-label="Hazır sorular">
+        <button type="button" data-prompt="Bu çalışmayı Türkçe olarak 3-4 cümleyle özetle.">Türkçe özetle</button>
+        <button type="button" data-prompt="Bu çalışmayı alana yabancı birinin anlayacağı sade bir Türkçeyle açıkla.">Basitçe açıkla</button>
+        <button type="button" data-prompt="Bu çalışmada hangi yöntem veya teknikler kullanılmış?">Hangi yöntem kullanılmış?</button>
+        <button type="button" data-prompt="Bu çalışmanın ana sonucu nedir?">Sonuç ne?</button>
+      </div>
+      <ol class="chat-log" id="chat-log" aria-live="polite"></ol>
+      <form class="chat-form" id="chat-form">
+        <label for="chat-input" class="sr-only">Sorunuz</label>
+        <textarea id="chat-input" rows="2" placeholder="Bu çalışma hakkında bir soru yazın"></textarea>
+        <div class="chat-actions">
+          <button type="submit" id="chat-send">Sor</button>
+          <button type="button" class="secondary" id="chat-stop" hidden>Durdur</button>
+        </div>
+      </form>
+      <p class="chat-disclaimer">Cevaplar yapay zekâ tarafından yalnızca soldaki özete dayanılarak üretilir ve hata içerebilir. Önemli bilgileri makalenin kendisinden doğrulayın.</p>
     </section>
   </main>
 
@@ -1045,6 +1149,19 @@
       </figure>
     </section>
 
+    <!-- Ask about a paper -->
+    <section class="chapter" aria-labelledby="ask-title">
+      <header>
+        <h2 id="ask-title">“Makaleyi sor” nasıl çalışır?</h2>
+        <p>Sonuçlardaki her yayının yanında bir “Makaleyi sor” bağlantısı var. Bu bağlantı, akademisyenin ve çalışmanın altında ayrı bir sayfa açar.</p>
+      </header>
+      <div class="prose">
+        <p><strong>Özet:</strong> Çalışmanın özeti, sayfa açılırken DOI numarasıyla açık akademik veri kaynaklarından (önce OpenAlex, sonra Crossref) alınır. Özetler bu sitede saklanmaz.</p>
+        <p><strong>Model:</strong> Sorularınızı Qwen3 0.6B adlı küçük bir dil modeli cevaplar. Model ilk kullanımda bir kez tarayıcınıza indirilir (≈570 MB) ve WebGPU ile cihazınızda çalışır. Sorularınız hiçbir sunucuya gönderilmez.</p>
+        <p><strong>Sınır:</strong> Modelden yalnızca başlık, anahtar kelimeler ve özete dayanarak cevap vermesi istenir. Özette olmayan bir şey sorulursa “Özette bu bilgi yok” demesi beklenir. Bu boyuttaki modeller yine de hata yapabilir; önemli bilgileri makalenin kendisinden doğrulayın. Özeti bulunamayan kayıtlarda sohbet kapalıdır.</p>
+      </div>
+    </section>
+
     <!-- Storage -->
     <section class="chapter" aria-labelledby="storage-title">
       <header>
@@ -1246,6 +1363,10 @@
     let currentPage = null;
     let personKind = 'all';
     let personName = null;
+    let article = null;          // {id, record, abstract: string|null|undefined, messages: []}
+    let chatWorker;
+    let chatState = 'idle';      // idle | loading | ready | busy | error
+    const abstracts = new Map(); // doi -> Promise<{text, source} | null>
 
     const pages = {
       '#arama': {
@@ -1277,17 +1398,38 @@
       return key;
     }
 
+    const articleSegment = '/makale/';
+
+    // Stable id for a record: the AVESIS UUID in its address, otherwise a hash of person and title.
+    function recordId(record) {
+      const uuid = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.exec(record.url || '');
+      if (uuid) return uuid[0].toLowerCase();
+      let hash = 5381;
+      for (const character of record.faculty + '|' + record.title) hash = (hash * 33 + character.codePointAt(0)) >>> 0;
+      return 'k' + hash.toString(36);
+    }
+
+    function articleHash(record) {
+      return personHash(record.faculty) + articleSegment + recordId(record);
+    }
+
     function showPage(moveFocus = false) {
       const isPerson = location.hash.startsWith(personPrefix);
-      const page = isPerson ? {id: 'person'} : pages[location.hash] ?? pages['#arama'];
+      const isArticle = isPerson && location.hash.includes(articleSegment);
+      const page = isArticle ? {id: 'article'} : isPerson ? {id: 'person'} : pages[location.hash] ?? pages['#arama'];
       if (currentPage === 'search' && page.id !== 'search') searchScroll = window.scrollY;
-      for (const id of ['search', 'data', 'architecture', 'person']) $(id + '-page').hidden = id !== page.id;
+      for (const id of ['search', 'data', 'architecture', 'person', 'article']) $(id + '-page').hidden = id !== page.id;
       for (const id of ['search', 'data', 'architecture']) {
         if (id === page.id) $(id + '-link').setAttribute('aria-current', 'page');
         else $(id + '-link').removeAttribute('aria-current');
       }
-      $('page-title').classList.toggle('is-person', isPerson);
-      if (isPerson) {
+      $('page-title').classList.toggle('is-person', isPerson && !isArticle);
+      $('page-title').classList.toggle('is-article', isArticle);
+      $('crumbs').hidden = !isArticle;
+      if (isArticle) {
+        const [personPart, id] = location.hash.split(articleSegment);
+        renderArticle(personFromHash(personPart), decodeURIComponent(id));
+      } else if (isPerson) {
         renderPerson(personFromHash(location.hash));
       } else {
         $('page-title').textContent = page.title;
@@ -1387,7 +1529,7 @@
       if (!Array.isArray(data) || data.length > 20000 || !data.every(record =>
         record && typeof record.faculty === 'string' && record.faculty.trim() &&
         typeof record.title === 'string' && record.title.trim() &&
-        [record.abstract, record.url, record.kind].every(value => value == null || typeof value === 'string')
+        [record.abstract, record.url, record.kind, record.doi, record.keywords].every(value => value == null || typeof value === 'string')
       )) {
         throw Error('Geçersiz JSON veri biçimi.');
       }
@@ -1397,6 +1539,8 @@
         abstract: record.abstract || '',
         url: record.url || '',
         kind: record.kind || 'publication',
+        doi: record.doi || '',
+        keywords: record.keywords || '',
       }));
     }
 
@@ -1623,6 +1767,9 @@
       badge.dataset.kind = record.kind;
       details.append(badge);
       if (withScore) details.append(meter(record.score));
+      const ask = element('a', record.kind === 'thesis' ? 'Tezi sor' : 'Makaleyi sor', 'ask-link');
+      ask.href = articleHash(record);
+      details.append(ask);
       const title = element('p', '', 'record-title');
       const url = safeUrl(record.url);
       if (url) {
@@ -1754,6 +1901,282 @@
     }
     $('person-filter').addEventListener('input', renderPersonRecords);
 
+    // ---------- "Makaleyi sor" ----------
+    const chatModel = 'onnx-community/Qwen3-0.6B-ONNX';
+
+    // Abstracts are fetched on demand from open scholarly APIs by DOI; they are not stored in this repository.
+    function fetchAbstract(doi) {
+      const key = doi.toLowerCase();
+      if (!abstracts.has(key)) abstracts.set(key, (async () => {
+        try {
+          const response = await fetch(`https://api.openalex.org/works/doi:${encodeURIComponent(key)}?select=abstract_inverted_index,publication_year`);
+          if (response.ok) {
+            const work = await response.json();
+            const index = work.abstract_inverted_index;
+            if (index && Object.keys(index).length) {
+              const words = [];
+              for (const [word, positions] of Object.entries(index)) for (const position of positions) words[position] = word;
+              const text = words.filter(Boolean).join(' ').trim();
+              if (text.length > 80) return {text, source: 'OpenAlex', year: work.publication_year};
+            }
+          }
+        } catch {
+          // Try the next source.
+        }
+        try {
+          const response = await fetch(`https://api.crossref.org/works/${encodeURIComponent(key)}`);
+          if (response.ok) {
+            const message = (await response.json()).message;
+            const markup = message?.abstract;
+            if (markup) {
+              const parsed = new DOMParser().parseFromString(markup, 'text/html');
+              const text = parsed.body.textContent.replace(/^\s*Abstract\s*/i, '').replace(/\s+/g, ' ').trim();
+              if (text.length > 80) return {text, source: 'Crossref', year: message.issued?.['date-parts']?.[0]?.[0]};
+            }
+          }
+        } catch {
+          // No open abstract available.
+        }
+        return null;
+      })());
+      return abstracts.get(key);
+    }
+
+    function findRecord(name, id) {
+      return records.find(record => record.faculty === name && recordId(record) === id);
+    }
+
+    function renderArticle(name, id) {
+      const record = findRecord(name, id);
+      const kindName = record?.kind === 'thesis' ? 'Tez' : 'Makale';
+      $('crumb-person').textContent = name;
+      $('crumb-person').href = personHash(name);
+      $('crumb-kind').textContent = kindName;
+      $('page-title').textContent = record ? record.title : (records.length ? 'Kayıt bulunamadı' : 'Yükleniyor…');
+      $('page-lead').textContent = record ? `${name} · ${record.kind === 'thesis' ? 'Yönetilen tez' : 'Yayın'}` : '';
+      document.title = (record ? record.title : kindName) + ' | Ankara Üniversitesi';
+      if (!record || article?.id === id) {
+        if (!record) article = null;
+        updateChat();
+        return;
+      }
+      article = {id, record, abstract: undefined, messages: []};
+      $('article-person').href = personHash(name);
+      $('article-person-name').textContent = name;
+      $('article-initials').textContent = initials(name);
+      const image = $('article-photo');
+      image.hidden = true;
+      image.onload = () => { image.hidden = false; };
+      loadPhoto(image, photoSources(name), () => { image.hidden = true; image.removeAttribute('src'); });
+      $('article-keywords').hidden = !record.keywords;
+      $('article-keywords').textContent = record.keywords ? 'Anahtar kelimeler: ' + record.keywords : '';
+      const links = [];
+      const avesis = safeUrl(record.url);
+      if (avesis) links.push(['AVESİS’te aç', avesis]);
+      if (record.doi) links.push(['Yayıncı sayfası (DOI)', 'https://doi.org/' + record.doi]);
+      $('article-links').replaceChildren(...links.map(([text, href]) => {
+        const link = element('a', text);
+        link.href = href;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        return link;
+      }));
+      $('chat-log').replaceChildren();
+      $('chat-input').value = '';
+      $('abstract-source').textContent = '';
+      $('abstract-body').replaceChildren(element('p', 'Özet aranıyor…', 'muted'));
+      if (record.abstract) {
+        setAbstract(id, {text: record.abstract, source: 'veri dosyası'});
+      } else if (record.doi) {
+        fetchAbstract(record.doi).then(found => setAbstract(id, found));
+      } else {
+        setAbstract(id, null);
+      }
+      updateChat();
+    }
+
+    function setAbstract(id, found) {
+      if (article?.id !== id) return;
+      article.abstract = found?.text ?? null;
+      if (found) {
+        $('abstract-body').replaceChildren(element('p', found.text));
+        $('abstract-source').textContent = `Kaynak: ${found.source}${found.year ? ' · ' + found.year : ''}. Özet, açık akademik veri kaynağından bu sayfa açılırken alınır.`;
+      } else {
+        const reason = article.record.doi
+          ? 'Bu çalışma için açık bir özet bulunamadı.'
+          : 'Bu kaydın DOI numarası olmadığı için özeti otomatik bulunamadı.';
+        $('abstract-body').replaceChildren(element('p', reason + ' Yapay zekâ yalnızca özet üzerinden konuştuğu için sohbet bu kayıtta kapalı. Çalışmanın tamamına aşağıdaki bağlantıdan ulaşabilirsiniz.', 'muted'));
+      }
+      updateChat();
+    }
+
+    async function hasWebGPU() {
+      try {
+        return Boolean(navigator.gpu && await navigator.gpu.requestAdapter());
+      } catch {
+        return false;
+      }
+    }
+
+    function updateChat() {
+      const ready = chatState === 'ready';
+      const hasAbstract = Boolean(article?.abstract);
+      $('chat-setup').hidden = ready || chatState === 'busy';
+      $('chat-load').disabled = chatState === 'loading' || !hasAbstract;
+      $('chat-load').hidden = chatState === 'loading';
+      const canAsk = ready && hasAbstract;
+      for (const button of $('chat-quick').querySelectorAll('button')) button.disabled = !canAsk;
+      $('chat-input').disabled = !canAsk;
+      $('chat-send').disabled = !canAsk;
+      $('chat-stop').hidden = chatState !== 'busy';
+      if (article && article.abstract === null) {
+        $('chat-setup-text').textContent = 'Bu kayıtta özet olmadığı için sohbet kullanılamıyor.';
+      } else if (chatState !== 'loading' && chatState !== 'error') {
+        $('chat-setup-text').textContent = 'Model ilk kullanımda bir kez indirilir (≈570 MB), sonra tarayıcınızın önbelleğinden gelir.';
+      }
+    }
+
+    function setChatLoadStatus(message, error = false) {
+      $('chat-load-status').textContent = message;
+      $('chat-load-status').dataset.error = String(error);
+    }
+
+    let pendingAnswer = null;
+
+    function startChatWorker() {
+      chatWorker = new Worker(new URL('./chat-worker.js', import.meta.url), {type: 'module'});
+      chatWorker.onerror = event => {
+        chatState = 'error';
+        setChatLoadStatus('Sohbet modeli başlatılamadı: ' + (event.message || 'bilinmeyen hata'), true);
+        chatWorker.terminate();
+        chatWorker = undefined;
+        updateChat();
+      };
+      chatWorker.onmessage = ({data: message}) => {
+        switch (message.type) {
+          case 'progress': {
+            const progress = $('chat-progress');
+            progress.hidden = false;
+            progress.max = message.total;
+            progress.value = message.loaded;
+            setChatLoadStatus(`İndiriliyor: ${formatMB.format(message.loaded / bytesInMB)} / ${formatMB.format(message.total / bytesInMB)} MB`);
+            break;
+          }
+          case 'status':
+            if (message.state === 'warming') {
+              $('chat-progress').hidden = true;
+              setChatLoadStatus('Model hazırlanıyor…');
+            } else if (message.state === 'ready') {
+              chatState = 'ready';
+              setChatLoadStatus('');
+              updateChat();
+            }
+            break;
+          case 'token':
+            if (pendingAnswer) {
+              pendingAnswer.raw += message.text;
+              pendingAnswer.node.textContent = cleanAnswer(pendingAnswer.raw);
+            }
+            break;
+          case 'done':
+            finishAnswer();
+            break;
+          case 'error':
+            if (message.phase === 'load') {
+              chatState = 'error';
+              $('chat-progress').hidden = true;
+              setChatLoadStatus('Model yüklenemedi: ' + message.message, true);
+            } else {
+              finishAnswer('Cevap üretilemedi: ' + message.message);
+            }
+            updateChat();
+            break;
+        }
+      };
+    }
+
+    // Qwen3 may still emit an empty <think></think> block; it is not part of the answer.
+    function cleanAnswer(text) {
+      return text.replace(/<think>[\s\S]*?(<\/think>|$)/g, '').trimStart();
+    }
+
+    function finishAnswer(error) {
+      if (!pendingAnswer) return;
+      const {node, raw, articleId} = pendingAnswer;
+      node.classList.remove('is-pending');
+      const answer = cleanAnswer(raw).trim();
+      if (error) {
+        node.dataset.error = 'true';
+        node.textContent = error;
+      } else if (!answer) {
+        node.textContent = '(Cevap üretilmedi.)';
+      }
+      if (!error && answer && article?.id === articleId) article.messages.push({role: 'assistant', content: answer});
+      pendingAnswer = null;
+      chatState = 'ready';
+      updateChat();
+    }
+
+    function systemPrompt(record, abstract) {
+      return [
+        'Sen Ankara Üniversitesi Fizik Mühendisliği bölümündeki bir akademik çalışmayı açıklayan bir asistansın.',
+        'Yalnızca aşağıdaki başlık, anahtar kelimeler ve özete dayanarak, Türkçe ve sade bir dille cevap ver.',
+        'Özette olmayan bir bilgi sorulursa "Özette bu bilgi yok." de; tahmin yürütme ve bilgi uydurma.',
+        'Cevapların kısa olsun (en fazla 6-7 cümle).',
+        '',
+        `Başlık: ${record.title}`,
+        `Akademisyen: ${record.faculty}`,
+        record.keywords ? `Anahtar kelimeler: ${record.keywords}` : '',
+        `Özet: ${abstract}`,
+      ].filter(line => line !== '').join('\n');
+    }
+
+    function ask(question) {
+      if (!article?.abstract || chatState !== 'ready' || !question.trim()) return;
+      const {record, abstract, messages} = article;
+      messages.push({role: 'user', content: question.trim()});
+      $('chat-log').append(element('li', question.trim(), 'from-user'));
+      const node = element('li', '', 'from-model is-pending');
+      $('chat-log').append(node);
+      node.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+      pendingAnswer = {node, raw: '', articleId: article.id};
+      chatState = 'busy';
+      updateChat();
+      // The abstract and the last few turns are enough context for a 0.6B model.
+      const history = messages.slice(-6);
+      chatWorker.postMessage({type: 'generate', messages: [{role: 'system', content: systemPrompt(record, abstract)}, ...history]});
+    }
+
+    $('chat-load').onclick = async () => {
+      if (!(await hasWebGPU())) {
+        chatState = 'error';
+        setChatLoadStatus('Bu özellik WebGPU destekleyen bir tarayıcı gerektirir. Bilgisayarda Chrome veya Edge’in güncel sürümüyle deneyin.', true);
+        updateChat();
+        return;
+      }
+      chatState = 'loading';
+      setChatLoadStatus('Model yükleniyor…');
+      updateChat();
+      if (!chatWorker) startChatWorker();
+      chatWorker.postMessage({type: 'load', model: chatModel, dtype: 'q4f16'});
+    };
+    for (const button of $('chat-quick').querySelectorAll('button')) {
+      button.onclick = () => ask(button.dataset.prompt);
+    }
+    $('chat-form').onsubmit = event => {
+      event.preventDefault();
+      const question = $('chat-input').value;
+      $('chat-input').value = '';
+      ask(question);
+    };
+    $('chat-input').addEventListener('keydown', event => {
+      if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+        event.preventDefault();
+        $('chat-form').requestSubmit();
+      }
+    });
+    $('chat-stop').onclick = () => chatWorker?.postMessage({type: 'stop'});
+
     function searchInBackground(queryText) {
       searchWorker ??= new Worker(new URL('./search-worker.js', import.meta.url), {type: 'module'});
       return new Promise((resolve, reject) => {
@@ -1791,7 +2214,8 @@
               break;
           }
         };
-        searchWorker.postMessage({model, weightsFile, queryText, records});
+        const indexed = records.map(({faculty, title, abstract, url, kind}) => ({faculty, title, abstract, url, kind}));
+        searchWorker.postMessage({model, weightsFile, queryText, records: indexed});
       });
     }
 
