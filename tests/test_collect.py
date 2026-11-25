@@ -107,6 +107,8 @@ class YearTests(unittest.TestCase):
             "<p><b>Tezin Onay Tarihi:</b></p><p>2018</p>": 2018,
             "<li>Publication Date: March 2019</li>": 2019,
             "<li>Cilt: 2021-5</li>": None,
+            '<meta name="DCTERMS.bibliographicCitation" content="Yılmaz D., 7th Annual International Conference on Physics, 22 - 25 Temmuz 2019">': 2019,
+            '<meta name="citation_publication_date" content="2015/03/01"><li>Basım Tarihi: 2016</li>': 2016,
         }
         for markup, year in cases.items():
             with self.subTest(markup=markup):

@@ -27,10 +27,27 @@ YEAR_LABEL = re.compile(
 )
 
 
+YEAR = re.compile(r"\b((?:19|20)\d{2})\b")
+YEAR_META = ("citation_publication_date", "citation_date", "dc.date", "dcterms.issued", "dcterms.bibliographiccitation")
+
+
 def extract_year(page):
-    """Publication year ("Basım Tarihi") or thesis approval year ("Tezin Onay Tarihi") from an AVESIS page."""
+    """Publication year of an AVESIS page.
+
+    Articles carry "Basım Tarihi" and theses "Tezin Onay Tarihi". Conference papers have no such field;
+    their date appears only in the citation metadata, e.g. "7th Annual International Conference on Physics,
+    22 - 25 Temmuz 2019", so the metadata is used as a fallback.
+    """
     match = YEAR_LABEL.search(page.get_text("\n"))
-    return int(match[1]) if match else None
+    if match:
+        return int(match[1])
+    metas = {meta.get("name", "").lower(): meta.get("content", "") for meta in page.select("meta[name][content]")}
+    for name in YEAR_META:
+        years = YEAR.findall(metas.get(name, ""))
+        if years:
+            # A citation may mention other numbers; the last year is the event or publication year.
+            return int(years[-1])
+    return None
 
 
 class PublicSite:
