@@ -85,18 +85,26 @@ self.onmessage = async ({data: {model, weightsFile, queryText, records}}) => {
     self.postMessage({type: 'ranking'});
     const query = await embed('query: ' + queryText);
     const groups = new Map();
+    let best = -1;
+    let bestScore = -Infinity;
     for (const [index, record] of records.entries()) {
       const score = query.reduce((sum, value, i) => sum + value * vectors[index][i], 0);
+      if (score > bestScore) {
+        best = index;
+        bestScore = score;
+      }
       if (!groups.has(record.faculty)) groups.set(record.faculty, []);
       groups.get(record.faculty).push({...record, score});
     }
+    // The query vector and the closest record's vector are drawn under the search box.
+    const match = best < 0 ? null : {title: records[best].title, score: bestScore, vector: Array.from(vectors[best])};
     const results = Array.from(groups, ([name, items]) => {
       items.sort((a, b) => b.score - a.score);
       const top = items.slice(0, 5);
       const average = top.reduce((sum, item) => sum + item.score, 0) / top.length;
       return {name, items: top.slice(0, 3), score: .6 * top[0].score + .4 * average};
     }).sort((a, b) => b.score - a.score);
-    self.postMessage({type: 'result', results});
+    self.postMessage({type: 'result', results, queryVector: Array.from(query), match});
   } catch (error) {
     self.postMessage({type: 'error', message: error.message, modelReady: Boolean(modelPipeline)});
   }
