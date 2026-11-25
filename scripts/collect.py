@@ -1,5 +1,5 @@
 """Opt-in AVESIS metadata collector; fails closed on robots restrictions."""
-import json, re, time
+import json, re, time, os
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit
 from urllib.robotparser import RobotFileParser
@@ -60,6 +60,11 @@ def metadata(page):
 
 def discover():
     profiles = set(json.loads((ROOT/"data/profiles.json").read_text()))
+    if os.getenv("DISCOVER_DEPARTMENT", "false").lower() != "true":
+        if not profiles:
+            raise RuntimeError("Add AVESIS profile slugs to data/profiles.json")
+        print(f"Manual profile list: {len(profiles)} profiles; department discovery disabled")
+        return sorted(profiles)
     source = "https://phys.eng.ankara.edu.tr"
     rp = RobotFileParser()
     resp = session.get(source+"/robots.txt", timeout=20, allow_redirects=False)
@@ -69,7 +74,7 @@ def discover():
     for path in ("/tr/ogretim-uyeleri/", "/tr/personel/akademik-son/"):
         url = source+path
         if not rp.can_fetch(AGENT,url):
-            raise RuntimeError("Department discovery not permitted")
+            raise RuntimeError("Department discovery not permitted by robots.txt: "+url+"; run with discovery disabled and supply profiles.json")
         time.sleep(max(2,rp.crawl_delay(AGENT) or 0))
         resp = session.get(url,timeout=30,allow_redirects=False)
         if resp.status_code != 200:
