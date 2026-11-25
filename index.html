@@ -380,6 +380,76 @@
 
     /* ---------- How it works page ---------- */
     .architecture { margin-block: -64px 80px; }
+    .how-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 6px; margin-bottom: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: 0 18px 40px -24px rgba(15,39,66,.45); }
+    .how-tabs a { display: grid; gap: 1px; padding: 10px 14px; border-radius: 11px; color: var(--ink); text-decoration: none; }
+    .how-tabs a:hover { background: var(--paper); }
+    .how-tabs a strong { font-size: 1rem; }
+    .how-tabs a span { color: var(--muted); font-size: .86rem; }
+    .how-tabs a[aria-selected="true"] { background: var(--ink); color: #fff; }
+    .how-tabs a[aria-selected="true"] span { color: #c6dbf1; }
+    .how-panel[hidden] { display: none; }
+    .how-panel > .journey { box-shadow: none; }
+
+    /* "Makaleyi sor" explanation */
+    .prompt-stack { display: grid; gap: 6px; }
+    .prompt-part { padding: 9px 12px; border-radius: 8px; background: #fff; border: 1px solid var(--line); border-left-width: 4px; font-size: .93rem; line-height: 1.4; }
+    .prompt-part small { display: block; color: var(--muted); font-size: .78rem; font-weight: 700; }
+    .prompt-part.rule { border-left-color: #8a9bb0; }
+    .prompt-part.work { border-left-color: var(--blue); }
+    .prompt-part.history { border-left-color: #b9c5d3; color: var(--muted); }
+    .prompt-part.ask { border-left-color: var(--amber); }
+    .next-sentence { font: 600 1.15rem/1.4 var(--serif); }
+    .next-cursor { display: inline-block; min-width: 1.4em; padding: 0 6px; border-radius: 6px; background: var(--amber-soft); color: var(--amber-ink); text-align: center; }
+    .next-bars { display: grid; gap: 6px; margin-top: 12px; }
+    .next-row { display: grid; grid-template-columns: 130px minmax(0, 1fr) 42px; gap: 10px; align-items: center; font-size: .92rem; }
+    .next-row i { display: block; height: 14px; border-radius: 4px; background: linear-gradient(to right, #8aa6d1 var(--w), #e3e9f0 var(--w)); }
+    .next-row b { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--muted); text-align: right; }
+    .next-row.chosen span { font-weight: 700; color: var(--amber-ink); }
+    .next-row.chosen i { background: linear-gradient(to right, var(--amber) var(--w), #e3e9f0 var(--w)); }
+    .next-loop { margin-top: 12px; color: var(--muted); font-size: .88rem; text-align: center; }
+    .grounding { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .ground-case { padding: 10px 12px; border-radius: 10px; background: #fff; border: 1px solid var(--line); font-size: .92rem; }
+    .ground-case small { display: block; font-weight: 700; font-size: .8rem; }
+    .ground-case.good small { color: var(--green); }
+    .ground-case.bad small { color: var(--red); }
+    .ground-case .q { margin-top: 6px; color: var(--muted); }
+    .ground-case .a { margin-top: 6px; padding: 6px 10px; border-radius: 8px; background: var(--paper); }
+    .param-rows { display: grid; gap: 10px; }
+    .param-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) 118px; gap: 10px; align-items: center; font-size: .9rem; }
+    .param-name { font-weight: 700; }
+    .param-bar { display: flex; height: 18px; border-radius: 4px; background: #e9eef4; overflow: hidden; }
+    .param-bar i { display: block; width: var(--w); }
+    .param-bar .eff, .key.eff { background: var(--blue); }
+    .param-bar .emb, .key.emb { background: #b4c7e3; }
+    .param-num { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .param-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 8px; color: var(--muted); font-size: .85rem; }
+    .key { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
+    .mini-table { width: 100%; margin-top: 14px; border-collapse: collapse; font-size: .9rem; }
+    .mini-table th, .mini-table td { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: left; }
+    .mini-table thead th { color: var(--muted); font-size: .82rem; }
+    .mini-table tbody th { color: var(--muted); font-weight: 600; }
+
+    /* Comparison */
+    .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+    .duo-card { padding: 18px; border-radius: var(--radius); background: var(--paper); }
+    .duo-card > p { margin-top: 10px; color: var(--ink-2); }
+    .duo-card > p.duo-role { margin-top: 0; color: var(--blue); font-weight: 700; font-size: .95rem; }
+    .duo-analogy { color: var(--muted) !important; font-size: .92rem; }
+    .duo-flow { display: flex; align-items: center; gap: 8px; margin-top: 12px; min-height: 56px; }
+    .duo-in { flex: none; padding: 6px 10px; border-radius: 8px; background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--amber); font-size: .9rem; }
+    .duo-arrow { flex: none; width: 18px; height: 2px; background: var(--line-strong); position: relative; }
+    .duo-arrow::after { content: ""; position: absolute; right: -2px; top: -4px; border: 5px solid transparent; border-left: 6px solid var(--line-strong); }
+    .duo-model { flex: none; padding: 8px 10px; border-radius: 8px; background: var(--blue-soft); color: var(--blue); font-weight: 700; font-size: .9rem; }
+    .duo-model.dark { background: var(--ink); color: #fff; }
+    .duo-out { flex: 1; min-width: 0; height: 40px; }
+    .duo-text { flex: 1; min-width: 0; padding: 6px 10px; border-radius: 8px; background: #fff; border: 1px solid var(--line); font-size: .9rem; line-height: 1.35; }
+    .compare-figure { padding: 8px 0 0; overflow-x: auto; }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: .97rem; }
+    .compare-table th, .compare-table td { padding: 11px 18px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .compare-table thead th { font-family: var(--serif); font-size: 1.1rem; }
+    .compare-table thead th span { display: block; font-family: var(--sans); color: var(--muted); font-size: .85rem; font-weight: 400; }
+    .compare-table tbody th { width: 24%; color: var(--muted); font-weight: 600; }
+    .compare-table tbody tr:last-child > * { border-bottom: 0; }
     .journey {
       background: var(--surface);
       border: 1px solid var(--line);
@@ -621,6 +691,12 @@
       .model-facts div:nth-child(n+3), .model-links { display: none; }
       .fp-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
       .journey-steps { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+      .how-tabs { grid-template-columns: minmax(0, 1fr); }
+      .how-tabs a span { display: none; }
+      .duo, .grounding { grid-template-columns: minmax(0, 1fr); }
+      .duo-flow { flex-wrap: wrap; }
+      .next-row { grid-template-columns: 100px minmax(0, 1fr) 40px; }
+      .compare-table th, .compare-table td { padding: 9px 10px; }
       .journey-steps li { display: grid; grid-template-columns: 56px 1fr; gap: 0 14px; padding: 0; }
       .journey-steps li .journey-icon { grid-row: span 2; margin: 0; }
       .journey-steps li:not(:last-child)::after { top: 60px; bottom: -16px; left: 27px; right: auto; border-top: 0; border-left: 2px dashed var(--line-strong); }
@@ -833,7 +909,7 @@
       <div class="chat-head">
         <div>
           <h2 id="chat-title">Yapay zekâya sor</h2>
-          <p class="chat-model"><span id="chat-model-name">Gemma 4</span> · tarayıcınızda çalışır · yalnızca özete göre cevap verir</p>
+          <p class="chat-model"><span id="chat-model-name">Gemma 4</span> · tarayıcınızda çalışır · yalnızca özete göre cevap verir · <a href="#nasil-calisir/makaleyi-sor">Nasıl çalışır?</a></p>
         </div>
       </div>
       <div class="chat-setup" id="chat-setup">
@@ -867,6 +943,19 @@
   </main>
 
   <main id="architecture-page" class="architecture wrap" hidden>
+    <nav class="how-tabs" role="tablist" aria-label="Anlatım bölümleri">
+      <a role="tab" id="tab-search" href="#nasil-calisir" aria-controls="panel-search" aria-selected="true">
+        <strong>Arama modeli</strong><span>Multilingual E5 Small</span>
+      </a>
+      <a role="tab" id="tab-llm" href="#nasil-calisir/makaleyi-sor" aria-controls="panel-llm" aria-selected="false">
+        <strong>Makaleyi sor</strong><span>Gemma 4 dil modeli</span>
+      </a>
+      <a role="tab" id="tab-compare" href="#nasil-calisir/karsilastirma" aria-controls="panel-compare" aria-selected="false">
+        <strong>İki modeli karşılaştır</strong><span>Bulan ve anlatan model</span>
+      </a>
+    </nav>
+
+    <div class="how-panel" id="panel-search" role="tabpanel" aria-labelledby="tab-search">
     <!-- Overview -->
     <section class="journey" aria-labelledby="flow-title">
       <h2 id="flow-title">Bir aramanın yolculuğu</h2>
@@ -1142,19 +1231,6 @@
       </figure>
     </section>
 
-    <!-- Ask about a paper -->
-    <section class="chapter" aria-labelledby="ask-title">
-      <header>
-        <h2 id="ask-title">“Makaleyi sor” nasıl çalışır?</h2>
-        <p>Sonuçlardaki her yayının yanında bir “Makaleyi sor” bağlantısı var. Bu bağlantı, akademisyenin ve çalışmanın altında ayrı bir sayfa açar.</p>
-      </header>
-      <div class="prose">
-        <p><strong>Özet:</strong> Tezlerin özetleri AVESİS'teki tez sayfalarından alınır. Yayınların özetleri ise yayıncılara ait olduğu için sitede saklanmaz; sayfa açılırken DOI numarasıyla açık akademik veri kaynaklarından (önce OpenAlex, sonra Crossref) alınır.</p>
-        <p><strong>Model:</strong> Sorularınızı Google'ın açık modeli Gemma 4 cevaplar. İki boyut arasından seçebilirsiniz: E2B (≈3,1 GB, en az 8 GB bellek) daha hızlıdır, E4B (≈4,9 GB, 16 GB bellek önerilir) daha iyi cevap verir. Modelin yalnızca metin parçaları ilk kullanımda bir kez tarayıcınıza indirilir ve WebGPU ile cihazınızda çalışır. Bilgisayarda güncel Chrome veya Edge gerekir; telefonlarda çalışmaz. Sorularınız hiçbir sunucuya gönderilmez.</p>
-        <p><strong>Sınır:</strong> Modelden yalnızca başlık, anahtar kelimeler ve özete dayanarak cevap vermesi istenir. Özette olmayan bir şey sorulursa “Özette bu bilgi yok” demesi beklenir. Bu boyuttaki modeller yine de hata yapabilir; önemli bilgileri makalenin kendisinden doğrulayın. Özeti bulunamayan kayıtlarda sohbet kapalıdır.</p>
-      </div>
-    </section>
-
     <!-- Storage -->
     <section class="chapter" aria-labelledby="storage-title">
       <header>
@@ -1164,6 +1240,230 @@
         <p>İçe aktarılan kayıtlar ve hesaplanan kayıt vektörleri tarayıcının yerel veritabanında (IndexedDB) saklanır. Veri veya model sürümü değişince vektörler yeniden hesaplanır. <a href="#veri">Veri kaynağı</a> sayfasındaki “Yerel veriyi sil” düğmesi bu kayıtları ve vektörleri temizler.</p>
       </div>
     </section>
+    </div>
+
+    <div class="how-panel" id="panel-llm" role="tabpanel" aria-labelledby="tab-llm" hidden>
+      <section class="journey" aria-labelledby="llm-flow-title">
+        <h2 id="llm-flow-title">Bir sorunun yolculuğu</h2>
+        <ol class="journey-steps" role="list">
+          <li>
+            <span class="journey-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 2.5h8l4 4V21a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 6 21z"/><path d="M14 2.5V7h4M9 12h6M9 15.5h6M9 19h4"/></svg>
+            </span>
+            <h3>Özet bulunur</h3>
+            <p>Tezlerde AVESİS'ten, yayınlarda DOI numarasıyla OpenAlex ya da Crossref'ten.</p>
+          </li>
+          <li>
+            <span class="journey-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3.5" width="16" height="4" rx="1"/><rect x="4" y="10" width="16" height="4" rx="1"/><rect x="4" y="16.5" width="16" height="4" rx="1"/></svg>
+            </span>
+            <h3>İstem hazırlanır</h3>
+            <p>Talimat, çalışmanın başlığı ve özeti ile sorunuz tek bir metinde birleşir.</p>
+          </li>
+          <li>
+            <span class="journey-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>
+            </span>
+            <h3>Gemma 4 okur</h3>
+            <p>Model bu metni tarayıcınızda, ekran kartınızı (WebGPU) kullanarak işler.</p>
+          </li>
+          <li>
+            <span class="journey-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>
+            </span>
+            <h3>Cevap yazılır</h3>
+            <p>Cevap kelime kelime üretilir ve ekrana akarak gelir.</p>
+          </li>
+        </ol>
+        <p class="journey-note">Arama modelinden farkı: E5 metinleri yalnızca sayıya çevirip karşılaştırır, hiç metin yazmaz. Gemma 4 ise bir <strong>dil modelidir</strong>: okuduğu metne devam ederek yeni metin üretir.</p>
+      </section>
+
+      <section class="chapter" aria-labelledby="llm-title">
+        <header>
+          <h2 id="llm-title">Dil modeli nasıl cevap yazar?</h2>
+          <p>Gemma 4, Google'ın herkese açık dil modelidir. Bu sitede yalnızca bir şey yapar: seçtiğiniz çalışmanın özetini okuyup sorularınızı o özete göre cevaplamak.</p>
+        </header>
+
+        <ol class="steps" aria-label="Dil modelinin çalışma adımları">
+          <li class="step">
+            <div class="step-text">
+              <h3>Modele bir “istem” gönderilir</h3>
+              <p>Model internete bakmaz, makalenin tamamını da okumaz. Yalnızca sayfanın ona verdiği metni görür. Bu metne <em>istem</em> denir.</p>
+              <p class="aside">İstem dört parçadan oluşur. Önceki konuşmadan yalnızca son altı mesaj eklenir; böylece takip soruları sorabilirsiniz.</p>
+            </div>
+            <div class="step-visual" aria-hidden="true">
+              <div class="prompt-stack">
+                <div class="prompt-part rule"><small>Talimat</small>Yalnızca aşağıdaki özete dayanarak, sade bir Türkçeyle cevap ver. Özette yoksa “Özette bu bilgi yok.” de.</div>
+                <div class="prompt-part work"><small>Çalışma</small>Başlık · anahtar kelimeler · özet</div>
+                <div class="prompt-part history"><small>Önceki konuşma</small>Son 6 mesaj</div>
+                <div class="prompt-part ask"><small>Sorunuz</small>Hangi yöntem kullanılmış?</div>
+              </div>
+            </div>
+          </li>
+
+          <li class="step">
+            <div class="step-text">
+              <h3>Cevabı kelime kelime tahmin eder</h3>
+              <p>Model, istemi ve o ana kadar yazdığı her şeyi okuyup <strong>bir sonraki kelime parçasının</strong> ne olabileceğini hesaplar. Bu sitede her adımda en olası parça seçilir, metne eklenir ve işlem tekrarlanır.</p>
+              <p class="aside">En olası parça seçildiği için aynı soru aynı özette aynı cevabı verir. Bir cevap en fazla 512 parça uzunluğunda olabilir; “Durdur” düğmesi üretimi istediğiniz an keser.</p>
+            </div>
+            <div class="step-visual" aria-hidden="true">
+              <p class="next-sentence">Bu çalışmada nötrinoların <span class="next-cursor">?</span></p>
+              <div class="next-bars">
+                <div class="next-row chosen"><span>elektromanyetik</span><i style="--w:62%"></i><b>%62</b></div>
+                <div class="next-row"><span>manyetik</span><i style="--w:21%"></i><b>%21</b></div>
+                <div class="next-row"><span>kütlesi</span><i style="--w:9%"></i><b>%9</b></div>
+                <div class="next-row"><span>diğerleri</span><i style="--w:8%"></i><b>%8</b></div>
+              </div>
+              <p class="next-loop">En olası parça eklenir → model yeniden okur → bir sonraki parçayı seçer</p>
+              <p class="vis-note">Olasılıklar temsilidir.</p>
+            </div>
+          </li>
+
+          <li class="step">
+            <div class="step-text">
+              <h3>Neden yalnızca özete göre?</h3>
+              <p>Dil modelleri bilmediği bir şeyi sorulduğunda bile akıcı ve inandırıcı bir cevap yazabilir. Buna <em>uydurma</em> (halüsinasyon) denir. Küçük modellerde bu risk daha yüksektir.</p>
+              <p>Bu yüzden modelden yalnızca özetteki bilgiyi kullanması istenir. Özeti bulunamayan kayıtlarda sohbet hiç açılmaz.</p>
+            </div>
+            <div class="step-visual" aria-hidden="true">
+              <div class="grounding">
+                <div class="ground-case good">
+                  <small>Özette var</small>
+                  <p class="q">Hangi alaşımlar incelenmiş?</p>
+                  <p class="a">NiCoMnSn tabanlı manyetik şekil hafıza alaşımları incelenmiş.</p>
+                </div>
+                <div class="ground-case bad">
+                  <small>Özette yok</small>
+                  <p class="q">Deneyler kaç yıl sürmüş?</p>
+                  <p class="a">Özette bu bilgi yok.</p>
+                </div>
+              </div>
+              <p class="vis-note">Örnek cevaplar temsilidir; model yine de hata yapabilir.</p>
+            </div>
+          </li>
+
+          <li class="step">
+            <div class="step-text">
+              <h3>E2B ve E4B ne demek?</h3>
+              <p>“E”, <em>etkin</em> (effective) parametre sayısını gösterir. Gemma 4'te her katmanın kelimeler için kendine ait küçük bir sözlüğü vardır. Bu sözlükler çok yer kaplar ama yalnızca hızlı bir bakma işine yarar, hesaplamayı pek artırmaz.</p>
+              <p class="aside">Bu yüzden indirme boyutu adındaki sayıdan büyüktür: E2B'nin 2,3 milyar etkin parametresi var, sözlüklerle birlikte 5,1 milyar.</p>
+            </div>
+            <div class="step-visual" aria-hidden="true">
+              <div class="param-rows">
+                <div class="param-row">
+                  <span class="param-name">E2B</span>
+                  <div class="param-bar"><i class="eff" style="--w:28.75%"></i><i class="emb" style="--w:35%"></i></div>
+                  <span class="param-num">2,3 / 5,1 milyar</span>
+                </div>
+                <div class="param-row">
+                  <span class="param-name">E4B</span>
+                  <div class="param-bar"><i class="eff" style="--w:56.25%"></i><i class="emb" style="--w:43.75%"></i></div>
+                  <span class="param-num">4,5 / 8 milyar</span>
+                </div>
+              </div>
+              <p class="param-legend"><span class="key eff"></span>etkin parametre <span class="key emb"></span>katman sözlükleri</p>
+              <table class="mini-table">
+                <thead><tr><th></th><th>E2B</th><th>E4B</th></tr></thead>
+                <tbody>
+                  <tr><th>İndirme</th><td>≈3,1 GB</td><td>≈4,9 GB</td></tr>
+                  <tr><th>Katman</th><td>35</td><td>42</td></tr>
+                  <tr><th>Bellek</th><td>en az 8 GB</td><td>16 GB önerilir</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </li>
+        </ol>
+
+        <figure class="figure" aria-labelledby="llm-device-title">
+          <h3 id="llm-device-title">Ne nereye gider?</h3>
+          <div class="device">
+            <div class="cloud-col">
+              <div class="ext"><strong>Hugging Face</strong><span>Gemma 4 ağırlıkları, bir kez indirilir</span></div>
+              <div class="ext"><strong>OpenAlex · Crossref</strong><span>Yalnızca DOI gider, özet gelir</span></div>
+            </div>
+            <div class="device-box">
+              <div class="device-bar"><i></i><i></i><i></i>Sizin tarayıcınız</div>
+              <div class="device-body">
+                <div class="dev-part"><strong>Makale sayfası</strong><span>Özeti ve sorunuzu istemde birleştirir.</span></div>
+                <div class="dev-part model"><strong>Gemma 4</strong><span>Ayrı bir arka plan işleminde, ekran kartıyla (WebGPU) çalışır.</span></div>
+                <div class="dev-part"><strong>Tarayıcı önbelleği</strong><span>Model dosyaları sonraki ziyaretlerde buradan gelir.</span></div>
+              </div>
+              <div class="device-foot">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                Sorularınız ve cevaplar cihazınızdan dışarı gönderilmez.
+              </div>
+            </div>
+          </div>
+          <figcaption>Model telefonlarda çalışmaz; bilgisayarda güncel Chrome veya Edge gerekir. İlk yükleme internet hızına göre birkaç dakika sürebilir.</figcaption>
+        </figure>
+
+        <p class="links"><a href="https://huggingface.co/google/gemma-4-E2B-it">Gemma 4 E2B model kartı</a> · <a href="https://huggingface.co/onnx-community/gemma-4-E2B-it-ONNX">Tarayıcıda kullanılan ONNX sürümü</a></p>
+      </section>
+    </div>
+
+    <div class="how-panel" id="panel-compare" role="tabpanel" aria-labelledby="tab-compare" hidden>
+      <section class="journey" aria-labelledby="compare-title">
+        <h2 id="compare-title">Biri bulur, diğeri anlatır</h2>
+        <div class="duo">
+          <div class="duo-card">
+            <p class="duo-role">Arama modeli · Multilingual E5 Small</p>
+            <div class="duo-flow" aria-hidden="true">
+              <span class="duo-in">“güneş nötrinoları”</span>
+              <span class="duo-arrow"></span>
+              <span class="duo-model">E5</span>
+              <span class="duo-arrow"></span>
+              <svg class="wave duo-out" id="duo-wave" viewBox="0 0 384 56" preserveAspectRatio="none"></svg>
+            </div>
+            <p>Metni okur ve <strong>384 sayılık bir anlam parmak izine</strong> çevirir. Hiç metin yazmaz. Parmak izleri karşılaştırılarak en yakın çalışmalar bulunur.</p>
+            <p class="duo-analogy">Benzetme: kütüphanenin katalog kartları.</p>
+          </div>
+          <div class="duo-card">
+            <p class="duo-role">Dil modeli · Gemma 4</p>
+            <div class="duo-flow" aria-hidden="true">
+              <span class="duo-in">özet + soru</span>
+              <span class="duo-arrow"></span>
+              <span class="duo-model dark">Gemma 4</span>
+              <span class="duo-arrow"></span>
+              <span class="duo-text">“Bu çalışma, Güneş'ten gelen nötrinoların…”</span>
+            </div>
+            <p>İstemi okur ve <strong>kelime kelime yeni metin yazar</strong>. Bir özeti açıklayabilir, özetleyebilir, sorulara cevap verebilir.</p>
+            <p class="duo-analogy">Benzetme: makaleyi okuyup size anlatan biri.</p>
+          </div>
+        </div>
+        <p class="journey-note">İkisi birlikte çalışır: E5 bölümdeki 1.983 kaydı saniyeler içinde tarar ve ilgili çalışmaları bulur. Gemma 4 bu kadar kaydı okuyamayacak kadar yavaştır, ama seçtiğiniz tek bir çalışmayı ayrıntılı anlatabilir.</p>
+      </section>
+
+      <section class="chapter" aria-labelledby="compare-table-title">
+        <header>
+          <h2 id="compare-table-title">Yan yana</h2>
+        </header>
+        <div class="figure compare-figure">
+          <table class="compare-table">
+            <thead>
+              <tr><th scope="col"></th><th scope="col">Arama modeli<span>Multilingual E5 Small</span></th><th scope="col">Dil modeli<span>Gemma 4 E2B / E4B</span></th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Görevi</th><td>Benzer çalışmaları bulmak</td><td>Seçilen çalışmayı açıklamak</td></tr>
+              <tr><th scope="row">Girdi → çıktı</th><td>Metin → 384 sayı</td><td>Metin → yeni metin</td></tr>
+              <tr><th scope="row">Ne zaman çalışır?</th><td>Her aramada</td><td>“Makaleyi sor” sayfasında, siz sorunca</td></tr>
+              <tr><th scope="row">Parametre</th><td>≈118 milyon</td><td>2,3 / 4,5 milyar etkin</td></tr>
+              <tr><th scope="row">İndirme</th><td>≈118 MB</td><td>≈3,1 / 4,9 GB</td></tr>
+              <tr><th scope="row">Katman</th><td>12</td><td>35 / 42</td></tr>
+              <tr><th scope="row">En uzun girdi</th><td>512 token</td><td>128 bin token</td></tr>
+              <tr><th scope="row">Nerede çalışır?</th><td>İşlemci (WebAssembly)</td><td>Ekran kartı (WebGPU)</td></tr>
+              <tr><th scope="row">Telefonda</th><td>Çalışır</td><td>Çalışmaz</td></tr>
+              <tr><th scope="row">Uydurma riski</th><td>Yok; yalnızca benzerlik ölçer</td><td>Var; özetle sınırlandırılır</td></tr>
+              <tr><th scope="row">Kütüphane</th><td>Transformers.js 3.7.2</td><td>Transformers.js 4.3.2</td></tr>
+              <tr><th scope="row">Lisans</th><td>MIT</td><td>Apache 2.0</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="prose">
+          <p>İki model de tarayıcınızda çalışır ve aramanız ya da sorularınız hiçbir sunucuya gönderilmez. Fark, yaptıkları işte: E5 küçük ve hızlıdır çünkü yalnızca “ne kadar benziyor?” sorusunu cevaplar. Gemma 4 çok daha büyüktür çünkü dili anlayıp yeni cümleler kurması gerekir.</p>
+        </div>
+      </section>
+    </div>
   </main>
 
   <footer class="site-footer">
@@ -1208,6 +1508,7 @@
       drawWave('wave-query', query, '#e0a100');
       drawWave('wave-near', blend(query, vector(21), .22), '#1b4f9c');
       drawWave('wave-far', vector(99), '#8a9bb0');
+      drawWave('duo-wave', query, '#e0a100');
 
       const pool = document.getElementById('pool');
       if (pool) {
@@ -1380,8 +1681,21 @@
       },
       '#nasil-calisir': {
         id: 'architecture',
+        tab: 'search',
         title: 'Arama nasıl çalışır?',
-        lead: 'Yayınların nereden geldiğini, yapay zekâ modelinin metinleri nasıl karşılaştırdığını ve sonuçların nasıl sıralandığını adım adım anlatıyoruz.',
+        lead: 'Aramayı yapan model ile “Makaleyi sor” sayfasındaki dil modelinin nasıl çalıştığını adım adım anlatıyoruz.',
+      },
+      '#nasil-calisir/makaleyi-sor': {
+        id: 'architecture',
+        tab: 'llm',
+        title: 'Arama nasıl çalışır?',
+        lead: 'Aramayı yapan model ile “Makaleyi sor” sayfasındaki dil modelinin nasıl çalıştığını adım adım anlatıyoruz.',
+      },
+      '#nasil-calisir/karsilastirma': {
+        id: 'architecture',
+        tab: 'compare',
+        title: 'Arama nasıl çalışır?',
+        lead: 'Aramayı yapan model ile “Makaleyi sor” sayfasındaki dil modelinin nasıl çalıştığını adım adım anlatıyoruz.',
       },
     };
 
@@ -1435,15 +1749,36 @@
         $('page-lead').textContent = page.lead;
         document.title = page.title + ' | Ankara Üniversitesi';
       }
+      const switchingTab = page.id === 'architecture' && currentPage === 'architecture';
+      if (page.tab) {
+        for (const tab of ['search', 'llm', 'compare']) {
+          $('panel-' + tab).hidden = tab !== page.tab;
+          $('tab-' + tab).setAttribute('aria-selected', String(tab === page.tab));
+          $('tab-' + tab).tabIndex = tab === page.tab ? 0 : -1;
+        }
+      }
       const returning = page.id === 'search' && currentPage && currentPage !== 'search';
       currentPage = page.id;
-      if (moveFocus) {
+      if (switchingTab) {
+        // Changing tabs keeps the reader where the tabs are instead of jumping to the top of the page.
+        $('tab-' + page.tab).focus({preventScroll: true});
+      } else if (moveFocus) {
         $('page-title').focus({preventScroll: true});
         window.scrollTo(0, returning ? searchScroll : 0);
       }
     }
 
     window.addEventListener('hashchange', () => showPage(true));
+    document.querySelector('.how-tabs').addEventListener('keydown', event => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      const tabs = [...document.querySelectorAll('.how-tabs [role="tab"]')];
+      const index = tabs.indexOf(document.activeElement);
+      if (index < 0) return;
+      event.preventDefault();
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
+        : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+      location.hash = tabs[next].getAttribute('href');
+    });
 
     function setStatus(message, error = false) {
       $('status').textContent = message;
