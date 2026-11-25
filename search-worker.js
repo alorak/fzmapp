@@ -108,10 +108,7 @@ self.onmessage = async ({data: {model, weightsFile, queryText, records}}) => {
     const scores = results.flatMap(group => group.items.map(item => item.score)).sort((a, b) => a - b);
     const middle = scores.length >> 1;
     const baseline = scores.length % 2 ? scores[middle] : (scores[middle - 1] + scores[middle]) / 2;
-    // The average record vector is the part every text shares; the page draws vectors relative to it.
-    const average = new Float32Array(query.length);
-    for (const vector of vectors) for (let i = 0; i < average.length; i++) average[i] += vector[i] / vectors.length;
-    self.postMessage({type: 'result', results, queryVector: Array.from(query), match, baseline, average: Array.from(average)});
+    self.postMessage({type: 'result', results, queryVector: Array.from(query), match, baseline});
   } catch (error) {
     self.postMessage({type: 'error', message: error.message, modelReady: Boolean(modelPipeline)});
   }
