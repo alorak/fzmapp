@@ -29,8 +29,9 @@ async function load(modelId, dtype) {
 
 async function generate(messages) {
   const {TextStreamer} = await import(library);
+  // Gemma 4's chat template applies `trim` to the system message content, so content must be a plain string.
   const prompt = processor.apply_chat_template(
-    messages.map(({role, content}) => ({role, content: [{type: 'text', text: content}]})),
+    messages.map(({role, content}) => ({role, content: String(content)})),
     {add_generation_prompt: true, enable_thinking: false},
   );
   const inputs = await processor(prompt, null, null, {add_special_tokens: false});
