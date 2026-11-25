@@ -234,7 +234,7 @@
       content: counter(rank);
       position: absolute;
       left: 22px;
-      top: 18px;
+      top: 25px;
       width: 38px;
       height: 38px;
       display: grid;
@@ -273,22 +273,18 @@
     .score { color: var(--muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
 
     /* Similarity shown on the model's usual 0.70-1.00 range */
-    .ring { flex: none; display: grid; justify-items: center; gap: 2px; }
+    .ring { flex: none; display: block; }
     .ring svg { display: block; }
     .ring-track { stroke: #e3e9f0; }
     .ring-fill { stroke: var(--blue); transition: stroke-dashoffset .6s ease-out; }
-    .ring-value { font: 600 13px var(--sans); fill: var(--ink); font-variant-numeric: tabular-nums; }
-    .ring span { font-size: .75rem; color: var(--muted); }
+    .ring-value { font: 650 11px var(--sans); fill: var(--ink); font-variant-numeric: tabular-nums; }
     .meter-inline { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: .88rem; font-variant-numeric: tabular-nums; }
     .meter-inline i { position: relative; display: block; width: 64px; height: 6px; border-radius: 3px; background: #e3e9f0; overflow: hidden; }
     .meter-inline b { position: absolute; inset: 0 auto 0 0; border-radius: 3px; background: #6f8fc4; }
-    .scale-note { margin: 0 0 12px; color: var(--muted); font-size: .9rem; }
-    .scale-note[hidden] { display: none; }
-    .result-more { display: inline-block; margin-top: 12px; font-weight: 650; font-size: .95rem; }
     .record-list { list-style: none; margin: 12px 0 0; padding: 0; }
     .record-list li { border-top: 1px solid var(--line); padding: 11px 0; overflow-wrap: anywhere; }
     .record-list li:last-child { padding-bottom: 0; }
-    .record-kind { font-size: .8rem; font-weight: 700; color: var(--blue); background: var(--blue-soft); padding: 1px 8px; border-radius: 4px; }
+    .record-kind { min-width: 48px; text-align: center; font-size: .8rem; font-weight: 700; color: var(--blue); background: var(--blue-soft); padding: 1px 8px; border-radius: 4px; }
     .record-kind[data-kind="thesis"] { color: var(--amber-ink); background: var(--amber-soft); }
     .record-title { margin: 4px 0 0; line-height: 1.45; }
     .record-title a { color: var(--ink); text-decoration-color: var(--line-strong); }
@@ -298,7 +294,8 @@
     .person-page { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px 28px; align-items: start; margin-block: -64px 64px; }
     .person-page[hidden] { display: none; }
     .person-card { box-shadow: 0 18px 40px -24px rgba(15,39,66,.45); text-align: center; }
-    .person-photo { display: block; width: 160px; height: 200px; margin: 0 auto 16px; object-fit: cover; object-position: center 20%; border-radius: 12px; background: var(--paper); }
+    .person-avatar { position: relative; display: grid; place-items: center; width: 160px; height: 200px; margin: 0 auto 16px; border-radius: 12px; overflow: hidden; background: var(--blue-soft); color: var(--blue); font: 600 3.2rem/1 var(--serif); }
+    .person-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
     .person-photo[hidden] { display: none; }
     .person-card .stats { margin: 0 0 16px; text-align: left; }
     .person-card a { display: block; font-weight: 650; }
@@ -568,9 +565,8 @@
       .workspace { grid-template-columns: minmax(0, 1fr); grid-template-areas: "search" "model" "results"; gap: 16px; }
       .data-page { grid-template-columns: minmax(0, 1fr); gap: 16px; }
       .person-page { grid-template-columns: minmax(0, 1fr); gap: 16px; }
-      .person-photo { width: 120px; height: 150px; }
+      .person-avatar { width: 120px; height: 150px; font-size: 2.4rem; }
       .result-photo { right: 64px; width: 40%; opacity: .16; }
-      .ring svg { width: 48px; height: 48px; }
       .faculty-list { grid-template-columns: minmax(0, 1fr); }
       .model-facts div:nth-child(2), .model-note { display: none; }
       .fp-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
@@ -676,7 +672,6 @@
     </aside>
 
     <div class="results-area">
-      <p class="scale-note" id="scale-note" hidden>Halka ve çubuklar benzerliği bu modelin olağan aralığında, 0,70 ile 1,00 arasında gösterir. <a href="#nasil-calisir">Neden bu aralık?</a></p>
       <section id="results" aria-label="Arama sonuçları"></section>
       <section class="empty-hint" aria-labelledby="hint-title">
         <h2 id="hint-title">Arama kelimeleri değil, anlamı eşleştirir</h2>
@@ -718,7 +713,10 @@
 
   <main id="person-page" class="person-page wrap" hidden>
     <aside class="panel person-card" aria-label="Akademisyen bilgileri">
-      <img id="person-photo" class="person-photo" alt="" referrerpolicy="no-referrer" hidden>
+      <div class="person-avatar">
+        <span id="person-initials" aria-hidden="true"></span>
+        <img id="person-photo" class="person-photo" alt="" hidden>
+      </div>
       <div class="stats">
         <div class="stat"><strong id="person-publications">–</strong><span>yayın</span></div>
         <div class="stat"><strong id="person-theses">–</strong><span>tez</span></div>
@@ -1292,7 +1290,6 @@
     function clearResults() {
       $('results').replaceChildren();
       $('fingerprint').hidden = true;
-      $('scale-note').hidden = true;
       lastSearch = null;
     }
 
@@ -1534,9 +1531,8 @@
     }
 
     const svgNS = 'http://www.w3.org/2000/svg';
-    // Scores from this model usually fall between 0.70 and 1.00, so that range fills the gauge.
-    const scaleLow = .7;
-    const gaugeShare = score => Math.min(1, Math.max(0, (score - scaleLow) / (1 - scaleLow)));
+    // Gauges use the plain 0-1 scale: a similarity of 0.85 fills 85% of the ring or bar.
+    const gaugeShare = score => Math.min(1, Math.max(0, score));
 
     function svg(tag, attributes) {
       const node = document.createElementNS(svgNS, tag);
@@ -1546,20 +1542,20 @@
 
     function ring(score) {
       const wrapper = element('div', '', 'ring');
-      const radius = 23;
+      const radius = 18.5;
       const length = 2 * Math.PI * radius;
-      const graphic = svg('svg', {width: 58, height: 58, viewBox: '0 0 58 58', role: 'img', 'aria-label': `Benzerlik ${formatScore.format(score)}`});
+      const graphic = svg('svg', {width: 44, height: 44, viewBox: '0 0 44 44', role: 'img', 'aria-label': `Benzerlik ${formatScore.format(score)}`});
       graphic.append(
-        svg('circle', {class: 'ring-track', cx: 29, cy: 29, r: radius, fill: 'none', 'stroke-width': 6}),
+        svg('circle', {class: 'ring-track', cx: 22, cy: 22, r: radius, fill: 'none', 'stroke-width': 4.5}),
         svg('circle', {
-          class: 'ring-fill', cx: 29, cy: 29, r: radius, fill: 'none', 'stroke-width': 6, 'stroke-linecap': 'round',
-          'stroke-dasharray': length, 'stroke-dashoffset': length * (1 - gaugeShare(score)), transform: 'rotate(-90 29 29)',
+          class: 'ring-fill', cx: 22, cy: 22, r: radius, fill: 'none', 'stroke-width': 4.5, 'stroke-linecap': 'round',
+          'stroke-dasharray': length, 'stroke-dashoffset': length * (1 - gaugeShare(score)), transform: 'rotate(-90 22 22)',
         }),
       );
-      const value = svg('text', {class: 'ring-value', x: 29, y: 33.5, 'text-anchor': 'middle', 'aria-hidden': 'true'});
+      const value = svg('text', {class: 'ring-value', x: 22, y: 25.8, 'text-anchor': 'middle', 'aria-hidden': 'true'});
       value.textContent = formatScore.format(score);
       graphic.append(value);
-      wrapper.append(graphic, element('span', 'benzerlik'));
+      wrapper.append(graphic);
       return wrapper;
     }
 
@@ -1600,16 +1596,43 @@
       return item;
     }
 
+    // A photo saved in the repository (photos/<profile>.jpg) is tried first, then the AVESIS address.
+    const failedPhotos = new Set();
+
+    function photoSources(name) {
+      const info = people.get(name);
+      return [
+        info?.profile && /^[\w.-]+$/.test(info.profile) ? `photos/${info.profile}.jpg` : null,
+        info?.photo,
+      ].filter(url => url && !failedPhotos.has(url));
+    }
+
+    function loadPhoto(image, sources, onFail) {
+      const [first, ...rest] = sources;
+      if (!first) {
+        onFail();
+        return;
+      }
+      image.onerror = () => {
+        failedPhotos.add(first);
+        loadPhoto(image, rest, onFail);
+      };
+      image.src = first;
+    }
+
     function photo(name, className) {
-      const url = people.get(name)?.photo;
-      if (!url) return null;
+      const sources = photoSources(name);
+      if (!sources.length) return null;
       const image = element('img', '', className);
-      image.src = url;
       image.alt = '';
       image.loading = 'lazy';
-      image.referrerPolicy = 'no-referrer';
-      image.addEventListener('error', () => image.remove());
+      loadPhoto(image, sources, () => image.remove());
       return image;
+    }
+
+    function initials(name) {
+      const words = name.replace(/^(Prof\.|Doç\.|Dr\.|Öğr\.|Üyesi|\s)+/u, '').split(/\s+/).filter(Boolean);
+      return words.length ? (words[0][0] + (words.length > 1 ? words.at(-1)[0] : '')).toLocaleUpperCase('tr') : '';
     }
 
     function renderResult(group) {
@@ -1624,10 +1647,7 @@
       heading.append(name, ring(group.score));
       const list = element('ul', '', 'record-list');
       for (const record of group.items.slice(0, 3)) list.append(recordItem(record, true));
-      const total = records.filter(record => record.faculty === group.name).length;
-      const more = element('a', `Tüm kayıtlarını gör (${formatCount.format(total)})`, 'result-more');
-      more.href = personHash(group.name);
-      card.append(heading, list, more);
+      card.append(heading, list);
       return card;
     }
 
@@ -1647,15 +1667,14 @@
       $('person-kind').querySelector('[data-kind="publication"]').disabled = !publications;
       const info = people.get(name);
       const image = $('person-photo');
-      if (info?.photo) {
-        image.hidden = false;
-        image.src = info.photo;
-        image.alt = name;
-        image.onerror = () => { image.hidden = true; };
-      } else {
+      $('person-initials').textContent = initials(name);
+      image.hidden = true;
+      image.alt = name;
+      image.onload = () => { image.hidden = false; };
+      loadPhoto(image, photoSources(name), () => {
         image.hidden = true;
         image.removeAttribute('src');
-      }
+      });
       $('person-profile').hidden = !info?.profile_url;
       if (info?.profile_url) $('person-profile').href = info.profile_url;
       $('person-filter').value = '';
@@ -1777,7 +1796,6 @@
       try {
         const {results: sorted, queryVector, match} = await searchInBackground(queryText);
         lastSearch = {queryText, byFaculty: new Map(sorted.map(group => [group.name, group.items]))};
-        $('scale-note').hidden = !sorted.length;
         $('results').append(...sorted.map(renderResult));
         showFingerprint({queryText, queryVector, match});
         setStatus(`${sorted.length} akademisyen sıralandı. Skor, sorgu ile kayıtlar arasındaki benzerliği gösterir.`);
