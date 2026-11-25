@@ -62,6 +62,8 @@ class CollectionTests(unittest.TestCase):
         pages = {
             PROFILE: html(f"""
                 <h1>Prof. Dr. MEHMET KABAK</h1>
+                <img src="/Content/images/logo.png">
+                <img src="/user/image/100112" alt="Profile photo">
                 <a href="{TURKISH_ARTICLE}">1. {TITLE}</a>
                 <a href="{TURKISH_ARTICLE}#detail">{TITLE}</a>
             """),
@@ -81,6 +83,7 @@ class CollectionTests(unittest.TestCase):
             collect(["mkabak"], site, output)
             rows = json.loads((output / "academics.json").read_text(encoding="utf-8"))
             report = json.loads((output / "collection-report.json").read_text(encoding="utf-8"))
+            people = json.loads((output / "faculty.json").read_text(encoding="utf-8"))
 
         self.assertEqual([row["kind"] for row in rows], ["publication", "thesis"])
         self.assertEqual(rows[0]["title"], TITLE)
@@ -89,6 +92,12 @@ class CollectionTests(unittest.TestCase):
         self.assertEqual(report[0]["counts"], {"publication": 1, "thesis": 1})
         self.assertEqual(report[0]["status"], "ok")
         self.assertEqual(site.get.call_count, 4)
+        self.assertEqual(people, [{
+            "faculty": "Prof. Dr. MEHMET KABAK",
+            "profile": "mkabak",
+            "profile_url": BASE + "mkabak",
+            "photo": BASE + "user/image/100112",
+        }])
 
 
 class PublicSiteTests(unittest.TestCase):

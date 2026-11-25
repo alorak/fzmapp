@@ -20,6 +20,7 @@ PUBLICATION_PATH = re.compile(
     re.IGNORECASE,
 )
 THESIS_PATH = re.compile(r"/(?:yonetilen-tez|thesis|theses|advising|supervisedthesis)/[^/]+", re.I)
+PHOTO_PATH = re.compile(r"^/user/image/\d+$")
 
 
 class PublicSite:
@@ -85,6 +86,16 @@ def metadata(page):
     return result
 
 
+def profile_photo(page):
+    """Return the AVESIS profile photo URL shown on a profile page, if any."""
+    for image in page.select("img[src]"):
+        url = urljoin(BASE, image["src"])
+        location = urlsplit(url)
+        if location.scheme == "https" and location.netloc == urlsplit(BASE).netloc and PHOTO_PATH.fullmatch(location.path):
+            return url
+    return None
+
+
 def discover(session):
     profiles = set(json.loads((ROOT / "data/profiles.json").read_text(encoding="utf-8")))
     if os.getenv("DISCOVER_DEPARTMENT", "false").lower() != "true":
@@ -108,7 +119,7 @@ def discover(session):
 
 
 def collect(profiles, site, output_dir):
-    rows, report, cache = [], [], {}
+    rows, report, cache, people = [], [], {}, []
     for slug in profiles:
         if not re.fullmatch(r"[a-zA-Z0-9_.-]+", slug):
             raise ValueError("Invalid profile slug")
@@ -123,6 +134,7 @@ def collect(profiles, site, output_dir):
                 raise RuntimeError("Profile heading missing")
             name = heading.get_text(" ", strip=True)
             entry["faculty"] = name
+            people.append(dict(faculty=name, profile=slug, profile_url=f"{BASE}{slug}", photo=profile_photo(page)))
         except (RuntimeError, requests.RequestException) as exc:
             entry["errors"].append(str(exc))
             entry["status"] = "failed"
@@ -164,6 +176,7 @@ def collect(profiles, site, output_dir):
     if not rows:
         raise RuntimeError("No records collected; inspect collection-report.json")
     write_json(output_dir / "academics.json", rows)
+    write_json(output_dir / "faculty.json", sorted(people, key=lambda person: person["faculty"]))
     print(f"Collected {len(rows)} records; inspect report for partial coverage")
 
 

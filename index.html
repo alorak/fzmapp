@@ -245,11 +245,46 @@
       font: 600 1.15rem/1 var(--serif);
     }
     #results article:first-child::before { background: var(--blue); color: #fff; }
-    .result-heading, .record-meta { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
-    .result-heading { justify-content: space-between; }
+    #results article { overflow: hidden; }
+    #results article > :not(.result-photo) { position: relative; z-index: 1; }
+    .result-photo {
+      position: absolute;
+      top: 0;
+      right: 92px;
+      width: 36%;
+      max-width: 190px;
+      height: 100%;
+      max-height: 280px;
+      object-fit: cover;
+      object-position: center 18%;
+      opacity: .2;
+      filter: grayscale(.35);
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 45%, #000 75%, transparent), linear-gradient(to bottom, #000 55%, transparent);
+      -webkit-mask-composite: source-in;
+      mask-image: linear-gradient(to right, transparent, #000 45%, #000 75%, transparent), linear-gradient(to bottom, #000 55%, transparent);
+      mask-composite: intersect;
+      pointer-events: none;
+    }
+    .result-heading { display: flex; justify-content: space-between; align-items: center; gap: 4px 16px; }
     .result-heading h2 { font-size: 1.3rem; }
+    .person-link { color: var(--ink); text-decoration: none; }
+    .person-link:hover { color: var(--blue); text-decoration: underline; text-decoration-thickness: 1px; }
+    .record-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 12px; }
     .score { color: var(--muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
-    .result-heading .score { background: var(--paper); padding: 2px 10px; border-radius: 999px; }
+
+    /* Similarity shown on the model's usual 0.70-1.00 range */
+    .ring { flex: none; display: grid; justify-items: center; gap: 2px; }
+    .ring svg { display: block; }
+    .ring-track { stroke: #e3e9f0; }
+    .ring-fill { stroke: var(--blue); transition: stroke-dashoffset .6s ease-out; }
+    .ring-value { font: 600 13px var(--sans); fill: var(--ink); font-variant-numeric: tabular-nums; }
+    .ring span { font-size: .75rem; color: var(--muted); }
+    .meter-inline { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: .88rem; font-variant-numeric: tabular-nums; }
+    .meter-inline i { position: relative; display: block; width: 64px; height: 6px; border-radius: 3px; background: #e3e9f0; overflow: hidden; }
+    .meter-inline b { position: absolute; inset: 0 auto 0 0; border-radius: 3px; background: #6f8fc4; }
+    .scale-note { margin: 0 0 12px; color: var(--muted); font-size: .9rem; }
+    .scale-note[hidden] { display: none; }
+    .result-more { display: inline-block; margin-top: 12px; font-weight: 650; font-size: .95rem; }
     .record-list { list-style: none; margin: 12px 0 0; padding: 0; }
     .record-list li { border-top: 1px solid var(--line); padding: 11px 0; overflow-wrap: anywhere; }
     .record-list li:last-child { padding-bottom: 0; }
@@ -258,6 +293,33 @@
     .record-title { margin: 4px 0 0; line-height: 1.45; }
     .record-title a { color: var(--ink); text-decoration-color: var(--line-strong); }
     .record-title a:hover { color: var(--blue); text-decoration-color: currentColor; }
+
+    /* Person page */
+    .person-page { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px 28px; align-items: start; margin-block: -64px 64px; }
+    .person-page[hidden] { display: none; }
+    .person-card { box-shadow: 0 18px 40px -24px rgba(15,39,66,.45); text-align: center; }
+    .person-photo { display: block; width: 160px; height: 200px; margin: 0 auto 16px; object-fit: cover; object-position: center 20%; border-radius: 12px; background: var(--paper); }
+    .person-photo[hidden] { display: none; }
+    .person-card .stats { margin: 0 0 16px; text-align: left; }
+    .person-card a { display: block; font-weight: 650; }
+    .person-card a + a { margin-top: 10px; font-weight: 600; font-size: .95rem; }
+    .person-records { min-width: 0; box-shadow: 0 18px 40px -24px rgba(15,39,66,.45); }
+    .person-tools { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+    .segmented { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); }
+    .segmented button { background: transparent; border: 0; color: var(--ink); border-radius: 999px; padding: 5px 14px; font-weight: 600; font-size: .93rem; }
+    .segmented button:hover:not(:disabled) { background: #e8eef5; }
+    .segmented button[aria-pressed="true"] { background: var(--blue); color: #fff; }
+    #person-filter { flex: 1; min-width: 180px; max-width: 320px; border: 1.5px solid var(--line-strong); border-radius: 8px; padding: 6px 12px; font-size: .97rem; }
+    #person-filter:focus { border-color: var(--blue); outline: none; box-shadow: 0 0 0 3px rgba(27,79,156,.14); }
+    #person-order { margin-top: 12px; color: var(--muted); font-size: .92rem; }
+    #person-order:empty { display: none; }
+    .person-list { margin-top: 8px; }
+    .person-list li:first-child { border-top: 0; }
+    #person-empty { margin-top: 14px; color: var(--muted); }
+    #person-empty[hidden] { display: none; }
+    h1.is-person { font-size: clamp(1.9rem, 4.2vw, 2.9rem); }
+    .faculty-list a { color: var(--ink); text-decoration-color: var(--line-strong); }
+    .faculty-list a:hover { color: var(--blue); }
 
     .empty-hint {
       border: 1.5px dashed var(--line-strong);
@@ -505,6 +567,10 @@
       .masthead-top { margin-bottom: 12px; }
       .workspace { grid-template-columns: minmax(0, 1fr); grid-template-areas: "search" "model" "results"; gap: 16px; }
       .data-page { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+      .person-page { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+      .person-photo { width: 120px; height: 150px; }
+      .result-photo { right: 64px; width: 40%; opacity: .16; }
+      .ring svg { width: 48px; height: 48px; }
       .faculty-list { grid-template-columns: minmax(0, 1fr); }
       .model-facts div:nth-child(2), .model-note { display: none; }
       .fp-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
@@ -574,7 +640,7 @@
         <button type="button" disabled>GaN transistörleri</button>
         <button type="button" disabled>güneş nötrinoları</button>
         <button type="button" disabled>manyetik malzemeler</button>
-        <button type="button" disabled>doğrusal olmayan optik</button>
+        <button type="button" disabled>yama anten</button>
       </div>
       <p id="status" role="status">Veri yükleniyor…</p>
       <progress id="index-progress" aria-label="Kayıt dizini hazırlanıyor" hidden></progress>
@@ -610,6 +676,7 @@
     </aside>
 
     <div class="results-area">
+      <p class="scale-note" id="scale-note" hidden>Halka ve çubuklar benzerliği bu modelin olağan aralığında, 0,70 ile 1,00 arasında gösterir. <a href="#nasil-calisir">Neden bu aralık?</a></p>
       <section id="results" aria-label="Arama sonuçları"></section>
       <section class="empty-hint" aria-labelledby="hint-title">
         <h2 id="hint-title">Arama kelimeleri değil, anlamı eşleştirir</h2>
@@ -646,6 +713,32 @@
     <section class="panel faculty-panel" id="faculty-roster" aria-labelledby="faculty-title" hidden>
       <h2 id="faculty-title">Akademisyenler</h2>
       <ul id="faculty-list" class="faculty-list"></ul>
+    </section>
+  </main>
+
+  <main id="person-page" class="person-page wrap" hidden>
+    <aside class="panel person-card" aria-label="Akademisyen bilgileri">
+      <img id="person-photo" class="person-photo" alt="" referrerpolicy="no-referrer" hidden>
+      <div class="stats">
+        <div class="stat"><strong id="person-publications">–</strong><span>yayın</span></div>
+        <div class="stat"><strong id="person-theses">–</strong><span>tez</span></div>
+      </div>
+      <a id="person-profile" target="_blank" rel="noopener noreferrer" hidden>AVESİS profilini aç</a>
+      <a href="#arama">Aramaya dön</a>
+    </aside>
+    <section class="panel person-records" aria-labelledby="person-records-title">
+      <h2 id="person-records-title" class="sr-only">Yayınlar ve tezler</h2>
+      <div class="person-tools">
+        <div class="segmented" role="group" aria-label="Kayıt türü" id="person-kind">
+          <button type="button" data-kind="all" aria-pressed="true">Tümü</button>
+          <button type="button" data-kind="publication" aria-pressed="false">Yayınlar</button>
+          <button type="button" data-kind="thesis" aria-pressed="false">Tezler</button>
+        </div>
+        <input id="person-filter" type="search" placeholder="Başlıklarda ara" aria-label="Bu akademisyenin kayıtlarında ara" autocomplete="off">
+      </div>
+      <p id="person-order"></p>
+      <ul id="person-list" class="record-list person-list"></ul>
+      <p id="person-empty" hidden>Bu filtreye uyan kayıt yok.</p>
     </section>
   </main>
 
@@ -1105,6 +1198,10 @@
 
   <script type="module">
     const $ = id => document.getElementById(id);
+    for (const link of document.querySelectorAll('a[href^="https://"]')) {
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+    }
     const model = 'Xenova/multilingual-e5-small';
     const weightsFile = 'onnx/model_quantized.onnx';
     const bytesInMB = 1_000_000;
@@ -1116,6 +1213,12 @@
     let searchWorker;
     let busy = false;
     let hasLocalData = false;
+    let people = new Map();      // faculty name -> {profile, profile_url, photo}
+    let lastSearch = null;       // {queryText, byFaculty: Map(name -> scored records)}
+    let searchScroll = 0;
+    let currentPage = null;
+    let personKind = 'all';
+    let personName = null;
 
     const pages = {
       '#arama': {
@@ -1135,23 +1238,43 @@
       },
     };
 
+    const personPrefix = '#akademisyen/';
+
+    function personHash(name) {
+      return personPrefix + encodeURIComponent(people.get(name)?.profile ?? name);
+    }
+
+    function personFromHash(hash) {
+      const key = decodeURIComponent(hash.slice(personPrefix.length));
+      for (const [name, info] of people) if (info.profile === key) return name;
+      return key;
+    }
+
     function showPage(moveFocus = false) {
-      const page = pages[location.hash] ?? pages['#arama'];
-      for (const {id} of Object.values(pages)) {
-        $(id + '-page').hidden = id !== page.id;
-        $(id + '-link').toggleAttribute('aria-current', id === page.id);
+      const isPerson = location.hash.startsWith(personPrefix);
+      const page = isPerson ? {id: 'person'} : pages[location.hash] ?? pages['#arama'];
+      if (currentPage === 'search' && page.id !== 'search') searchScroll = window.scrollY;
+      for (const id of ['search', 'data', 'architecture', 'person']) $(id + '-page').hidden = id !== page.id;
+      for (const id of ['search', 'data', 'architecture']) {
         if (id === page.id) $(id + '-link').setAttribute('aria-current', 'page');
+        else $(id + '-link').removeAttribute('aria-current');
       }
-      $('page-title').textContent = page.title;
-      $('page-lead').textContent = page.lead;
-      document.title = page.title + ' | Ankara Üniversitesi';
+      $('page-title').classList.toggle('is-person', isPerson);
+      if (isPerson) {
+        renderPerson(personFromHash(location.hash));
+      } else {
+        $('page-title').textContent = page.title;
+        $('page-lead').textContent = page.lead;
+        document.title = page.title + ' | Ankara Üniversitesi';
+      }
+      const returning = page.id === 'search' && currentPage && currentPage !== 'search';
+      currentPage = page.id;
       if (moveFocus) {
         $('page-title').focus({preventScroll: true});
-        window.scrollTo(0, 0);
+        window.scrollTo(0, returning ? searchScroll : 0);
       }
     }
 
-    showPage();
     window.addEventListener('hashchange', () => showPage(true));
 
     function setStatus(message, error = false) {
@@ -1169,6 +1292,8 @@
     function clearResults() {
       $('results').replaceChildren();
       $('fingerprint').hidden = true;
+      $('scale-note').hidden = true;
+      lastSearch = null;
     }
 
     function setModelState(state, loaded, total) {
@@ -1277,8 +1402,10 @@
       $('faculty-roster').hidden = !faculty.length;
       $('faculty-list').replaceChildren(...faculty.map(name => {
         const {publication, thesis} = counts.get(name);
-        const item = element('li', name);
-        item.append(element('span', thesis ? `${publication} yayın · ${thesis} tez` : `${publication} yayın`));
+        const item = element('li');
+        const link = element('a', name);
+        link.href = personHash(name);
+        item.append(link, element('span', thesis ? `${publication} yayın · ${thesis} tez` : `${publication} yayın`));
         return item;
       }));
       $('go').disabled = busy || !records.length;
@@ -1287,6 +1414,34 @@
       $('choose').disabled = busy;
       $('reset').disabled = busy;
     }
+
+    // Profile links and photos for the department's academics (optional).
+    async function readPeople() {
+      try {
+        const response = await fetch('./data/faculty.json', {cache: 'no-cache'});
+        if (!response.ok) return new Map();
+        const list = await response.json();
+        return new Map(list.filter(person => typeof person?.faculty === 'string').map(person => [person.faculty, {
+          profile: typeof person.profile === 'string' ? person.profile : undefined,
+          profile_url: safeUrl(person.profile_url),
+          photo: safeUrl(person.photo),
+        }]));
+      } catch {
+        return new Map();
+      }
+    }
+
+    function safeUrl(value) {
+      try {
+        const url = new URL(value);
+        return url.protocol === 'https:' ? url.href : undefined;
+      } catch {
+        return undefined;
+      }
+    }
+
+    showPage();
+    people = await readPeople();
 
     try {
       const [saved, source] = await Promise.all([read('records'), read('source')]);
@@ -1299,6 +1454,7 @@
       setDataStatus(error.message, true);
     }
     update();
+    showPage();
 
     $('load-bundled').onclick = async () => {
       busy = true;
@@ -1377,40 +1533,164 @@
       return item;
     }
 
+    const svgNS = 'http://www.w3.org/2000/svg';
+    // Scores from this model usually fall between 0.70 and 1.00, so that range fills the gauge.
+    const scaleLow = .7;
+    const gaugeShare = score => Math.min(1, Math.max(0, (score - scaleLow) / (1 - scaleLow)));
+
+    function svg(tag, attributes) {
+      const node = document.createElementNS(svgNS, tag);
+      for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
+      return node;
+    }
+
+    function ring(score) {
+      const wrapper = element('div', '', 'ring');
+      const radius = 23;
+      const length = 2 * Math.PI * radius;
+      const graphic = svg('svg', {width: 58, height: 58, viewBox: '0 0 58 58', role: 'img', 'aria-label': `Benzerlik ${formatScore.format(score)}`});
+      graphic.append(
+        svg('circle', {class: 'ring-track', cx: 29, cy: 29, r: radius, fill: 'none', 'stroke-width': 6}),
+        svg('circle', {
+          class: 'ring-fill', cx: 29, cy: 29, r: radius, fill: 'none', 'stroke-width': 6, 'stroke-linecap': 'round',
+          'stroke-dasharray': length, 'stroke-dashoffset': length * (1 - gaugeShare(score)), transform: 'rotate(-90 29 29)',
+        }),
+      );
+      const value = svg('text', {class: 'ring-value', x: 29, y: 33.5, 'text-anchor': 'middle', 'aria-hidden': 'true'});
+      value.textContent = formatScore.format(score);
+      graphic.append(value);
+      wrapper.append(graphic, element('span', 'benzerlik'));
+      return wrapper;
+    }
+
+    function meter(score) {
+      const wrapper = element('span', '', 'meter-inline');
+      wrapper.setAttribute('aria-label', `Benzerlik ${formatScore.format(score)}`);
+      const track = element('i');
+      const fill = element('b');
+      fill.style.width = (gaugeShare(score) * 100).toFixed(1) + '%';
+      track.append(fill);
+      track.setAttribute('aria-hidden', 'true');
+      const value = element('span', formatScore.format(score));
+      value.setAttribute('aria-hidden', 'true');
+      wrapper.append(track, value);
+      return wrapper;
+    }
+
+    function recordItem(record, withScore) {
+      const item = element('li');
+      const details = element('div', '', 'record-meta');
+      const kind = record.kind === 'publication' ? 'Yayın' : record.kind === 'thesis' ? 'Tez' : 'Kayıt';
+      const badge = element('span', kind, 'record-kind');
+      badge.dataset.kind = record.kind;
+      details.append(badge);
+      if (withScore) details.append(meter(record.score));
+      const title = element('p', '', 'record-title');
+      const url = safeUrl(record.url);
+      if (url) {
+        const link = element('a', record.title);
+        link.href = url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        title.append(link);
+      } else {
+        title.textContent = record.title;
+      }
+      item.append(details, title);
+      return item;
+    }
+
+    function photo(name, className) {
+      const url = people.get(name)?.photo;
+      if (!url) return null;
+      const image = element('img', '', className);
+      image.src = url;
+      image.alt = '';
+      image.loading = 'lazy';
+      image.referrerPolicy = 'no-referrer';
+      image.addEventListener('error', () => image.remove());
+      return image;
+    }
+
     function renderResult(group) {
       const card = element('article');
+      const picture = photo(group.name, 'result-photo');
+      if (picture) card.append(picture);
       const heading = element('div', '', 'result-heading');
-      heading.append(
-        element('h2', group.name),
-        element('span', `Benzerlik ${formatScore.format(group.score)}`, 'score'),
-      );
+      const name = element('h2');
+      const link = element('a', group.name, 'person-link');
+      link.href = personHash(group.name);
+      name.append(link);
+      heading.append(name, ring(group.score));
       const list = element('ul', '', 'record-list');
-      for (const record of group.items.slice(0, 3)) {
-        const item = element('li');
-        const details = element('div', '', 'record-meta');
-        const kind = record.kind === 'publication' ? 'Yayın' : record.kind === 'thesis' ? 'Tez' : 'Kayıt';
-        const badge = element('span', kind, 'record-kind');
-        badge.dataset.kind = record.kind;
-        details.append(badge, element('span', formatScore.format(record.score), 'score'));
-        const title = element('p', '', 'record-title');
-        try {
-          const url = new URL(record.url);
-          if (url.protocol === 'https:') {
-            const link = element('a', record.title);
-            link.href = url.href;
-            link.rel = 'noopener noreferrer';
-            title.append(link);
-          }
-        } catch {
-          // Titles without a source URL are also searchable.
-        }
-        if (!title.firstChild) title.textContent = record.title;
-        item.append(details, title);
-        list.append(item);
-      }
-      card.append(heading, list);
+      for (const record of group.items.slice(0, 3)) list.append(recordItem(record, true));
+      const total = records.filter(record => record.faculty === group.name).length;
+      const more = element('a', `Tüm kayıtlarını gör (${formatCount.format(total)})`, 'result-more');
+      more.href = personHash(group.name);
+      card.append(heading, list, more);
       return card;
     }
+
+    function renderPerson(name) {
+      personName = name;
+      const own = records.filter(record => record.faculty === name);
+      const publications = own.filter(record => record.kind !== 'thesis').length;
+      const theses = own.length - publications;
+      $('page-title').textContent = name;
+      $('page-lead').textContent = own.length
+        ? `Ankara Üniversitesi Fizik Mühendisliği · ${formatCount.format(publications)} yayın, ${formatCount.format(theses)} tez`
+        : 'Bu akademisyene ait kayıt bulunamadı.';
+      document.title = name + ' | Ankara Üniversitesi';
+      $('person-publications').textContent = formatCount.format(publications);
+      $('person-theses').textContent = formatCount.format(theses);
+      $('person-kind').querySelector('[data-kind="thesis"]').disabled = !theses;
+      $('person-kind').querySelector('[data-kind="publication"]').disabled = !publications;
+      const info = people.get(name);
+      const image = $('person-photo');
+      if (info?.photo) {
+        image.hidden = false;
+        image.src = info.photo;
+        image.alt = name;
+        image.onerror = () => { image.hidden = true; };
+      } else {
+        image.hidden = true;
+        image.removeAttribute('src');
+      }
+      $('person-profile').hidden = !info?.profile_url;
+      if (info?.profile_url) $('person-profile').href = info.profile_url;
+      $('person-filter').value = '';
+      personKind = 'all';
+      for (const button of $('person-kind').querySelectorAll('button')) {
+        button.setAttribute('aria-pressed', String(button.dataset.kind === 'all'));
+      }
+      renderPersonRecords();
+    }
+
+    function renderPersonRecords() {
+      if (personName == null) return;
+      const scored = lastSearch?.byFaculty.get(personName);
+      const source = scored ?? records.filter(record => record.faculty === personName);
+      const filter = $('person-filter').value.trim().toLocaleLowerCase('tr');
+      const shown = source.filter(record =>
+        (personKind === 'all' || (personKind === 'thesis') === (record.kind === 'thesis')) &&
+        (!filter || record.title.toLocaleLowerCase('tr').includes(filter)));
+      $('person-order').textContent = scored
+        ? `“${lastSearch.queryText}” aramasına benzerliğe göre sıralandı.`
+        : '';
+      $('person-list').replaceChildren(...shown.map(record => recordItem(record, Boolean(scored))));
+      $('person-empty').hidden = shown.length > 0;
+    }
+
+    for (const button of $('person-kind').querySelectorAll('button')) {
+      button.onclick = () => {
+        personKind = button.dataset.kind;
+        for (const other of $('person-kind').querySelectorAll('button')) {
+          other.setAttribute('aria-pressed', String(other === button));
+        }
+        renderPersonRecords();
+      };
+    }
+    $('person-filter').addEventListener('input', renderPersonRecords);
 
     function searchInBackground(queryText) {
       searchWorker ??= new Worker(new URL('./search-worker.js', import.meta.url), {type: 'module'});
@@ -1496,6 +1776,8 @@
       setStatus('Arama hazırlanıyor…');
       try {
         const {results: sorted, queryVector, match} = await searchInBackground(queryText);
+        lastSearch = {queryText, byFaculty: new Map(sorted.map(group => [group.name, group.items]))};
+        $('scale-note').hidden = !sorted.length;
         $('results').append(...sorted.map(renderResult));
         showFingerprint({queryText, queryVector, match});
         setStatus(`${sorted.length} akademisyen sıralandı. Skor, sorgu ile kayıtlar arasındaki benzerliği gösterir.`);
