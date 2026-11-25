@@ -102,7 +102,7 @@ self.onmessage = async ({data: {model, weightsFile, queryText, records}}) => {
       items.sort((a, b) => b.score - a.score);
       const top = items.slice(0, 5);
       const average = top.reduce((sum, item) => sum + item.score, 0) / top.length;
-      return {name, items: top.slice(0, 3), score: .6 * top[0].score + .4 * average};
+      return {name, items, score: .6 * top[0].score + .4 * average};
     }).sort((a, b) => b.score - a.score);
     self.postMessage({type: 'result', results, queryVector: Array.from(query), match});
   } catch (error) {
