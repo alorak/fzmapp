@@ -344,6 +344,7 @@
     .chat-models label { display: flex; align-items: flex-start; gap: 8px; font-weight: 400; font-size: .93rem; cursor: pointer; padding: 8px 10px; border-radius: 8px; background: #fff; border: 1px solid var(--line); }
     .chat-models label:has(input:checked) { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
     .chat-models input { margin-top: 3px; accent-color: var(--blue); }
+    .chat-phone-note { margin-top: 6px; color: var(--muted); font-size: .88rem; }
     .chat-load-status { margin-top: 8px; color: var(--muted); font-size: .9rem; }
     .chat-load-status:empty { display: none; }
     .chat-load-status[data-error="true"] { color: var(--red); }
@@ -428,6 +429,13 @@
     .mini-table th, .mini-table td { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: left; }
     .mini-table thead th { color: var(--muted); font-size: .82rem; }
     .mini-table tbody th { color: var(--muted); font-weight: 600; }
+
+    .phone-intro { margin-bottom: 16px; color: var(--ink-2); }
+    .phone-reasons { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .phone-reason { padding: 16px; border-radius: var(--radius); background: var(--paper); }
+    .phone-reason h4 { margin: 10px 0 0; font-size: 1rem; }
+    .phone-reason p { margin-top: 6px; color: var(--ink-2); font-size: .94rem; line-height: 1.5; }
+    .phone-icon { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: var(--blue-soft); color: var(--blue); }
 
     /* Comparison */
     .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
@@ -693,7 +701,7 @@
       .journey-steps { grid-template-columns: minmax(0, 1fr); gap: 18px; }
       .how-tabs { grid-template-columns: minmax(0, 1fr); }
       .how-tabs a span { display: none; }
-      .duo, .grounding { grid-template-columns: minmax(0, 1fr); }
+      .duo, .grounding, .phone-reasons { grid-template-columns: minmax(0, 1fr); }
       .duo-flow { flex-wrap: wrap; }
       .next-row { grid-template-columns: 100px minmax(0, 1fr) 40px; }
       .compare-table th, .compare-table td { padding: 9px 10px; }
@@ -918,7 +926,8 @@
           <label><input type="radio" name="chat-model" value="e2b" checked><span><strong>Gemma 4 E2B</strong> · daha hızlı · ≈3,1 GB indirilir · en az 8 GB bellek</span></label>
           <label><input type="radio" name="chat-model" value="e4b"><span><strong>Gemma 4 E4B</strong> · daha iyi cevaplar · ≈4,9 GB indirilir · 16 GB bellek önerilir</span></label>
         </fieldset>
-        <p id="chat-setup-text">Model ilk kullanımda bir kez indirilir, sonra tarayıcınızın önbelleğinden gelir. Bilgisayarda güncel Chrome veya Edge gerekir; telefonlarda çalışmaz.</p>
+        <p id="chat-setup-text">Model ilk kullanımda bir kez indirilir, sonra tarayıcınızın önbelleğinden gelir. Bilgisayarda güncel Chrome veya Edge gerekir.</p>
+        <p class="chat-phone-note">Telefonlarda önerilmez: model ≈3,1 GB ve telefon tarayıcılarının bir sayfaya ayırdığı bellek genellikle yetmez. <a href="#nasil-calisir/makaleyi-sor">Neden?</a></p>
         <button type="button" id="chat-load">Modeli yükle ve başla</button>
         <progress id="chat-progress" aria-label="Sohbet modeli yükleniyor" hidden></progress>
         <p id="chat-load-status" class="chat-load-status" role="status"></p>
@@ -1395,7 +1404,30 @@
               </div>
             </div>
           </div>
-          <figcaption>Model telefonlarda çalışmaz; bilgisayarda güncel Chrome veya Edge gerekir. İlk yükleme internet hızına göre birkaç dakika sürebilir.</figcaption>
+          <figcaption>Bilgisayarda güncel Chrome veya Edge gerekir. İlk yükleme internet hızına göre birkaç dakika sürebilir.</figcaption>
+        </figure>
+
+        <figure class="figure" aria-labelledby="phone-title">
+          <h3 id="phone-title">Telefonda neden önerilmez?</h3>
+          <p class="prose phone-intro">Sorun telefonun bu teknolojiyi desteklememesi değil. Android'de Chrome 121 ve sonrası (Android 12 ve üzeri), iPhone'da iOS 26 ile telefon tarayıcıları da WebGPU'yu destekliyor. Engel, modelin büyüklüğü ve telefon tarayıcısının bir sayfaya izin verdiği bellek.</p>
+          <div class="phone-reasons">
+            <div class="phone-reason">
+              <span class="phone-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="7" width="16" height="10" rx="1.5"/><path d="M7 7V5M10 7V5M14 7V5M17 7V5M7 19v-2M10 19v-2M14 19v-2M17 19v-2"/></svg></span>
+              <h4>Bellek yetmez</h4>
+              <p>E2B'nin yalnızca metin parçaları ≈3,1 GB; çalışırken hepsi belleğe yüklenir, cevap üretilirken ara bilgiler de eklenir. Telefonda ekran kartının ayrı belleği yoktur; işletim sistemi ve diğer uygulamalarla aynı belleği paylaşır. Telefon tarayıcıları tek bir sekmeye bilgisayardakinden çok daha az bellek ayırır. 8 GB'lık bir telefonda bile sekme büyük olasılıkla yükleme sırasında kapanır ya da sayfa yenilenir; iPhone'larda bu sınır daha da sıkıdır.</p>
+            </div>
+            <div class="phone-reason">
+              <span class="phone-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M5 19h14"/></svg></span>
+              <h4>İndirme ve depolama</h4>
+              <p>3,1 GB'ı mobil veriyle indirmek çoğu kullanıcı için kabul edilemez. Tarayıcılar sitelerin önbelleğe alabileceği veri miktarını da sınırlar; telefonda yer azalınca önbellek kendiliğinden silinebilir ve model her seferinde yeniden inebilir.</p>
+            </div>
+            <div class="phone-reason">
+              <span class="phone-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-2 1-3 2-4 0 1.5.8 2.5 2 2.5 0-2.5-1-4.5 0-7z"/><path d="M8 20h8"/></svg></span>
+              <h4>Hız, ısı ve pil</h4>
+              <p>Model yüklenebilse bile telefonun ekran kartında cevaplar çok yavaş gelir. Uzun hesaplama telefonu ısıtır ve pili hızla tüketir.</p>
+            </div>
+          </div>
+          <figcaption>Gemma 4 E2B aslında telefonlar için tasarlanmış bir modeldir, ancak telefonda verimli çalışması Google'ın kendi araçlarıyla hazırlanmış yerel uygulamalarda mümkündür; tarayıcı sekmesine bu kadar bellek verilmez. Arama modeli E5 ise yalnızca ≈118 MB olduğu için telefonda sorunsuz çalışır.</figcaption>
         </figure>
 
         <p class="links"><a href="https://huggingface.co/google/gemma-4-E2B-it">Gemma 4 E2B model kartı</a> · <a href="https://huggingface.co/onnx-community/gemma-4-E2B-it-ONNX">Tarayıcıda kullanılan ONNX sürümü</a></p>
@@ -1452,7 +1484,7 @@
               <tr><th scope="row">Katman</th><td>12</td><td>35 / 42</td></tr>
               <tr><th scope="row">En uzun girdi</th><td>512 token</td><td>128 bin token</td></tr>
               <tr><th scope="row">Nerede çalışır?</th><td>İşlemci (WebAssembly)</td><td>Ekran kartı (WebGPU)</td></tr>
-              <tr><th scope="row">Telefonda</th><td>Çalışır</td><td>Çalışmaz</td></tr>
+              <tr><th scope="row">Telefonda</th><td>Çalışır</td><td>Önerilmez; tarayıcıya ayrılan bellek yetmez</td></tr>
               <tr><th scope="row">Uydurma riski</th><td>Yok; yalnızca benzerlik ölçer</td><td>Var; özetle sınırlandırılır</td></tr>
               <tr><th scope="row">Kütüphane</th><td>Transformers.js 3.7.2</td><td>Transformers.js 4.3.2</td></tr>
               <tr><th scope="row">Lisans</th><td>MIT</td><td>Apache 2.0</td></tr>
@@ -2451,7 +2483,7 @@
       if (article && article.abstract === null) {
         $('chat-setup-text').textContent = 'Bu kayıtta özet olmadığı için sohbet kullanılamıyor.';
       } else if (chatState !== 'loading' && chatState !== 'error') {
-        $('chat-setup-text').textContent = 'Model ilk kullanımda bir kez indirilir, sonra tarayıcınızın önbelleğinden gelir. Bilgisayarda güncel Chrome veya Edge gerekir; telefonlarda çalışmaz.';
+        $('chat-setup-text').textContent = 'Model ilk kullanımda bir kez indirilir, sonra tarayıcınızın önbelleğinden gelir. Bilgisayarda güncel Chrome veya Edge gerekir.';
       }
     }
 
