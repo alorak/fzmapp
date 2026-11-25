@@ -96,29 +96,50 @@ cache = {}
 for slug in discover():
     if not re.fullmatch(r"[a-zA-Z0-9_.-]+", slug):
         raise ValueError("Invalid profile slug")
-    page = get(BASE+slug+"/yayinlar")
-    heading = page.find("h1")
-    if not heading:
-        raise RuntimeError("Profile heading missing")
-    name = heading.get_text(" ", strip=True)
+    entry = dict(profile=slug, counts={"publication": 0, "thesis": 0}, errors=[])
+    report.append(entry)
+    print("Collecting "+slug, flush=True)
+    try:
+        page = get(BASE+slug+"/yayinlar")
+        heading = page.find("h1")
+        if not heading:
+            raise RuntimeError("Profile heading missing")
+        name = heading.get_text(" ", strip=True)
+        entry["faculty"] = name
+    except (RuntimeError, requests.RequestException) as exc:
+        entry["errors"].append(str(exc))
+        entry["status"] = "failed"
+        print("::warning::"+slug+": "+str(exc), flush=True)
+        continue
     seen = set()
-    counts = {}
-    for kind, listing in (("publication", page), ("thesis", get(BASE+slug+"/deneyim"))):
-        counts[kind] = 0
-        for url, title in extract_links(listing, kind):
-            if url in seen:
-                continue
-            seen.add(url)
-            if url not in cache:
-                cache[url] = metadata(get(url))
-            rows.append(dict(faculty=name,title=title,url=url,kind=kind,**cache[url]))
-            counts[kind] += 1
-    if not counts["publication"]:
-        raise RuntimeError("No publication links found: "+slug)
-    report.append(dict(profile=slug, faculty=name, counts=counts))
+    for kind, suffix in (("publication", "/yayinlar"), ("thesis", "/deneyim")):
+        try:
+            listing = page if kind == "publication" else get(BASE+slug+suffix)
+            links = list(extract_links(listing, kind))
+            if not links and kind == "publication":
+                raise RuntimeError("No publication links found; page title: "+str(listing.title.get_text(" ",strip=True) if listing.title else "(missing)")+"; anchor count: "+str(len(listing.select("a[href]"))))
+            for url, title in links:
+                if url in seen:
+                    continue
+                seen.add(url)
+                if url not in cache:
+                    try:
+                        cache[url] = metadata(get(url))
+                    except (RuntimeError, requests.RequestException) as exc:
+                        entry["errors"].append(str(exc))
+                        cache[url] = {}
+                rows.append(dict(faculty=name,title=title,url=url,kind=kind,**cache[url]))
+                entry["counts"][kind] += 1
+        except (RuntimeError, requests.RequestException) as exc:
+            entry["errors"].append(str(exc))
+            print("::warning::"+slug+": "+str(exc), flush=True)
+    entry["status"] = "partial" if entry["errors"] else "ok"
 target = ROOT/"data/academics.json"
 tmp = target.with_suffix(".tmp")
 tmp.write_text(json.dumps(rows,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-tmp.replace(target)
 (ROOT/"data/collection-report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print(f"Collected {len(rows)} records")
+if not rows:
+    tmp.unlink(missing_ok=True)
+    raise RuntimeError("No records collected; inspect collection-report.json")
+tmp.replace(target)
+print(f"Collected {len(rows)} records; inspect report for partial coverage")

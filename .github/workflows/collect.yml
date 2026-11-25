@@ -25,9 +25,15 @@ jobs:
         env:
           DISCOVER_DEPARTMENT: ${{ inputs.discover_department }}
       - uses: actions/upload-artifact@v4
+        if: success()
         with:
           name: academics
           path: |
             data/academics.json
-            data/collection-report.json
           if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: collection-report
+          path: data/collection-report.json
+          if-no-files-found: warn
