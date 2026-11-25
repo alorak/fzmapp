@@ -1335,6 +1335,8 @@
 
   <script type="module">
     const $ = id => document.getElementById(id);
+    // Bump when search-worker.js or chat-worker.js changes, so browsers do not keep using a cached copy.
+    const workerVersion = '2026-11-26';
     for (const link of document.querySelectorAll('a[href^="https://"]')) {
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
@@ -2126,7 +2128,7 @@
     let pendingAnswer = null;
 
     function startChatWorker() {
-      chatWorker = new Worker(new URL('./chat-worker.js', import.meta.url), {type: 'module'});
+      chatWorker = new Worker(new URL(`./chat-worker.js?v=${workerVersion}`, import.meta.url), {type: 'module'});
       chatWorker.onerror = event => {
         chatState = 'error';
         setChatLoadStatus('Sohbet modeli başlatılamadı: ' + (event.message || 'bilinmeyen hata'), true);
@@ -2268,7 +2270,7 @@
     $('chat-stop').onclick = () => chatWorker?.postMessage({type: 'stop'});
 
     function searchInBackground(queryText) {
-      searchWorker ??= new Worker(new URL('./search-worker.js', import.meta.url), {type: 'module'});
+      searchWorker ??= new Worker(new URL(`./search-worker.js?v=${workerVersion}`, import.meta.url), {type: 'module'});
       return new Promise((resolve, reject) => {
         const onWorkerError = message => {
           searchWorker.terminate();
