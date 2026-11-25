@@ -104,7 +104,11 @@ self.onmessage = async ({data: {model, weightsFile, queryText, records}}) => {
       const average = top.reduce((sum, item) => sum + item.score, 0) / top.length;
       return {name, items, score: .6 * top[0].score + .4 * average};
     }).sort((a, b) => b.score - a.score);
-    self.postMessage({type: 'result', results, queryVector: Array.from(query), match});
+    // The median score over all records is this query's baseline: an unrelated record scores about this much.
+    const scores = results.flatMap(group => group.items.map(item => item.score)).sort((a, b) => a - b);
+    const middle = scores.length >> 1;
+    const baseline = scores.length % 2 ? scores[middle] : (scores[middle - 1] + scores[middle]) / 2;
+    self.postMessage({type: 'result', results, queryVector: Array.from(query), match, baseline});
   } catch (error) {
     self.postMessage({type: 'error', message: error.message, modelReady: Boolean(modelPipeline)});
   }
