@@ -23,9 +23,15 @@
     }
     .wrap { width: min(1040px, calc(100% - 40px)); margin-inline: auto; }
     .masthead { background: #112840; color: var(--surface); padding: 38px 0 59px; }
-    .institution { margin: 0 0 10px; color: #b6d4ee; font-size: .88rem; font-weight: 650; }
+    .masthead-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px 20px; margin-bottom: 14px; }
+    .institution { margin: 0; color: #b6d4ee; font-size: .88rem; font-weight: 650; }
+    .navigation { display: flex; flex-wrap: wrap; gap: 6px; }
+    .navigation a { color: #dceafa; padding: 6px 10px; border-radius: 6px; font-size: .84rem; font-weight: 650; }
+    .navigation a[aria-current="page"] { background: #29445f; color: white; text-decoration: none; }
     h1 { margin: 0; font-size: clamp(1.95rem, 5vw, 3.1rem); letter-spacing: -.045em; line-height: 1.12; }
+    h1:focus { outline: none; }
     h2 { margin: 0; font-size: 1.15rem; letter-spacing: -.015em; }
+    h3 { margin: 0; font-size: 1rem; }
     .workspace {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 280px;
@@ -82,8 +88,24 @@
     .record-kind { color: var(--muted); font-size: .78rem; font-weight: 680; }
     .record-title { margin: 3px 0 0; }
     a { color: var(--blue); text-underline-offset: .17em; }
+    .architecture { margin-block: -30px 40px; display: grid; gap: 16px; }
+    .workspace[hidden], .architecture[hidden] { display: none; }
+    .architecture p { max-width: 72ch; margin: 8px 0 0; }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 14px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    .flow li { background: var(--background); border: 1px solid var(--line); border-radius: 10px; padding: 13px; }
+    .flow p { margin-top: 4px; color: var(--muted); font-size: .86rem; }
+    .architecture .model-links { margin-top: 14px; font-size: .87rem; }
+    code { font-size: .88em; overflow-wrap: anywhere; }
     @media (max-width: 720px) {
       .workspace { grid-template-columns: minmax(0, 1fr); grid-template-areas: "search" "data" "results"; gap: 14px; }
+      .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 420px) {
       .wrap { width: calc(100% - 28px); }
@@ -95,11 +117,17 @@
 <body>
   <header class="masthead">
     <div class="wrap">
-      <p class="institution">Ankara Üniversitesi · Fizik Mühendisliği</p>
-      <h1>Akademik uzmanlık arama</h1>
+      <div class="masthead-top">
+        <p class="institution">Ankara Üniversitesi · Fizik Mühendisliği</p>
+        <nav class="navigation" aria-label="Ana gezinme">
+          <a id="search-link" href="#arama" aria-current="page">Arama</a>
+          <a id="architecture-link" href="#nasil-calisir">Nasıl çalışır?</a>
+        </nav>
+      </div>
+      <h1 id="page-title" tabindex="-1">Akademik uzmanlık arama</h1>
     </div>
   </header>
-  <main class="workspace wrap">
+  <main id="search-page" class="workspace wrap">
     <section class="panel search-panel" aria-label="Konu arama">
       <form id="search">
         <label for="q">Araştırma konusu</label>
@@ -123,6 +151,44 @@
     </aside>
     <section id="results" aria-label="Arama sonuçları"></section>
   </main>
+  <main id="architecture-page" class="architecture wrap" hidden>
+    <section class="panel" aria-labelledby="flow-title">
+      <h2 id="flow-title">Veri akışı</h2>
+      <ol class="flow" role="list">
+        <li>
+          <h3>AVESİS</h3>
+          <p>Toplayıcı, tarama kurallarının izin verdiği herkese açık yayın ve tez sayfalarını okur.</p>
+        </li>
+        <li>
+          <h3>JSON dosyası</h3>
+          <p>Elle başlatılan veri toplama çalıştırması, akademik kayıtları bir dosyaya yazar.</p>
+        </li>
+        <li>
+          <h3>Tarayıcıdaki model</h3>
+          <p>Model, sorguyu ve kayıtların metnini birer sayısal vektöre dönüştürür.</p>
+        </li>
+        <li>
+          <h3>Arama sonuçları</h3>
+          <p>Uygulama, sorguya en yakın kayıtları akademisyene göre gruplar ve sıralar.</p>
+        </li>
+      </ol>
+      <p>Arama, uygulamayla gelen <code>academics.json</code> dosyasını veya yüklediğiniz JSON’u kullanır. İçe aktardığınız dosya, sonraki açılışlarda öncelikli veri kaynağı olur.</p>
+    </section>
+    <section class="panel" aria-labelledby="model-title">
+      <h2 id="model-title">Yapay zekâ modeli</h2>
+      <p><strong>Multilingual E5 Small</strong>, Türkçe ve İngilizce metinler dahil farklı dillerde çalışabilen bir arama modelidir. Metnin anlamını 384 sayıdan oluşan bir vektörle temsil eder. Uygulama araştırma konusunu <code>query:</code>, kayıt başlığı ile varsa özetini <code>passage:</code> önekiyle modele verir.</p>
+      <p>İlk aramada Transformers.js ve model dosyaları indirilir. Modelin 8 bitlik ONNX sürümü WebAssembly ile tarayıcıda çalışır. Arama metni ve yüklediğiniz kayıtlar cihazınızda işlenir.</p>
+      <p class="model-links"><a href="https://huggingface.co/intfloat/multilingual-e5-small">Model kartı</a> · <a href="https://huggingface.co/Xenova/multilingual-e5-small">Tarayıcıda kullanılan ONNX sürümü</a></p>
+    </section>
+    <section class="panel" aria-labelledby="ranking-title">
+      <h2 id="ranking-title">Sonuçlar nasıl sıralanır?</h2>
+      <p>Uygulama, sorgu vektörü ile her kayıt vektörü arasındaki kosinüs benzerliğini hesaplar. Bir akademisyenin skoru, en yakın kaydının skorunun %60’ı ile en yakın en fazla beş kaydının ortalama skorunun %40’ının toplamıdır. Her akademisyenin kartında sorguya en yakın üç kayıt gösterilir.</p>
+    </section>
+    <section class="panel" aria-labelledby="storage-title">
+      <h2 id="storage-title">Veri nerede tutulur?</h2>
+      <p>İçe aktarılan kayıtlar ve hesaplanan kayıt vektörleri tarayıcının yerel veritabanında (IndexedDB) saklanır. Veri veya model sürümü değişince vektörler yeniden hesaplanır. Arama ekranındaki “Yerel veriyi sil” düğmesi bu kayıtları ve vektörleri temizler.</p>
+    </section>
+  </main>
 
   <script type="module">
     const $ = id => document.getElementById(id);
@@ -132,6 +198,25 @@
     let pipe;
     let busy = false;
     let hasLocalData = false;
+
+    function showPage(moveFocus = false) {
+      const architecture = location.hash === '#nasil-calisir';
+      const title = architecture ? 'Arama nasıl çalışır?' : 'Akademik uzmanlık arama';
+      $('search-page').hidden = architecture;
+      $('architecture-page').hidden = !architecture;
+      $('page-title').textContent = title;
+      document.title = title + ' | Ankara Üniversitesi';
+      $('search-link').removeAttribute('aria-current');
+      $('architecture-link').removeAttribute('aria-current');
+      $(architecture ? 'architecture-link' : 'search-link').setAttribute('aria-current', 'page');
+      if (moveFocus) {
+        $('page-title').focus({preventScroll: true});
+        window.scrollTo(0, 0);
+      }
+    }
+
+    showPage();
+    window.addEventListener('hashchange', () => showPage(true));
 
     function setStatus(message, error = false) {
       $('status').textContent = message;
