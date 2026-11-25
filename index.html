@@ -197,6 +197,10 @@
     .model-facts a { color: var(--blue); }
     #model-transfer { color: var(--muted); font-weight: 400; }
     .model-note { margin-top: 12px; color: var(--muted); font-size: .88rem; line-height: 1.45; }
+    .model-card-info { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 12px; }
+    .model-card-info summary { cursor: pointer; color: var(--ink); font-weight: 650; font-size: .95rem; }
+    .model-card-info .model-facts { margin-top: 6px; }
+    .model-card-info .model-note { display: block; }
 
     /* Data page */
     .data-page { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 24px 28px; align-items: start; margin-block: -64px 64px; }
@@ -676,6 +680,20 @@
       </dl>
       <progress id="model-progress" aria-label="Model ağırlıkları yükleniyor" hidden></progress>
       <p class="model-note">İlk aramada bir kez indirilir, sonraki aramalarda önbellekten gelir.</p>
+      <details class="model-card-info" open>
+        <summary>Model kartından</summary>
+        <dl class="model-facts">
+          <div><dt>Parametre sayısı</dt><dd>≈118 milyon</dd></div>
+          <div><dt>Katman</dt><dd>12</dd></div>
+          <div><dt>Vektör boyutu</dt><dd>384 sayı</dd></div>
+          <div><dt>En uzun girdi</dt><dd>512 token</dd></div>
+          <div><dt>Dil desteği</dt><dd>≈100 dil</dd></div>
+          <div><dt>Temel model</dt><dd>Multilingual MiniLM</dd></div>
+          <div><dt>Ağırlıklar</dt><dd>8 bit, ONNX</dd></div>
+          <div><dt>Lisans</dt><dd>MIT</dd></div>
+        </dl>
+        <p class="model-note">512 tokenden uzun metinler kesilir; bu uygulamada yalnızca başlıklar işlendiği için sınıra ulaşılmaz. <a href="https://huggingface.co/intfloat/multilingual-e5-small">Model kartı</a> · <a href="https://arxiv.org/abs/2402.05672">Teknik rapor (2024)</a></p>
+      </details>
     </aside>
 
     <div class="results-area">
