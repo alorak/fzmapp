@@ -1,20 +1,346 @@
 <!doctype html>
-<html lang="tr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FZM | Akademik arama</title>
-<style>*{box-sizing:border-box}body{font:16px system-ui;color:#182433;background:#f5f7fa;margin:0}main{max-width:850px;margin:auto;padding:24px}section,article{background:white;border:1px solid #dce2ea;border-radius:12px;padding:20px;margin:12px 0}input,button{font:inherit;padding:12px;border:1px solid #ccd5df;border-radius:8px}input[type=search]{width:100%}button{background:#164e80;color:white;cursor:pointer}button:disabled{opacity:.5}small{color:#526172}a{color:#164e80}h1{font-size:26px}h2{font-size:19px}</style>
-<main><h1>Akademik uzmanlık arama</h1><small>Ankara Üniversitesi · Fizik Mühendisliği</small><section><form id="search"><input id="q" type="search" required placeholder="Araştırma konusu (Türkçe veya İngilizce)"><p><button id="go">AI ile ara</button></p></form><p id="status" role="status">Veri yükleniyor…</p></section><div id="results"></div><section><h2>Veri yönetimi</h2><label>JSON içe aktar <input id="file" type="file" accept=".json,application/json"></label><p id="count"></p><button id="reset">Yerel veriyi sil</button></section></main>
-<script type="module">
-const $=id=>document.getElementById(id), status=$('status'), model='Xenova/multilingual-e5-small', version='e5-small-q8-v1';
-let records=[], pipe, busy=false;
-const db=await new Promise((ok,no)=>{let r=indexedDB.open('fzmapp',1);r.onupgradeneeded=()=>r.result.createObjectStore('data');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
-function read(k){return new Promise((ok,no)=>{let r=db.transaction('data').objectStore('data').get(k);r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
-function write(k,v){return new Promise((ok,no)=>{let t=db.transaction('data','readwrite');t.objectStore('data').put(v,k);t.oncomplete=ok;t.onerror=()=>no(t.error);t.onabort=()=>no(t.error)})}
-function validate(a){if(!Array.isArray(a)||a.length>20000||!a.every(x=>x&&typeof x.faculty==='string'&&x.faculty.trim()&&typeof x.title==='string'&&x.title.trim()&&[x.abstract,x.url,x.kind].every(v=>v==null||typeof v==='string')))throw Error('Geçersiz JSON veri biçimi');return a.map(x=>({faculty:x.faculty,title:x.title,abstract:x.abstract||'',url:x.url||'',kind:x.kind||'publication'}))}
-function update(){ $('count').textContent=records.length+' kayıt · '+new Set(records.map(x=>x.faculty)).size+' akademisyen';$('go').disabled=busy||!records.length;$('file').disabled=busy;$('reset').disabled=busy}
-try{let saved=await read('records');records=validate(saved??await (await fetch('./data/academics.json')).json());status.textContent=records.length?'Aramaya hazır. İlk aramada model indirilecek.':'Veri yok; JSON içe aktarın.'}catch(e){status.textContent=e.message}update();
-$('file').onchange=async()=>{try{let f=$('file').files[0];if(!f)return;let next=validate(JSON.parse(await f.text()));await write('records',next);records=next;status.textContent='Yerel veri kaydedildi.';$('results').replaceChildren();update()}catch(e){status.textContent=e.message}};
-$('reset').onclick=async()=>{try{await new Promise((ok,no)=>{let t=db.transaction('data','readwrite');t.objectStore('data').clear();t.oncomplete=ok;t.onerror=()=>no(t.error)});records=[];$('results').replaceChildren();status.textContent='Yerel veri silindi. Yenileme ile başlangıç verisi yüklenir.';update()}catch(e){status.textContent=e.message}};
-async function embed(text){let out=await pipe(text,{pooling:'mean',normalize:true});return Array.from(out.data)}
-function dot(a,b){return a.reduce((s,x,i)=>s+x*b[i],0)}
-function node(tag,text){let n=document.createElement(tag);n.textContent=text;return n}
-$('search').onsubmit=async e=>{e.preventDefault();if(busy||!records.length)return;let q=$('q').value.trim();if(!q)return;busy=true;update();$('results').replaceChildren();try{if(!pipe){status.textContent='AI modeli yükleniyor…';let {pipeline}=await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2');pipe=await pipeline('feature-extraction',model,{device:'wasm',dtype:'q8'})}let query=await embed('query: '+q),groups=new Map(),cache=await read('vectors');let signature=JSON.stringify(records);let vectors=cache?.version===version&&cache.signature===signature?cache.vectors:[];let fresh=vectors.length!==records.length;if(fresh)vectors=[];for(let i=0;i<records.length;i++){let r=records[i];if(fresh){status.textContent='İndeksleniyor: '+(i+1)+' / '+records.length;vectors.push(await embed('passage: '+r.title+' '+r.abstract))}let match={...r,score:dot(query,vectors[i])};if(!groups.has(r.faculty))groups.set(r.faculty,[]);groups.get(r.faculty).push(match)}if(fresh)await write('vectors',{version,signature,vectors});let sorted=Array.from(groups,([name,items])=>{items.sort((a,b)=>b.score-a.score);let top=items.slice(0,5);return {name,items,score:.6*top[0].score+.4*top.reduce((s,x)=>s+x.score,0)/top.length}}).sort((a,b)=>b.score-a.score);for(let g of sorted){let card=node('article','');card.append(node('h2',g.name),node('p','Benzerlik: '+g.score.toFixed(3)));for(let r of g.items.slice(0,3)){let p=node('p',r.title+' · '+r.score.toFixed(3));try{let u=new URL(r.url);if(u.protocol==='https:'){let a=node('a',' Kaynak');a.href=u.href;a.rel='noopener noreferrer';p.append(a)}}catch{}card.append(p)}$('results').append(card)}status.textContent='Sıralama tamamlandı. Skor uzmanlık olasılığı değildir.'}catch(e){status.textContent='Arama başarısız: '+e.message}finally{busy=false;update()}};
-</script></html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Akademik uzmanlık arama | Ankara Üniversitesi</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #14283f;
+      --muted: #506278;
+      --blue: #15549b;
+      --line: #dce4ed;
+      --surface: #fff;
+      --background: #f3f6f9;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--ink);
+      font: 16px/1.55 system-ui, sans-serif;
+    }
+    .wrap { width: min(1040px, calc(100% - 40px)); margin-inline: auto; }
+    .masthead { background: #112840; color: var(--surface); padding: 38px 0 59px; }
+    .institution { margin: 0 0 10px; color: #b6d4ee; font-size: .88rem; font-weight: 650; }
+    h1 { margin: 0; font-size: clamp(1.95rem, 5vw, 3.1rem); letter-spacing: -.045em; line-height: 1.12; }
+    h2 { margin: 0; font-size: 1.15rem; letter-spacing: -.015em; }
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      grid-template-areas: "search data" "results data";
+      align-items: start;
+      gap: 22px;
+      margin-block: -30px 40px;
+    }
+    .panel, article {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 22px;
+    }
+    .search-panel { grid-area: search; }
+    .data-panel { grid-area: data; }
+    #results { grid-area: results; display: grid; gap: 12px; }
+    .search-fields { display: flex; gap: 10px; margin-top: 8px; }
+    label { display: block; font-size: .9rem; font-weight: 650; }
+    button, input { font: inherit; }
+    input[type="search"] {
+      min-width: 0;
+      flex: 1;
+      border: 1px solid #aab9ca;
+      border-radius: 8px;
+      color: var(--ink);
+      padding: 11px 12px;
+    }
+    button {
+      border: 1px solid var(--blue);
+      border-radius: 8px;
+      background: var(--blue);
+      color: white;
+      cursor: pointer;
+      font-weight: 650;
+      padding: 10px 15px;
+    }
+    button:disabled { opacity: .52; cursor: default; }
+    .data-actions { display: grid; justify-items: start; gap: 10px; }
+    .data-actions button { font-size: .85rem; }
+    .secondary { background: white; border-color: #aab9ca; color: var(--ink); }
+    :focus-visible { outline: 3px solid #377dcc; outline-offset: 3px; }
+    #status, #source { margin: 12px 0 0; color: var(--muted); font-size: .88rem; }
+    #status[data-error="true"] { color: #a0242c; }
+    #count { margin: 12px 0 2px; font-size: 1rem; font-weight: 700; }
+    #breakdown { margin: 0 0 16px; color: var(--muted); font-size: .87rem; }
+    #source { margin-top: 0; }
+    .result-heading, .record-meta { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+    .result-heading { justify-content: space-between; }
+    .score { color: var(--muted); font-size: .82rem; font-variant-numeric: tabular-nums; }
+    .record-list { list-style: none; margin: 11px 0 0; padding: 0; }
+    .record-list li { border-top: 1px solid var(--line); padding: 11px 0; overflow-wrap: anywhere; }
+    .record-list li:last-child { padding-bottom: 0; }
+    .record-kind { color: var(--muted); font-size: .78rem; font-weight: 680; }
+    .record-title { margin: 3px 0 0; }
+    a { color: var(--blue); text-underline-offset: .17em; }
+    @media (max-width: 720px) {
+      .workspace { grid-template-columns: minmax(0, 1fr); grid-template-areas: "search" "data" "results"; gap: 14px; }
+    }
+    @media (max-width: 420px) {
+      .wrap { width: calc(100% - 28px); }
+      .panel, article { padding: 16px; }
+      .search-fields { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="wrap">
+      <p class="institution">Ankara Üniversitesi · Fizik Mühendisliği</p>
+      <h1>Akademik uzmanlık arama</h1>
+    </div>
+  </header>
+  <main class="workspace wrap">
+    <section class="panel search-panel" aria-label="Konu arama">
+      <form id="search">
+        <label for="q">Araştırma konusu</label>
+        <div class="search-fields">
+          <input id="q" type="search" required placeholder="Örn. GaN transistörleri" aria-describedby="status">
+          <button id="go" disabled>AI ile ara</button>
+        </div>
+      </form>
+      <p id="status" role="status">Veri yükleniyor…</p>
+    </section>
+    <aside class="panel data-panel" aria-labelledby="data-title">
+      <h2 id="data-title">Veri kaynağı</h2>
+      <p id="source"></p>
+      <p id="count"></p>
+      <p id="breakdown"></p>
+      <div class="data-actions">
+        <input id="file" type="file" accept=".json,application/json" hidden>
+        <button type="button" id="choose" disabled>JSON dosyası seç</button>
+        <button type="button" class="secondary" id="reset" disabled>Yerel veriyi sil</button>
+      </div>
+    </aside>
+    <section id="results" aria-label="Arama sonuçları"></section>
+  </main>
+
+  <script type="module">
+    const $ = id => document.getElementById(id);
+    const model = 'Xenova/multilingual-e5-small';
+    const version = 'e5-small-q8-v1';
+    let records = [];
+    let pipe;
+    let busy = false;
+    let hasLocalData = false;
+
+    function setStatus(message, error = false) {
+      $('status').textContent = message;
+      $('status').dataset.error = String(error);
+    }
+
+    const db = await new Promise((resolve, reject) => {
+      const request = indexedDB.open('fzmapp', 1);
+      request.onupgradeneeded = () => request.result.createObjectStore('data');
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+
+    function read(key) {
+      return new Promise((resolve, reject) => {
+        const request = db.transaction('data').objectStore('data').get(key);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    function updateStorage(operation) {
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction('data', 'readwrite');
+        operation(transaction.objectStore('data'));
+        transaction.oncomplete = resolve;
+        transaction.onerror = transaction.onabort = () => reject(transaction.error);
+      });
+    }
+
+    function validate(data) {
+      if (!Array.isArray(data) || data.length > 20000 || !data.every(record =>
+        record && typeof record.faculty === 'string' && record.faculty.trim() &&
+        typeof record.title === 'string' && record.title.trim() &&
+        [record.abstract, record.url, record.kind].every(value => value == null || typeof value === 'string')
+      )) {
+        throw Error('Geçersiz JSON veri biçimi.');
+      }
+      return data.map(record => ({
+        faculty: record.faculty,
+        title: record.title,
+        abstract: record.abstract || '',
+        url: record.url || '',
+        kind: record.kind || 'publication',
+      }));
+    }
+
+    function update() {
+      const facultyCount = new Set(records.map(record => record.faculty)).size;
+      const publications = records.filter(record => record.kind === 'publication').length;
+      const theses = records.filter(record => record.kind === 'thesis').length;
+      $('source').textContent = hasLocalData ? 'İçe aktarılan dosya' : records.length ? 'Başlangıç verisi' : '';
+      $('count').textContent = `${records.length} kayıt · ${facultyCount} akademisyen`;
+      $('breakdown').textContent = records.length ? `${publications} yayın · ${theses} tez` : '';
+      $('go').disabled = busy || !records.length;
+      $('choose').disabled = busy;
+      $('reset').disabled = busy || !hasLocalData;
+    }
+
+    try {
+      const saved = await read('records');
+      hasLocalData = saved != null;
+      if (hasLocalData) {
+        records = validate(saved);
+      } else {
+        const response = await fetch('./data/academics.json');
+        if (!response.ok) throw Error('Başlangıç verisi yüklenemedi. Bir JSON dosyası seçin.');
+        records = validate(await response.json());
+      }
+      setStatus(records.length
+        ? 'Aramaya hazır. İlk aramada model indirilecek.'
+        : 'Aramak için bir akademik kayıt dosyası (JSON) seçin.');
+    } catch (error) {
+      setStatus(error.message, true);
+    }
+    update();
+
+    $('choose').onclick = () => $('file').click();
+    $('file').onchange = async () => {
+      const file = $('file').files[0];
+      if (!file) return;
+      busy = true;
+      update();
+      try {
+        const next = validate(JSON.parse(await file.text()));
+        await updateStorage(store => store.put(next, 'records'));
+        records = next;
+        hasLocalData = true;
+        $('results').replaceChildren();
+        setStatus(next.length ? 'Dosya yüklendi. Aramaya hazır.' : 'Dosya boş. Aramak için kayıt içeren bir dosya seçin.');
+      } catch (error) {
+        setStatus(error instanceof SyntaxError ? 'JSON dosyası okunamadı. Geçerli bir dosya seçin.' : error.message, true);
+      } finally {
+        $('file').value = '';
+        busy = false;
+        update();
+      }
+    };
+
+    $('reset').onclick = async () => {
+      busy = true;
+      update();
+      try {
+        await updateStorage(store => store.clear());
+        records = [];
+        hasLocalData = false;
+        $('results').replaceChildren();
+        setStatus('Yerel veri silindi. Sayfayı yenileyerek başlangıç verisini yükleyebilirsiniz.');
+      } catch (error) {
+        setStatus(error.message, true);
+      } finally {
+        busy = false;
+        update();
+      }
+    };
+
+    async function embed(text) {
+      const output = await pipe(text, {pooling: 'mean', normalize: true});
+      return Array.from(output.data);
+    }
+
+    function element(tag, text, className) {
+      const item = document.createElement(tag);
+      if (text) item.textContent = text;
+      if (className) item.className = className;
+      return item;
+    }
+
+    function renderResult(group) {
+      const card = element('article');
+      const heading = element('div', '', 'result-heading');
+      heading.append(
+        element('h2', group.name),
+        element('span', `Benzerlik ${group.score.toFixed(3)}`, 'score'),
+      );
+      const list = element('ul', '', 'record-list');
+      for (const record of group.items.slice(0, 3)) {
+        const item = element('li');
+        const details = element('div', '', 'record-meta');
+        const kind = record.kind === 'publication' ? 'Yayın' : record.kind === 'thesis' ? 'Tez' : 'Kayıt';
+        details.append(element('span', kind, 'record-kind'), element('span', record.score.toFixed(3), 'score'));
+        const title = element('p', '', 'record-title');
+        try {
+          const url = new URL(record.url);
+          if (url.protocol === 'https:') {
+            const link = element('a', record.title);
+            link.href = url.href;
+            link.rel = 'noopener noreferrer';
+            title.append(link);
+          }
+        } catch {
+          // Titles without a source URL are also searchable.
+        }
+        if (!title.firstChild) title.textContent = record.title;
+        item.append(details, title);
+        list.append(item);
+      }
+      card.append(heading, list);
+      return card;
+    }
+
+    $('search').onsubmit = async event => {
+      event.preventDefault();
+      if (busy || !records.length) return;
+      const queryText = $('q').value.trim();
+      if (!queryText) return;
+      busy = true;
+      update();
+      $('results').replaceChildren();
+      try {
+        if (!pipe) {
+          setStatus('AI modeli yükleniyor…');
+          const {pipeline} = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2');
+          pipe = await pipeline('feature-extraction', model, {device: 'wasm', dtype: 'q8'});
+        }
+        setStatus('Aranıyor…');
+        const query = await embed('query: ' + queryText);
+        const groups = new Map();
+        const cache = await read('vectors');
+        const signature = JSON.stringify(records);
+        let vectors = cache?.version === version && cache.signature === signature ? cache.vectors : [];
+        const fresh = vectors.length !== records.length;
+        if (fresh) vectors = [];
+        for (const [index, record] of records.entries()) {
+          if (fresh) {
+            setStatus(`İndeksleniyor: ${index + 1} / ${records.length}`);
+            vectors.push(await embed('passage: ' + record.title + ' ' + record.abstract));
+          }
+          const score = query.reduce((sum, value, i) => sum + value * vectors[index][i], 0);
+          if (!groups.has(record.faculty)) groups.set(record.faculty, []);
+          groups.get(record.faculty).push({...record, score});
+        }
+        if (fresh) await updateStorage(store => store.put({version, signature, vectors}, 'vectors'));
+
+        const sorted = Array.from(groups, ([name, items]) => {
+          items.sort((a, b) => b.score - a.score);
+          const top = items.slice(0, 5);
+          const average = top.reduce((sum, item) => sum + item.score, 0) / top.length;
+          return {name, items, score: .6 * top[0].score + .4 * average};
+        }).sort((a, b) => b.score - a.score);
+        $('results').append(...sorted.map(renderResult));
+        setStatus(`${sorted.length} akademisyen sıralandı. Skor, sorgu ile kayıtlar arasındaki benzerliği gösterir.`);
+      } catch (error) {
+        setStatus('Arama başarısız: ' + error.message, true);
+      } finally {
+        busy = false;
+        update();
+      }
+    };
+  </script>
+</body>
+</html>
