@@ -1,0 +1,37 @@
+name: Collect AVESIS publication years
+on:
+  workflow_dispatch:
+  push:
+    branches: ['abstracts/**']
+    paths: ['scripts/years.py', '.github/workflows/years.yml']
+permissions:
+  contents: write
+concurrency:
+  group: avesis-collection
+  cancel-in-progress: false
+jobs:
+  years:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: python -m unittest discover -s tests -v
+      - run: python -m scripts.years
+      # Commits data/years.json to the branch the workflow ran on.
+      - name: Commit years
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/years.json 2>/dev/null || exit 0
+          if git diff --cached --quiet; then
+            echo "No year changes"
+          else
+            git commit -m "Yayın yıllarını AVESİS'ten ekle"
+            git pull --rebase
+            git push
+          fi

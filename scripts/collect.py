@@ -21,6 +21,16 @@ PUBLICATION_PATH = re.compile(
 )
 THESIS_PATH = re.compile(r"/(?:yonetilen-tez|thesis|theses|advising|supervisedthesis)/[^/]+", re.I)
 PHOTO_PATH = re.compile(r"^/user/image/\d+$")
+YEAR_LABEL = re.compile(
+    r"(?:Basım Tarihi|Yayın Tarihi|Publication Date|Tezin Onay Tarihi|Thesis Approval Date)\s*:\s*(?:[^\n]*?)\b((?:19|20)\d{2})\b",
+    re.IGNORECASE,
+)
+
+
+def extract_year(page):
+    """Publication year ("Basım Tarihi") or thesis approval year ("Tezin Onay Tarihi") from an AVESIS page."""
+    match = YEAR_LABEL.search(page.get_text("\n"))
+    return int(match[1]) if match else None
 
 
 class PublicSite:
@@ -75,11 +85,11 @@ def metadata(page):
         if url.hostname in ("doi.org", "dx.doi.org"):
             result["doi"] = url.path.lstrip("/")
             break
+    year = extract_year(page)
+    if year:
+        result["year"] = year
     for item in page.select("li"):
         value = item.get_text(" ", strip=True)
-        match = re.fullmatch(r"(?:Publication Date|Yayın Tarihi)\s*:\s*(\d{4})", value, re.I)
-        if match:
-            result["year"] = int(match[1])
         if re.match(r"^(Keywords|Anahtar Kelimeler)\s*:", value, re.I):
             result["keywords"] = value.split(":", 1)[1].strip()
     # Abstract redistribution is disabled until reuse rights are confirmed.

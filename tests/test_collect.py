@@ -8,7 +8,7 @@ from unittest.mock import Mock, call, patch
 
 from bs4 import BeautifulSoup
 
-from scripts.collect import AGENT, BASE, PublicSite, collect, extract_links
+from scripts.collect import AGENT, BASE, PublicSite, collect, extract_links, extract_year
 
 PROFILE = BASE + "mkabak/yayinlar"
 ARTICLE = "1b6a8ec0-a865-4fc3-b2f4-fc7af4e1976a/normally-off-algan-gan-mis-hemt-with-low-gate-leakage-current-using-a-hydrofluoric-acid-pre-treatment"
@@ -98,6 +98,19 @@ class CollectionTests(unittest.TestCase):
             "profile_url": BASE + "mkabak",
             "photo": BASE + "user/image/100112",
         }])
+
+
+class YearTests(unittest.TestCase):
+    def test_publication_and_thesis_years(self):
+        cases = {
+            "<ul><li><strong>Basım Tarihi:</strong> 2026</li></ul>": 2026,
+            "<p><b>Tezin Onay Tarihi:</b></p><p>2018</p>": 2018,
+            "<li>Publication Date: March 2019</li>": 2019,
+            "<li>Cilt: 2021-5</li>": None,
+        }
+        for markup, year in cases.items():
+            with self.subTest(markup=markup):
+                self.assertEqual(extract_year(html(markup)), year)
 
 
 class PublicSiteTests(unittest.TestCase):
