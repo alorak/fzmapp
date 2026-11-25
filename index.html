@@ -79,6 +79,10 @@
     #count { margin: 12px 0 2px; font-size: 1rem; font-weight: 700; }
     #breakdown { margin: 0 0 16px; color: var(--muted); font-size: .87rem; }
     #source { margin-top: 0; }
+    .roster { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 12px; font-size: .87rem; }
+    .roster summary { cursor: pointer; color: var(--blue); font-weight: 650; }
+    .roster ul { margin: 8px 0 0; padding-inline-start: 18px; }
+    .roster li + li { margin-top: 5px; }
     .result-heading, .record-meta { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
     .result-heading { justify-content: space-between; }
     .score { color: var(--muted); font-size: .82rem; font-variant-numeric: tabular-nums; }
@@ -192,9 +196,14 @@
       <p id="breakdown"></p>
       <div class="data-actions">
         <input id="file" type="file" accept=".json,application/json" hidden>
-        <button type="button" id="choose" disabled>JSON dosyası seç</button>
+        <button type="button" id="load-bundled" disabled>Bölüm verisini yükle</button>
+        <button type="button" class="secondary" id="choose" disabled>JSON dosyası seç</button>
         <button type="button" class="secondary" id="reset" disabled>Yerel veriyi sil</button>
       </div>
+      <details class="roster" id="faculty-roster" hidden>
+        <summary>Akademisyenleri göster</summary>
+        <ul id="faculty-list"></ul>
+      </details>
     </aside>
     <section id="results" aria-label="Arama sonuçları"></section>
   </main>
@@ -219,7 +228,7 @@
           <p>Uygulama, sorguya en yakın kayıtları akademisyene göre gruplar ve sıralar.</p>
         </li>
       </ol>
-      <p>Arama, uygulamayla gelen <code>academics.json</code> dosyasını veya yüklediğiniz JSON’u kullanır. İçe aktardığınız dosya, sonraki açılışlarda öncelikli veri kaynağı olur.</p>
+      <p>Uygulama ilk açılışta bölümün <code>academics.json</code> dosyasını otomatik yükler. Kendi dosyanızı içe aktarabilir ve “Bölüm verisini yükle” düğmesiyle bölümün kayıtlarına dönebilirsiniz.</p>
     </section>
     <section class="panel" aria-labelledby="model-title">
       <h2 id="model-title">Yapay zekâ modeli</h2>
@@ -287,6 +296,7 @@
     const $ = id => document.getElementById(id);
     const model = 'Xenova/multilingual-e5-small';
     const version = 'e5-small-q8-v1';
+    const facultyOrder = new Intl.Collator('tr');
     let records = [];
     let pipe;
     let busy = false;
@@ -357,28 +367,31 @@
       }));
     }
 
+    async function readBundledRecords() {
+      const response = await fetch('./data/academics.json', {cache: 'no-cache'});
+      if (!response.ok) throw Error('Bölüm verisi yüklenemedi. Tekrar deneyin veya bir JSON dosyası seçin.');
+      return validate(await response.json());
+    }
+
     function update() {
-      const facultyCount = new Set(records.map(record => record.faculty)).size;
+      const faculty = [...new Set(records.map(record => record.faculty))].sort(facultyOrder.compare);
       const publications = records.filter(record => record.kind === 'publication').length;
       const theses = records.filter(record => record.kind === 'thesis').length;
-      $('source').textContent = hasLocalData ? 'İçe aktarılan dosya' : records.length ? 'Başlangıç verisi' : '';
-      $('count').textContent = `${records.length} kayıt · ${facultyCount} akademisyen`;
+      $('source').textContent = hasLocalData ? 'İçe aktarılan dosya' : records.length ? 'Bölüm verisi' : '';
+      $('count').textContent = `${records.length} kayıt · ${faculty.length} akademisyen`;
       $('breakdown').textContent = records.length ? `${publications} yayın · ${theses} tez` : '';
+      $('faculty-roster').hidden = !faculty.length;
+      $('faculty-list').replaceChildren(...faculty.map(name => element('li', name)));
       $('go').disabled = busy || !records.length;
+      $('load-bundled').disabled = busy;
       $('choose').disabled = busy;
-      $('reset').disabled = busy || !hasLocalData;
+      $('reset').disabled = busy;
     }
 
     try {
-      const saved = await read('records');
-      hasLocalData = saved != null;
-      if (hasLocalData) {
-        records = validate(saved);
-      } else {
-        const response = await fetch('./data/academics.json');
-        if (!response.ok) throw Error('Başlangıç verisi yüklenemedi. Bir JSON dosyası seçin.');
-        records = validate(await response.json());
-      }
+      const [saved, source] = await Promise.all([read('records'), read('source')]);
+      hasLocalData = saved != null && source !== 'bundled';
+      records = hasLocalData ? validate(saved) : await readBundledRecords();
       setStatus(records.length
         ? 'Aramaya hazır. İlk aramada model indirilecek.'
         : 'Aramak için bir akademik kayıt dosyası (JSON) seçin.');
@@ -386,6 +399,24 @@
       setStatus(error.message, true);
     }
     update();
+
+    $('load-bundled').onclick = async () => {
+      busy = true;
+      update();
+      try {
+        const next = await readBundledRecords();
+        await updateStorage(store => store.put('bundled', 'source'));
+        records = next;
+        hasLocalData = false;
+        $('results').replaceChildren();
+        setStatus(next.length ? 'Bölüm verisi yüklendi. Aramaya hazır.' : 'Bölüm dosyası boş.');
+      } catch (error) {
+        setStatus(error.message, true);
+      } finally {
+        busy = false;
+        update();
+      }
+    };
 
     $('choose').onclick = () => $('file').click();
     $('file').onchange = async () => {
@@ -395,7 +426,10 @@
       update();
       try {
         const next = validate(JSON.parse(await file.text()));
-        await updateStorage(store => store.put(next, 'records'));
+        await updateStorage(store => {
+          store.put(next, 'records');
+          store.put('imported', 'source');
+        });
         records = next;
         hasLocalData = true;
         $('results').replaceChildren();
@@ -414,10 +448,13 @@
       update();
       try {
         await updateStorage(store => store.clear());
-        records = [];
-        hasLocalData = false;
-        $('results').replaceChildren();
-        setStatus('Yerel veri silindi. Sayfayı yenileyerek başlangıç verisini yükleyebilirsiniz.');
+        if (hasLocalData) {
+          records = [];
+          hasLocalData = false;
+          $('results').replaceChildren();
+          records = await readBundledRecords();
+        }
+        setStatus(records.length ? 'Yerel veri silindi. Bölüm verisi aramaya hazır.' : 'Yerel veri silindi.');
       } catch (error) {
         setStatus(error.message, true);
       } finally {
