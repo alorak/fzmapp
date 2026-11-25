@@ -175,6 +175,9 @@
     .fp-row + .fp-row { margin-top: 6px; }
     .fp-row span { color: var(--muted); font-size: .88rem; font-weight: 600; }
     .fp-row svg { display: block; width: 100%; height: 44px; background: var(--paper); border-radius: 6px; }
+    .fp-band { fill: #2f9e6e; opacity: .22; }
+    .fp-legend { display: inline-flex; align-items: center; gap: 6px; }
+    .fp-legend::before { content: ""; width: 14px; height: 10px; border-radius: 2px; background: rgba(47,158,110,.35); }
     #fp-note { margin-top: 10px; color: var(--muted); font-size: .9rem; line-height: 1.45; }
     #fp-note strong { color: var(--ink); font-weight: 650; }
 
@@ -246,26 +249,9 @@
       font: 600 1.15rem/1 var(--serif);
     }
     #results article:first-child::before { background: var(--blue); color: #fff; }
-    #results article { overflow: hidden; }
-    #results article > :not(.result-photo) { position: relative; z-index: 1; }
-    .result-photo {
-      position: absolute;
-      top: 0;
-      right: 92px;
-      width: 36%;
-      max-width: 190px;
-      height: 100%;
-      max-height: 280px;
-      object-fit: cover;
-      object-position: center 18%;
-      opacity: .2;
-      filter: grayscale(.35);
-      -webkit-mask-image: linear-gradient(to right, transparent, #000 45%, #000 75%, transparent), linear-gradient(to bottom, #000 55%, transparent);
-      -webkit-mask-composite: source-in;
-      mask-image: linear-gradient(to right, transparent, #000 45%, #000 75%, transparent), linear-gradient(to bottom, #000 55%, transparent);
-      mask-composite: intersect;
-      pointer-events: none;
-    }
+    .result-side { display: flex; align-items: center; gap: 10px; flex: none; }
+    .result-avatar { width: 40px; height: 40px; font-size: .85rem; }
+    #results article.is-weak .result-avatar { opacity: .7; }
     .result-heading { display: flex; justify-content: space-between; align-items: center; gap: 4px 16px; }
     .result-heading h2 { font-size: 1.3rem; }
     .person-link { color: var(--ink); text-decoration: none; }
@@ -310,6 +296,10 @@
     .person-card a + a { margin-top: 10px; font-weight: 600; font-size: .95rem; }
     .person-records { min-width: 0; box-shadow: 0 18px 40px -24px rgba(15,39,66,.45); }
     .person-tools { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+    .person-tools-right { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; flex: 1; justify-content: flex-end; }
+    .sort-label { display: inline-flex; align-items: center; gap: 8px; font-size: .93rem; font-weight: 600; color: var(--muted); }
+    #person-sort { font: inherit; color: var(--ink); border: 1.5px solid var(--line-strong); border-radius: 8px; padding: 5px 8px; background: #fff; }
+    .record-year { color: var(--muted); font-size: .88rem; font-variant-numeric: tabular-nums; }
     .segmented { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); }
     .segmented button { background: transparent; border: 0; color: var(--ink); border-radius: 999px; padding: 5px 14px; font-weight: 600; font-size: .93rem; }
     .segmented button:hover:not(:disabled) { background: #e8eef5; }
@@ -323,7 +313,7 @@
     #person-empty { margin-top: 14px; color: var(--muted); }
     #person-empty[hidden] { display: none; }
     h1.is-person { font-size: clamp(1.9rem, 4.2vw, 2.9rem); }
-    h1.is-article { font-size: clamp(1.45rem, 3vw, 2.15rem); line-height: 1.2; max-width: 34ch; }
+    h1.is-article { font-size: clamp(1.45rem, 2.8vw, 2.05rem); line-height: 1.22; }
     .crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-bottom: 10px; color: #9fb9d6; font-size: .95rem; }
     .crumbs[hidden] { display: none; }
     .crumbs a { color: #dceafa; }
@@ -626,7 +616,6 @@
       .person-page { grid-template-columns: minmax(0, 1fr); gap: 16px; }
       .article-page { grid-template-columns: minmax(0, 1fr); gap: 16px; }
       .person-avatar { width: 120px; height: 150px; font-size: 2.4rem; }
-      .result-photo { right: 64px; width: 40%; opacity: .16; }
       .faculty-list { grid-template-columns: minmax(0, 1fr); }
       .model-facts div:nth-child(n+3), .model-links { display: none; }
       .fp-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
@@ -809,7 +798,16 @@
           <button type="button" data-kind="publication" aria-pressed="false">Yayınlar</button>
           <button type="button" data-kind="thesis" aria-pressed="false">Tezler</button>
         </div>
-        <input id="person-filter" type="search" placeholder="Başlıklarda ara" aria-label="Bu akademisyenin kayıtlarında ara" autocomplete="off">
+        <div class="person-tools-right">
+          <label class="sort-label">Sırala
+            <select id="person-sort">
+              <option value="relevance">Uygunluk</option>
+              <option value="newest">En yeni</option>
+              <option value="oldest">En eski</option>
+            </select>
+          </label>
+          <input id="person-filter" type="search" placeholder="Başlıklarda ara" aria-label="Bu akademisyenin kayıtlarında ara" autocomplete="off">
+        </div>
       </div>
       <p id="person-order"></p>
       <ul id="person-list" class="record-list person-list"></ul>
@@ -1145,7 +1143,7 @@
         <p>Sonuçlardaki her yayının yanında bir “Makaleyi sor” bağlantısı var. Bu bağlantı, akademisyenin ve çalışmanın altında ayrı bir sayfa açar.</p>
       </header>
       <div class="prose">
-        <p><strong>Özet:</strong> Çalışmanın özeti, sayfa açılırken DOI numarasıyla açık akademik veri kaynaklarından (önce OpenAlex, sonra Crossref) alınır. Özetler bu sitede saklanmaz.</p>
+        <p><strong>Özet:</strong> Tezlerin özetleri AVESİS'teki tez sayfalarından alınır. Yayınların özetleri ise yayıncılara ait olduğu için sitede saklanmaz; sayfa açılırken DOI numarasıyla açık akademik veri kaynaklarından (önce OpenAlex, sonra Crossref) alınır.</p>
         <p><strong>Model:</strong> Sorularınızı Qwen3 0.6B adlı küçük bir dil modeli cevaplar. Model ilk kullanımda bir kez tarayıcınıza indirilir (≈570 MB) ve WebGPU ile cihazınızda çalışır. Sorularınız hiçbir sunucuya gönderilmez.</p>
         <p><strong>Sınır:</strong> Modelden yalnızca başlık, anahtar kelimeler ve özete dayanarak cevap vermesi istenir. Özette olmayan bir şey sorulursa “Özette bu bilgi yok” demesi beklenir. Bu boyuttaki modeller yine de hata yapabilir; önemli bilgileri makalenin kendisinden doğrulayın. Özeti bulunamayan kayıtlarda sohbet kapalıdır.</p>
       </div>
@@ -1351,6 +1349,9 @@
     let searchScroll = 0;
     let currentPage = null;
     let personKind = 'all';
+    const failedPhotos = new Set(); // photo URLs that failed to load
+    let personSort = null;       // 'relevance' | 'newest' | 'oldest'; null picks a default
+    let years = new Map();       // record id -> year, from data/years.json
     let personName = null;
     let article = null;          // {id, record, abstract: string|null|undefined, messages: []}
     let chatWorker;
@@ -1530,6 +1531,7 @@
         kind: record.kind || 'publication',
         doi: record.doi || '',
         keywords: record.keywords || '',
+        year: Number.isInteger(record.year) ? record.year : undefined,
       }));
     }
 
@@ -1575,6 +1577,22 @@
       $('reset').disabled = busy;
     }
 
+    // Publication years collected from AVESIS (optional); records may also carry a year themselves.
+    async function readYears() {
+      try {
+        const response = await fetch('./data/years.json', {cache: 'no-cache'});
+        if (!response.ok) return new Map();
+        const data = await response.json();
+        return new Map(Object.entries(data).filter(([, year]) => Number.isInteger(year)));
+      } catch {
+        return new Map();
+      }
+    }
+
+    function yearOf(record) {
+      return Number.isInteger(record.year) ? record.year : years.get(recordId(record));
+    }
+
     // Profile links and photos for the department's academics (optional).
     async function readPeople() {
       try {
@@ -1601,7 +1619,7 @@
     }
 
     showPage();
-    people = await readPeople();
+    [people, years] = await Promise.all([readPeople(), readYears()]);
 
     try {
       const [saved, source] = await Promise.all([read('records'), read('source')]);
@@ -1755,6 +1773,8 @@
       const badge = element('span', kind, 'record-kind');
       badge.dataset.kind = record.kind;
       details.append(badge);
+      const year = yearOf(record);
+      if (year) details.append(element('span', String(year), 'record-year'));
       if (withScore) details.append(meter(record.score));
       const ask = element('a', record.kind === 'thesis' ? 'Tezi sor' : 'Makaleyi sor', 'ask-link');
       ask.href = articleHash(record);
@@ -1775,7 +1795,6 @@
     }
 
     // A photo saved in the repository (photos/<profile>.jpg) is tried first, then the AVESIS address.
-    const failedPhotos = new Set();
 
     function photoSources(name) {
       const info = people.get(name);
@@ -1798,14 +1817,21 @@
       image.src = first;
     }
 
-    function photo(name, className) {
+    // Small round photo with the person's initials underneath as a fallback.
+    function avatar(name, className) {
+      const wrapper = element('span', '', 'mini-avatar ' + className);
+      wrapper.setAttribute('aria-hidden', 'true');
+      wrapper.append(element('span', initials(name)));
       const sources = photoSources(name);
-      if (!sources.length) return null;
-      const image = element('img', '', className);
-      image.alt = '';
-      image.loading = 'lazy';
-      loadPhoto(image, sources, () => image.remove());
-      return image;
+      if (sources.length) {
+        const image = element('img');
+        image.alt = '';
+        image.hidden = true;
+        image.onload = () => { image.hidden = false; };
+        loadPhoto(image, sources, () => image.remove());
+        wrapper.append(image);
+      }
+      return wrapper;
     }
 
     function initials(name) {
@@ -1815,14 +1841,14 @@
 
     function renderResult(group) {
       const card = element('article');
-      const picture = photo(group.name, 'result-photo');
-      if (picture) card.append(picture);
       const heading = element('div', '', 'result-heading');
       const name = element('h2');
       const link = element('a', group.name, 'person-link');
       link.href = personHash(group.name);
       name.append(link);
-      heading.append(name, ring(group.score));
+      const side = element('div', '', 'result-side');
+      side.append(avatar(group.name, 'result-avatar'), ring(group.score));
+      heading.append(name, side);
       card.classList.toggle('is-weak', relevance(group.score) < weakRelevance);
       const list = element('ul', '', 'record-list');
       for (const record of group.items.slice(0, 3)) list.append(recordItem(record, true));
@@ -1834,10 +1860,12 @@
       personName = name;
       const own = records.filter(record => record.faculty === name);
       const publications = own.filter(record => record.kind !== 'thesis').length;
+      const ownYears = own.map(yearOf).filter(Boolean);
+      const span = ownYears.length ? ` · ${Math.min(...ownYears)}–${Math.max(...ownYears)}` : '';
       const theses = own.length - publications;
       $('page-title').textContent = name;
       $('page-lead').textContent = own.length
-        ? `Ankara Üniversitesi Fizik Mühendisliği · ${formatCount.format(publications)} yayın, ${formatCount.format(theses)} tez`
+        ? `Ankara Üniversitesi Fizik Mühendisliği · ${formatCount.format(publications)} yayın, ${formatCount.format(theses)} tez${span}`
         : 'Bu akademisyene ait kayıt bulunamadı.';
       document.title = name + ' | Ankara Üniversitesi';
       $('person-publications').textContent = formatCount.format(publications);
@@ -1858,6 +1886,7 @@
       if (info?.profile_url) $('person-profile').href = info.profile_url;
       $('person-filter').value = '';
       personKind = 'all';
+      personSort = null;
       for (const button of $('person-kind').querySelectorAll('button')) {
         button.setAttribute('aria-pressed', String(button.dataset.kind === 'all'));
       }
@@ -1872,12 +1901,31 @@
       const shown = source.filter(record =>
         (personKind === 'all' || (personKind === 'thesis') === (record.kind === 'thesis')) &&
         (!filter || record.title.toLocaleLowerCase('tr').includes(filter)));
-      $('person-order').textContent = scored
+      const relevanceOption = $('person-sort').querySelector('option[value="relevance"]');
+      relevanceOption.hidden = relevanceOption.disabled = !scored;
+      const sort = personSort === 'relevance' && !scored ? 'newest' : personSort ?? (scored ? 'relevance' : 'newest');
+      $('person-sort').value = sort;
+      if (sort !== 'relevance') {
+        // Records without a year go last; the original order is kept within a year.
+        const direction = sort === 'newest' ? -1 : 1;
+        shown.sort((a, b) => {
+          const ya = yearOf(a);
+          const yb = yearOf(b);
+          if (!ya || !yb) return (ya ? 0 : 1) - (yb ? 0 : 1);
+          return direction * (ya - yb);
+        });
+      }
+      $('person-order').textContent = scored && sort === 'relevance'
         ? `“${lastSearch.queryText}” aramasına uygunluğa göre sıralandı.`
-        : '';
+        : scored ? `Uygunluk “${lastSearch.queryText}” aramasına göre gösteriliyor.` : '';
       $('person-list').replaceChildren(...shown.map(record => recordItem(record, Boolean(scored))));
       $('person-empty').hidden = shown.length > 0;
     }
+
+    $('person-sort').onchange = () => {
+      personSort = $('person-sort').value;
+      renderPersonRecords();
+    };
 
     for (const button of $('person-kind').querySelectorAll('button')) {
       button.onclick = () => {
@@ -1942,7 +1990,9 @@
       $('crumb-person').href = personHash(name);
       $('crumb-kind').textContent = kindName;
       $('page-title').textContent = record ? record.title : (records.length ? 'Kayıt bulunamadı' : 'Yükleniyor…');
-      $('page-lead').textContent = record ? `${name} · ${record.kind === 'thesis' ? 'Yönetilen tez' : 'Yayın'}` : '';
+      $('page-lead').textContent = record
+        ? [name, record.kind === 'thesis' ? 'Yönetilen tez' : 'Yayın', yearOf(record)].filter(Boolean).join(' · ')
+        : '';
       document.title = (record ? record.title : kindName) + ' | Ankara Üniversitesi';
       if (!record || article?.id === id) {
         if (!record) article = null;
@@ -1976,12 +2026,25 @@
       $('abstract-body').replaceChildren(element('p', 'Özet aranıyor…', 'muted'));
       if (record.abstract) {
         setAbstract(id, {text: record.abstract, source: 'veri dosyası'});
-      } else if (record.doi) {
-        fetchAbstract(record.doi).then(found => setAbstract(id, found));
       } else {
-        setAbstract(id, null);
+        readStoredAbstracts().then(stored => {
+          const entry = stored[id];
+          if (entry?.text) setAbstract(id, {text: entry.text, source: entry.source || 'AVESİS'});
+          else if (record.doi) fetchAbstract(record.doi).then(found => setAbstract(id, found));
+          else setAbstract(id, null);
+        });
       }
       updateChat();
+    }
+
+    // Thesis abstracts collected from AVESIS (data/abstracts.json), loaded the first time an article page opens.
+    let storedAbstracts;
+    function readStoredAbstracts() {
+      storedAbstracts ??= fetch('./data/abstracts.json', {cache: 'no-cache'})
+        .then(response => response.ok ? response.json() : {})
+        .then(data => (data && typeof data === 'object' ? data : {}))
+        .catch(() => ({}));
+      return storedAbstracts;
     }
 
     function setAbstract(id, found) {
@@ -1989,11 +2052,15 @@
       article.abstract = found?.text ?? null;
       if (found) {
         $('abstract-body').replaceChildren(element('p', found.text));
-        $('abstract-source').textContent = `Kaynak: ${found.source}${found.year ? ' · ' + found.year : ''}. Özet, açık akademik veri kaynağından bu sayfa açılırken alınır.`;
+        $('abstract-source').textContent = found.source === 'AVESİS'
+          ? 'Kaynak: AVESİS, Ankara Üniversitesi.'
+          : `Kaynak: ${found.source}${found.year ? ' · ' + found.year : ''}. Özet, açık akademik veri kaynağından bu sayfa açılırken alınır.`;
       } else {
-        const reason = article.record.doi
-          ? 'Bu çalışma için açık bir özet bulunamadı.'
-          : 'Bu kaydın DOI numarası olmadığı için özeti otomatik bulunamadı.';
+        const reason = article.record.kind === 'thesis'
+          ? 'Bu tezin AVESİS sayfasında özet bulunamadı.'
+          : article.record.doi
+            ? 'Bu çalışma için açık bir özet bulunamadı.'
+            : 'Bu kaydın DOI numarası olmadığı için özeti otomatik bulunamadı.';
         $('abstract-body').replaceChildren(element('p', reason + ' Yapay zekâ yalnızca özet üzerinden konuştuğu için sohbet bu kayıtta kapalı. Çalışmanın tamamına aşağıdaki bağlantıdan ulaşabilirsiniz.', 'muted'));
       }
       updateChat();
@@ -2208,7 +2275,17 @@
       });
     }
 
-    function drawFingerprint(id, values, color) {
+    // The dimensions that add most to the similarity: both vectors are large there and point the same way.
+    const highlightCount = 40;
+    function agreement(query, match) {
+      return Array.from(query, (value, i) => [i, value * match[i]])
+        .filter(([, product]) => product > 0)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, highlightCount)
+        .map(([i]) => i);
+    }
+
+    function drawFingerprint(id, values, color, highlighted = []) {
       const svg = $(id);
       const sorted = Array.from(values, Math.abs).sort((a, b) => a - b);
       // Scale by a high percentile so a few large dimensions do not flatten the rest.
@@ -2224,18 +2301,29 @@
         bar.setAttribute('fill', color);
         return bar;
       });
-      svg.replaceChildren(...bars);
+      const bands = highlighted.map(i => {
+        const band = document.createElementNS(ns, 'rect');
+        band.setAttribute('x', i - .6);
+        band.setAttribute('width', 2);
+        band.setAttribute('y', 0);
+        band.setAttribute('height', 44);
+        band.setAttribute('class', 'fp-band');
+        return band;
+      });
+      svg.replaceChildren(...bands, ...bars);
     }
 
     function showFingerprint({queryText, queryVector, match}) {
       if (!queryVector || !match) return;
-      drawFingerprint('fp-query', queryVector, '#e0a100');
-      drawFingerprint('fp-match', match.vector, '#1b4f9c');
+      const shared = agreement(queryVector, match.vector);
+      drawFingerprint('fp-query', queryVector, '#e0a100', shared);
+      drawFingerprint('fp-match', match.vector, '#1b4f9c', shared);
       const note = $('fp-note');
       note.replaceChildren(
         `Model “${queryText}” sorgusunu ${queryVector.length} sayıya çevirdi. Desene en çok benzeyen kayıt: `,
         element('strong', match.title),
-        ` (uygunluk ${formatPercent.format(relevance(match.score))}).`,
+        ` (uygunluk ${formatPercent.format(relevance(match.score))}). `,
+        element('span', `Yeşil şeritler, iki desenin aynı yönde güçlü olduğu ve benzerliğe en çok katkı veren ${highlightCount} sayıyı gösterir.`, 'fp-legend'),
       );
       $('fingerprint').hidden = false;
     }
