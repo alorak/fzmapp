@@ -1,0 +1,41 @@
+name: Fetch AVESIS profile photos
+on:
+  workflow_dispatch:
+  push:
+    branches: ['photos/**']
+    paths: ['data/faculty.json', 'scripts/photos.py', '.github/workflows/photos.yml']
+permissions:
+  contents: write
+concurrency:
+  group: avesis-photos
+  cancel-in-progress: false
+jobs:
+  photos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: python -m unittest discover -s tests -v
+      - run: python -m scripts.photos
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: photos
+          path: photos/
+          if-no-files-found: warn
+      # Commits the photos to the branch the workflow ran on.
+      - name: Commit photos
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add photos
+          if git diff --cached --quiet; then
+            echo "No photo changes"
+          else
+            git commit -m "Akademisyen fotoğraflarını AVESİS'ten güncelle"
+            git push
+          fi
