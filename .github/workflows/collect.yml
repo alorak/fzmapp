@@ -1,11 +1,17 @@
 name: Collect AVESIS metadata
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '20 2 * * 0'
 permissions:
   contents: read
+concurrency:
+  group: avesis-collection
+  cancel-in-progress: false
 jobs:
   collect:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -16,4 +22,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: academics
-          path: data/academics.json
+          path: |
+            data/academics.json
+            data/collection-report.json
+          if-no-files-found: error
