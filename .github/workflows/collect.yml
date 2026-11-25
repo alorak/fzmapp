@@ -6,6 +6,9 @@ on:
         description: 'Discover department profiles (only if robots.txt permits)'
         type: boolean
         default: false
+      profile:
+        description: 'Collect one profile by slug (leave blank for the full roster)'
+        type: string
 permissions:
   contents: read
 concurrency:
@@ -21,9 +24,11 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r requirements.txt
+      - run: python -m unittest discover -s tests -v
       - run: python scripts/collect.py
         env:
           DISCOVER_DEPARTMENT: ${{ inputs.discover_department }}
+          AVESIS_PROFILE: ${{ inputs.profile }}
       - uses: actions/upload-artifact@v4
         if: success()
         with:
