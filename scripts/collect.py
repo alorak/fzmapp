@@ -58,11 +58,36 @@ def metadata(page):
     # Abstract redistribution is disabled until reuse rights are confirmed.
     return result
 
+def discover():
+    profiles = set(json.loads((ROOT/"data/profiles.json").read_text()))
+    source = "https://phys.eng.ankara.edu.tr"
+    rp = RobotFileParser()
+    resp = session.get(source+"/robots.txt", timeout=20, allow_redirects=False)
+    if resp.status_code != 200 or "<html" in resp.text.lower():
+        raise RuntimeError("Department robots unavailable")
+    rp.parse(resp.text.splitlines())
+    for path in ("/tr/ogretim-uyeleri/", "/tr/personel/akademik-son/"):
+        url = source+path
+        if not rp.can_fetch(AGENT,url):
+            raise RuntimeError("Department discovery not permitted")
+        time.sleep(max(2,rp.crawl_delay(AGENT) or 0))
+        resp = session.get(url,timeout=30,allow_redirects=False)
+        if resp.status_code != 200:
+            raise RuntimeError("Department page unavailable")
+        soup = BeautifulSoup(resp.text,"html.parser")
+        for a in soup.select("a[href]"):
+            u = urlsplit(a["href"])
+            if u.hostname == "avesis.ankara.edu.tr":
+                slug = u.path.strip("/").split("/")[0]
+                if re.fullmatch(r"[a-zA-Z0-9_.-]+",slug):
+                    profiles.add(slug)
+    return sorted(profiles)
+
 rows = []
 report = []
 cache = {}
-for slug in json.loads((ROOT/"data/profiles.json").read_text()):
-    if not re.fullmatch(r"[a-zA-Z0-9_-]+", slug):
+for slug in discover():
+    if not re.fullmatch(r"[a-zA-Z0-9_.-]+", slug):
         raise ValueError("Invalid profile slug")
     page = get(BASE+slug+"/yayinlar")
     heading = page.find("h1")
