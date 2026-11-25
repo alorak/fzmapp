@@ -76,6 +76,19 @@
     :focus-visible { outline: 3px solid #377dcc; outline-offset: 3px; }
     #status, #source { margin: 12px 0 0; color: var(--muted); font-size: .88rem; }
     #status[data-error="true"] { color: #a0242c; }
+    .model-status {
+      margin-top: 15px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+      font-size: .84rem;
+    }
+    .model-status-line { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; }
+    #model-state, #model-transfer { color: var(--muted); }
+    #model-state[data-state="ready"] { color: #1e5142; font-weight: 650; }
+    #model-state[data-state="error"] { color: #a0242c; }
+    .model-size { color: var(--muted); }
+    progress { width: 100%; height: 7px; margin: 4px 0; accent-color: var(--blue); }
+    progress[hidden] { display: none; }
     #count { margin: 12px 0 2px; font-size: 1rem; font-weight: 700; }
     #breakdown { margin: 0 0 16px; color: var(--muted); font-size: .87rem; }
     #source { margin-top: 0; }
@@ -188,6 +201,16 @@
         </div>
       </form>
       <p id="status" role="status">Veri yükleniyor…</p>
+      <progress id="index-progress" aria-label="Kayıt dizini hazırlanıyor" hidden></progress>
+      <div class="model-status" aria-label="AI modeli">
+        <div class="model-status-line">
+          <strong>Multilingual E5 Small</strong>
+          <span id="model-state" data-state="idle" role="status">Henüz yüklenmedi</span>
+        </div>
+        <a class="model-size" href="https://huggingface.co/Xenova/multilingual-e5-small/blob/main/onnx/model_quantized.onnx">Model ağırlıkları ≈118 MB</a>
+        <span id="model-transfer"></span>
+        <progress id="model-progress" aria-label="Model ağırlıkları yükleniyor" hidden></progress>
+      </div>
     </section>
     <aside class="panel data-panel" aria-labelledby="data-title">
       <h2 id="data-title">Veri kaynağı</h2>
@@ -279,7 +302,7 @@
         <figcaption>Çubuklar vektörleri şematik olarak gösterir.</figcaption>
       </figure>
       <p>Uygulama araştırma konusunu <code>query:</code>, kayıt başlığını ve varsa özetini <code>passage:</code> önekiyle modele verir.</p>
-      <p>İlk aramada Transformers.js ve model dosyaları indirilir. Modelin 8 bitlik ONNX sürümü WebAssembly ile tarayıcıda çalışır. Arama metni ve yüklediğiniz kayıtlar cihazınızda işlenir.</p>
+      <p>İlk aramada Transformers.js ve yaklaşık 118 MB’lık model ağırlıkları yüklenir. Modelin 8 bitlik ONNX sürümü WebAssembly ile tarayıcının ayrı bir işlem alanında çalışır. Arama metni ve yüklediğiniz kayıtlar cihazınızda işlenir.</p>
       <p class="model-links"><a href="https://huggingface.co/intfloat/multilingual-e5-small">Model kartı</a> · <a href="https://huggingface.co/Xenova/multilingual-e5-small">Tarayıcıda kullanılan ONNX sürümü</a></p>
     </section>
     <section class="panel" aria-labelledby="ranking-title">
@@ -295,10 +318,12 @@
   <script type="module">
     const $ = id => document.getElementById(id);
     const model = 'Xenova/multilingual-e5-small';
-    const version = 'e5-small-q8-v1';
+    const weightsFile = 'onnx/model_quantized.onnx';
+    const bytesInMB = 1_000_000;
+    const formatMB = new Intl.NumberFormat('tr', {maximumFractionDigits: 1});
     const facultyOrder = new Intl.Collator('tr');
     let records = [];
-    let pipe;
+    let searchWorker;
     let busy = false;
     let hasLocalData = false;
 
@@ -324,6 +349,42 @@
     function setStatus(message, error = false) {
       $('status').textContent = message;
       $('status').dataset.error = String(error);
+    }
+
+    function setModelState(state, loaded, total) {
+      const labels = {
+        idle: 'Henüz yüklenmedi',
+        cached: 'Ağırlıklar önbellekte',
+        loading: 'Model yükleniyor…',
+        downloading: 'Ağırlıklar yükleniyor…',
+        initializing: 'Model hazırlanıyor…',
+        ready: 'Yüklendi · Aramaya hazır',
+        error: 'Model yüklenemedi',
+      };
+      const label = $('model-state');
+      if (label.dataset.state !== state) {
+        label.textContent = labels[state];
+        label.dataset.state = state;
+      }
+      const progress = $('model-progress');
+      progress.hidden = state !== 'downloading';
+      $('model-transfer').textContent = '';
+      if (!progress.hidden && Number.isFinite(total) && total > 0) {
+        progress.max = total;
+        progress.value = loaded;
+        $('model-transfer').textContent = ' · ' + formatMB.format(loaded / bytesInMB)
+          + ' / ' + formatMB.format(total / bytesInMB) + ' MB';
+      } else {
+        progress.removeAttribute('value');
+      }
+    }
+
+    if (globalThis.caches) {
+      caches.match(`https://huggingface.co/${model}/resolve/main/${weightsFile}`, {cacheName: 'transformers-cache'})
+        .then(response => {
+          if (response && $('model-state').dataset.state === 'idle') setModelState('cached');
+        })
+        .catch(() => {});
     }
 
     const db = await new Promise((resolve, reject) => {
@@ -393,7 +454,7 @@
       hasLocalData = saved != null && source !== 'bundled';
       records = hasLocalData ? validate(saved) : await readBundledRecords();
       setStatus(records.length
-        ? 'Aramaya hazır. İlk aramada model indirilecek.'
+        ? 'Aramaya hazır.'
         : 'Aramak için bir akademik kayıt dosyası (JSON) seçin.');
     } catch (error) {
       setStatus(error.message, true);
@@ -463,11 +524,6 @@
       }
     };
 
-    async function embed(text) {
-      const output = await pipe(text, {pooling: 'mean', normalize: true});
-      return Array.from(output.data);
-    }
-
     function element(tag, text, className) {
       const item = document.createElement(tag);
       if (text) item.textContent = text;
@@ -508,6 +564,47 @@
       return card;
     }
 
+    function searchInBackground(queryText) {
+      searchWorker ??= new Worker(new URL('./search-worker.js', import.meta.url), {type: 'module'});
+      return new Promise((resolve, reject) => {
+        const onWorkerError = message => {
+          searchWorker.terminate();
+          searchWorker = undefined;
+          setModelState('error');
+          reject(new Error(message));
+        };
+        searchWorker.onerror = event => onWorkerError(event.message || 'Arama işlemi başlatılamadı.');
+        searchWorker.onmessageerror = () => onWorkerError('Arama işlemi yanıtı alınamadı.');
+        searchWorker.onmessage = ({data: message}) => {
+          switch (message.type) {
+            case 'model':
+              setModelState(message.state, message.loaded, message.total);
+              break;
+            case 'index': {
+              const progress = $('index-progress');
+              progress.hidden = false;
+              progress.max = message.total;
+              progress.value = message.count;
+              setStatus(`Kayıtlar hazırlanıyor: ${message.count} / ${message.total}`);
+              break;
+            }
+            case 'ranking':
+              $('index-progress').hidden = true;
+              setStatus('Aranıyor…');
+              break;
+            case 'result':
+              resolve(message.results);
+              break;
+            case 'error':
+              if (!message.modelReady) setModelState('error');
+              reject(new Error(message.message));
+              break;
+          }
+        };
+        searchWorker.postMessage({model, weightsFile, queryText, records});
+      });
+    }
+
     $('search').onsubmit = async event => {
       event.preventDefault();
       if (busy || !records.length) return;
@@ -516,42 +613,15 @@
       busy = true;
       update();
       $('results').replaceChildren();
+      setStatus('Arama hazırlanıyor…');
       try {
-        if (!pipe) {
-          setStatus('AI modeli yükleniyor…');
-          const {pipeline} = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2');
-          pipe = await pipeline('feature-extraction', model, {device: 'wasm', dtype: 'q8'});
-        }
-        setStatus('Aranıyor…');
-        const query = await embed('query: ' + queryText);
-        const groups = new Map();
-        const cache = await read('vectors');
-        const signature = JSON.stringify(records);
-        let vectors = cache?.version === version && cache.signature === signature ? cache.vectors : [];
-        const fresh = vectors.length !== records.length;
-        if (fresh) vectors = [];
-        for (const [index, record] of records.entries()) {
-          if (fresh) {
-            setStatus(`İndeksleniyor: ${index + 1} / ${records.length}`);
-            vectors.push(await embed('passage: ' + record.title + ' ' + record.abstract));
-          }
-          const score = query.reduce((sum, value, i) => sum + value * vectors[index][i], 0);
-          if (!groups.has(record.faculty)) groups.set(record.faculty, []);
-          groups.get(record.faculty).push({...record, score});
-        }
-        if (fresh) await updateStorage(store => store.put({version, signature, vectors}, 'vectors'));
-
-        const sorted = Array.from(groups, ([name, items]) => {
-          items.sort((a, b) => b.score - a.score);
-          const top = items.slice(0, 5);
-          const average = top.reduce((sum, item) => sum + item.score, 0) / top.length;
-          return {name, items, score: .6 * top[0].score + .4 * average};
-        }).sort((a, b) => b.score - a.score);
+        const sorted = await searchInBackground(queryText);
         $('results').append(...sorted.map(renderResult));
         setStatus(`${sorted.length} akademisyen sıralandı. Skor, sorgu ile kayıtlar arasındaki benzerliği gösterir.`);
       } catch (error) {
         setStatus('Arama başarısız: ' + error.message, true);
       } finally {
+        $('index-progress').hidden = true;
         busy = false;
         update();
       }
