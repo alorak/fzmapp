@@ -102,6 +102,7 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) 300px;
       grid-template-areas: "search model" "results model";
+      grid-template-rows: auto 1fr;
       align-items: start;
       gap: 24px 28px;
       margin-block: -64px 64px;
@@ -196,11 +197,7 @@
     .model-facts dd { margin: 0; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
     .model-facts a { color: var(--blue); }
     #model-transfer { color: var(--muted); font-weight: 400; }
-    .model-note { margin-top: 12px; color: var(--muted); font-size: .88rem; line-height: 1.45; }
-    .model-card-info { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 12px; }
-    .model-card-info summary { cursor: pointer; color: var(--ink); font-weight: 650; font-size: .95rem; }
-    .model-card-info .model-facts { margin-top: 6px; }
-    .model-card-info .model-note { display: block; }
+    .model-links { margin-top: 12px; font-size: .9rem; font-weight: 600; }
 
     /* Data page */
     .data-page { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 24px 28px; align-items: start; margin-block: -64px 64px; }
@@ -624,14 +621,14 @@
       .wrap { width: calc(100% - 32px); }
       .masthead { padding-bottom: 84px; }
       .masthead-top { margin-bottom: 12px; }
-      .workspace { grid-template-columns: minmax(0, 1fr); grid-template-areas: "search" "model" "results"; gap: 16px; }
+      .workspace { grid-template-columns: minmax(0, 1fr); grid-template-areas: "search" "model" "results"; grid-template-rows: none; gap: 16px; }
       .data-page { grid-template-columns: minmax(0, 1fr); gap: 16px; }
       .person-page { grid-template-columns: minmax(0, 1fr); gap: 16px; }
       .article-page { grid-template-columns: minmax(0, 1fr); gap: 16px; }
       .person-avatar { width: 120px; height: 150px; font-size: 2.4rem; }
       .result-photo { right: 64px; width: 40%; opacity: .16; }
       .faculty-list { grid-template-columns: minmax(0, 1fr); }
-      .model-facts div:nth-child(2), .model-note { display: none; }
+      .model-facts div:nth-child(n+3), .model-links { display: none; }
       .fp-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
       .journey-steps { grid-template-columns: minmax(0, 1fr); gap: 18px; }
       .journey-steps li { display: grid; grid-template-columns: 56px 1fr; gap: 0 14px; padding: 0; }
@@ -732,27 +729,19 @@
         </div>
       </div>
       <p class="model-state-line"><span id="model-state" data-state="idle" role="status">Henüz yüklenmedi</span></p>
+      <progress id="model-progress" aria-label="Model ağırlıkları yükleniyor" hidden></progress>
       <dl class="model-facts">
         <div><dt>Boyut</dt><dd><a class="model-size" href="https://huggingface.co/Xenova/multilingual-e5-small/blob/main/onnx/model_quantized.onnx">≈118 MB</a><span id="model-transfer"></span></dd></div>
-        <div><dt>Çalıştığı yer</dt><dd>Sizin tarayıcınız</dd></div>
         <div><dt>Aranan veri</dt><dd><a href="#veri" id="data-summary">Veri yükleniyor…</a></dd></div>
+        <div><dt>Parametre sayısı</dt><dd>≈118 milyon</dd></div>
+        <div><dt>Katman</dt><dd>12</dd></div>
+        <div><dt>Vektör boyutu</dt><dd>384 sayı</dd></div>
+        <div><dt>En uzun girdi</dt><dd>512 token</dd></div>
+        <div><dt>Temel model</dt><dd>Multilingual MiniLM</dd></div>
+        <div><dt>Ağırlıklar</dt><dd>8 bit, ONNX</dd></div>
+        <div><dt>Lisans</dt><dd>MIT</dd></div>
       </dl>
-      <progress id="model-progress" aria-label="Model ağırlıkları yükleniyor" hidden></progress>
-      <p class="model-note">İlk aramada bir kez indirilir, sonraki aramalarda önbellekten gelir.</p>
-      <details class="model-card-info" open>
-        <summary>Model kartından</summary>
-        <dl class="model-facts">
-          <div><dt>Parametre sayısı</dt><dd>≈118 milyon</dd></div>
-          <div><dt>Katman</dt><dd>12</dd></div>
-          <div><dt>Vektör boyutu</dt><dd>384 sayı</dd></div>
-          <div><dt>En uzun girdi</dt><dd>512 token</dd></div>
-          <div><dt>Dil desteği</dt><dd>≈100 dil</dd></div>
-          <div><dt>Temel model</dt><dd>Multilingual MiniLM</dd></div>
-          <div><dt>Ağırlıklar</dt><dd>8 bit, ONNX</dd></div>
-          <div><dt>Lisans</dt><dd>MIT</dd></div>
-        </dl>
-        <p class="model-note">512 tokenden uzun metinler kesilir; bu uygulamada yalnızca başlıklar işlendiği için sınıra ulaşılmaz. <a href="https://huggingface.co/intfloat/multilingual-e5-small">Model kartı</a> · <a href="https://arxiv.org/abs/2402.05672">Teknik rapor (2024)</a></p>
-      </details>
+      <p class="model-links"><a href="https://huggingface.co/intfloat/multilingual-e5-small">Model kartı</a> · <a href="https://arxiv.org/abs/2402.05672">Teknik rapor (2024)</a></p>
     </aside>
 
     <div class="results-area">
