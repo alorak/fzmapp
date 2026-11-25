@@ -1,5 +1,6 @@
 """Download the AVESIS profile photos listed in data/faculty.json into photos/<profile>.jpg."""
 
+import hashlib
 import io
 import json
 import re
@@ -59,7 +60,7 @@ def fetch_photo(session, url, target, robots):
 
 def main():
     people = json.loads((ROOT / "data/faculty.json").read_text(encoding="utf-8"))
-    saved, failed, robots = 0, [], {}
+    saved, failed, robots = [], [], {}
     with requests.Session() as session:
         session.headers["User-Agent"] = AGENT
         for person in people:
@@ -74,10 +75,21 @@ def main():
                 failed.append(profile)
                 print(f"::warning::{profile}: {error}", flush=True)
             else:
-                saved += 1
+                saved.append(profile)
                 print(f"{profile}: saved", flush=True)
             time.sleep(2)
-    print(f"Saved {saved} photos; {len(failed)} failed: {', '.join(failed) or '-'}")
+    # AVESIS serves the same generic silhouette for profiles without a photo; drop images shared by several people.
+    groups = {}
+    for profile in saved:
+        digest = hashlib.sha256((ROOT / "photos" / f"{profile}.jpg").read_bytes()).hexdigest()
+        groups.setdefault(digest, []).append(profile)
+    for profiles in groups.values():
+        if len(profiles) > 1:
+            for profile in profiles:
+                (ROOT / "photos" / f"{profile}.jpg").unlink()
+                saved.remove(profile)
+            print(f"::warning::Same image for {', '.join(profiles)}; treated as the default silhouette and removed")
+    print(f"Saved {len(saved)} photos; {len(failed)} failed: {', '.join(failed) or '-'}")
     if not saved:
         sys.exit(1)
 
