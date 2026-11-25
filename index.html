@@ -88,25 +88,25 @@
       background-position: -1px -1px;
       padding: 26px 0 96px;
     }
-    .masthead-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px 24px; margin-bottom: 52px; }
+    .masthead-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px 24px; margin-bottom: 14px; }
     .institution { display: flex; align-items: center; gap: 10px; color: #c6dbf1; font-size: .95rem; font-weight: 600; }
     .institution svg { flex: none; }
     .navigation { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.08); }
     .navigation a { color: #dceafa; padding: 6px 16px; border-radius: 999px; font-size: .95rem; font-weight: 600; text-decoration: none; }
     .navigation a:hover { background: rgba(255,255,255,.1); }
     .navigation a[aria-current="page"] { background: #fff; color: var(--ink); }
-    .lead { margin-top: 14px; max-width: 58ch; color: #c6dbf1; font-size: 1.15rem; line-height: 1.5; }
+    .lead { margin-top: 10px; max-width: 100%; color: #c6dbf1; font-size: 1.15rem; line-height: 1.5; }
 
     /* ---------- Search page ---------- */
     .workspace {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 300px;
-      grid-template-areas: "search data" "results data";
+      grid-template-areas: "search model" "results model";
       align-items: start;
       gap: 24px 28px;
       margin-block: -64px 64px;
     }
-    .workspace[hidden], .architecture[hidden] { display: none; }
+    .workspace[hidden], .architecture[hidden], .data-page[hidden] { display: none; }
     .panel {
       background: var(--surface);
       border: 1px solid var(--line);
@@ -114,14 +114,13 @@
       padding: 26px;
     }
     .search-panel { grid-area: search; box-shadow: 0 18px 40px -24px rgba(15,39,66,.45); }
-    .data-panel { grid-area: data; }
+    .model-panel { grid-area: model; }
     .results-area { grid-area: results; min-width: 0; }
     label { display: block; font-size: 1rem; font-weight: 700; }
     button, input { font: inherit; }
     .search-fields {
       display: flex;
       gap: 6px;
-      margin-top: 10px;
       padding: 6px;
       border: 1.5px solid var(--line-strong);
       border-radius: 12px;
@@ -152,13 +151,13 @@
     button:hover:not(:disabled) { background: #163f7d; border-color: #163f7d; }
     button:disabled { opacity: .5; cursor: default; }
     #go { padding-inline: 22px; border-radius: 8px; }
-    .examples { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; font-size: .95rem; color: var(--muted); }
+    .examples { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 14px; font-size: .92rem; color: var(--muted); }
     .examples button {
       background: var(--blue-soft);
       border-color: transparent;
       color: var(--blue);
       font-weight: 600;
-      padding: 3px 12px;
+      padding: 3px 11px;
       border-radius: 999px;
     }
     .examples button:hover:not(:disabled) { background: #d6e3f4; border-color: transparent; }
@@ -166,44 +165,60 @@
     #status[data-error="true"] { color: var(--red); }
     progress { width: 100%; height: 6px; margin: 8px 0 0; accent-color: var(--blue); }
     progress[hidden] { display: none; }
-    .model-status {
-      display: grid;
-      grid-template-columns: auto minmax(0, 1fr);
-      gap: 0 12px;
-      margin-top: 18px;
-      border-top: 1px solid var(--line);
-      padding-top: 16px;
-      font-size: .93rem;
-    }
-    .model-chip { grid-row: span 3; width: 38px; height: 38px; border-radius: 9px; background: var(--blue-soft); color: var(--blue); display: grid; place-items: center; }
-    .model-status-line { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; }
-    #model-state { color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
-    #model-state::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--line-strong); }
+    /* Query fingerprint under the search box */
+    .fingerprint { margin: 18px 0 0; border-top: 1px solid var(--line); padding-top: 16px; }
+    .fingerprint[hidden] { display: none; }
+    .fp-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px; font-size: .97rem; }
+    .fp-head a { font-size: .92rem; }
+    .fp-row { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; align-items: center; }
+    .fp-row + .fp-row { margin-top: 6px; }
+    .fp-row span { color: var(--muted); font-size: .88rem; font-weight: 600; }
+    .fp-row svg { display: block; width: 100%; height: 44px; background: var(--paper); border-radius: 6px; }
+    #fp-note { margin-top: 10px; color: var(--muted); font-size: .9rem; line-height: 1.45; }
+    #fp-note strong { color: var(--ink); font-weight: 650; }
+
+    /* Model panel */
+    .model-head { display: flex; align-items: center; gap: 12px; }
+    .model-chip { flex: none; width: 42px; height: 42px; border-radius: 10px; background: var(--ink); color: #fff; display: grid; place-items: center; }
+    .model-head h2 { font-family: var(--sans); font-size: .9rem; font-weight: 650; color: var(--muted); letter-spacing: 0; }
+    .model-name { font: 600 1.1rem/1.25 var(--serif); white-space: nowrap; }
+    .model-state-line { margin-top: 16px; padding: 9px 12px; border-radius: var(--radius); background: var(--paper); font-size: .95rem; }
+    #model-state { color: var(--muted); display: inline-flex; align-items: center; gap: 8px; }
+    #model-state::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--line-strong); }
     #model-state[data-state="ready"] { color: var(--green); font-weight: 650; }
     #model-state[data-state="ready"]::before, #model-state[data-state="cached"]::before { background: var(--green); }
     #model-state[data-state="downloading"]::before, #model-state[data-state="loading"]::before, #model-state[data-state="initializing"]::before { background: var(--amber); }
     #model-state[data-state="error"] { color: var(--red); }
     #model-state[data-state="error"]::before { background: var(--red); }
-    .model-meta { color: var(--muted); }
-    .model-meta a { color: inherit; }
-    #model-transfer { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .model-facts { margin: 14px 0 0; font-size: .93rem; }
+    .model-facts div { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+    .model-facts dt { color: var(--muted); }
+    .model-facts dd { margin: 0; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .model-facts a { color: var(--blue); }
+    #model-transfer { color: var(--muted); font-weight: 400; }
+    .model-note { margin-top: 12px; color: var(--muted); font-size: .88rem; line-height: 1.45; }
 
-    .data-panel h2 { font-size: 1.3rem; }
+    /* Data page */
+    .data-page { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 24px 28px; align-items: start; margin-block: -64px 64px; }
+    .data-panel { box-shadow: 0 18px 40px -24px rgba(15,39,66,.45); }
+    .data-panel h2, .faculty-panel h2 { font-size: 1.35rem; }
     #source { margin-top: 4px; color: var(--muted); font-size: .95rem; }
-    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0 6px; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0 18px; }
     .stat { background: var(--paper); border-radius: var(--radius); padding: 10px 12px; }
     .stat strong { display: block; font: 600 1.6rem/1.1 var(--serif); font-variant-numeric: lining-nums tabular-nums; }
     .stat span { color: var(--muted); font-size: .9rem; }
-    #count { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-    #breakdown { margin: 0 0 18px; color: var(--muted); font-size: .93rem; }
     .data-actions { display: grid; gap: 8px; }
     .data-actions button { font-size: .95rem; text-align: left; }
     .secondary { background: #fff; border-color: var(--line-strong); color: var(--ink); }
     button.secondary:hover:not(:disabled) { background: var(--paper); border-color: var(--line-strong); }
-    .roster { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 14px; font-size: .95rem; }
-    .roster summary { cursor: pointer; color: var(--blue); font-weight: 650; }
-    .roster ul { margin: 10px 0 0; padding: 0; list-style: none; columns: 1; }
-    .roster li { padding: 5px 0; border-bottom: 1px dashed var(--line); }
+    #data-status { margin-top: 12px; color: var(--muted); font-size: .93rem; }
+    #data-status:empty { display: none; }
+    #data-status[data-error="true"] { color: var(--red); }
+    .data-help { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: .88rem; line-height: 1.5; }
+    .faculty-panel[hidden] { display: none; }
+    .faculty-list { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
+    .faculty-list li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+    .faculty-list span { color: var(--muted); font-size: .88rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
 
     /* Results */
     #results { display: grid; gap: 14px; counter-reset: rank; }
@@ -487,8 +502,12 @@
       body { font-size: 16px; }
       .wrap { width: calc(100% - 32px); }
       .masthead { padding-bottom: 84px; }
-      .masthead-top { margin-bottom: 36px; }
-      .workspace { grid-template-columns: minmax(0, 1fr); grid-template-areas: "search" "results" "data"; gap: 16px; }
+      .masthead-top { margin-bottom: 12px; }
+      .workspace { grid-template-columns: minmax(0, 1fr); grid-template-areas: "search" "model" "results"; gap: 16px; }
+      .data-page { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+      .faculty-list { grid-template-columns: minmax(0, 1fr); }
+      .model-facts div:nth-child(2), .model-note { display: none; }
+      .fp-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
       .journey-steps { grid-template-columns: minmax(0, 1fr); gap: 18px; }
       .journey-steps li { display: grid; grid-template-columns: 56px 1fr; gap: 0 14px; padding: 0; }
       .journey-steps li .journey-icon { grid-row: span 2; margin: 0; }
@@ -532,6 +551,7 @@
         </p>
         <nav class="navigation" aria-label="Ana gezinme">
           <a id="search-link" href="#arama" aria-current="page">Arama</a>
+          <a id="data-link" href="#veri">Veri kaynağı</a>
           <a id="architecture-link" href="#nasil-calisir">Nasıl çalışır?</a>
         </nav>
       </div>
@@ -543,7 +563,7 @@
   <main id="search-page" class="workspace wrap">
     <section class="panel search-panel" aria-label="Konu arama">
       <form id="search">
-        <label for="q">Araştırma konusu</label>
+        <label for="q" class="sr-only">Araştırma konusu</label>
         <div class="search-fields">
           <input id="q" type="search" required placeholder="Örn. GaN transistörleri" aria-describedby="status" autocomplete="off">
           <button id="go" disabled>AI ile ara</button>
@@ -553,43 +573,40 @@
         <span>Deneyin:</span>
         <button type="button" disabled>GaN transistörleri</button>
         <button type="button" disabled>güneş nötrinoları</button>
-        <button type="button" disabled>radyoterapi</button>
+        <button type="button" disabled>manyetik malzemeler</button>
         <button type="button" disabled>doğrusal olmayan optik</button>
       </div>
       <p id="status" role="status">Veri yükleniyor…</p>
       <progress id="index-progress" aria-label="Kayıt dizini hazırlanıyor" hidden></progress>
-      <div class="model-status" aria-label="AI modeli">
+      <figure class="fingerprint" id="fingerprint" hidden>
+        <div class="fp-head">
+          <strong>Sorgunuzun anlam parmak izi</strong>
+          <a href="#nasil-calisir">Bu ne demek?</a>
+        </div>
+        <div class="fp-row"><span>Sorgunuz</span><svg id="fp-query" viewBox="0 0 384 44" preserveAspectRatio="none" aria-hidden="true"></svg></div>
+        <div class="fp-row"><span>En yakın kayıt</span><svg id="fp-match" viewBox="0 0 384 44" preserveAspectRatio="none" aria-hidden="true"></svg></div>
+        <figcaption id="fp-note"></figcaption>
+      </figure>
+    </section>
+
+    <aside class="panel model-panel" aria-labelledby="model-panel-title">
+      <div class="model-head">
         <span class="model-chip" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>
         </span>
-        <div class="model-status-line">
-          <strong>Multilingual E5 Small</strong>
-          <span id="model-state" data-state="idle" role="status">Henüz yüklenmedi</span>
+        <div>
+          <h2 id="model-panel-title">Yapay zekâ modeli</h2>
+          <p class="model-name">Multilingual E5 Small</p>
         </div>
-        <span class="model-meta">İlk aramada tarayıcınıza indirilir: <a class="model-size" href="https://huggingface.co/Xenova/multilingual-e5-small/blob/main/onnx/model_quantized.onnx">≈118 MB</a><span id="model-transfer"></span></span>
-        <progress id="model-progress" aria-label="Model ağırlıkları yükleniyor" hidden></progress>
       </div>
-    </section>
-
-    <aside class="panel data-panel" aria-labelledby="data-title">
-      <h2 id="data-title">Veri kaynağı</h2>
-      <p id="source"></p>
-      <div class="stats" aria-hidden="true">
-        <div class="stat"><strong id="stat-records">–</strong><span>kayıt</span></div>
-        <div class="stat"><strong id="stat-faculty">–</strong><span>akademisyen</span></div>
-      </div>
-      <p id="count"></p>
-      <p id="breakdown"></p>
-      <div class="data-actions">
-        <input id="file" type="file" accept=".json,application/json" hidden>
-        <button type="button" id="load-bundled" disabled>Bölüm verisini yükle</button>
-        <button type="button" class="secondary" id="choose" disabled>JSON dosyası seç</button>
-        <button type="button" class="secondary" id="reset" disabled>Yerel veriyi sil</button>
-      </div>
-      <details class="roster" id="faculty-roster" hidden>
-        <summary>Akademisyenleri göster</summary>
-        <ul id="faculty-list"></ul>
-      </details>
+      <p class="model-state-line"><span id="model-state" data-state="idle" role="status">Henüz yüklenmedi</span></p>
+      <dl class="model-facts">
+        <div><dt>Boyut</dt><dd><a class="model-size" href="https://huggingface.co/Xenova/multilingual-e5-small/blob/main/onnx/model_quantized.onnx">≈118 MB</a><span id="model-transfer"></span></dd></div>
+        <div><dt>Çalıştığı yer</dt><dd>Sizin tarayıcınız</dd></div>
+        <div><dt>Aranan veri</dt><dd><a href="#veri" id="data-summary">Veri yükleniyor…</a></dd></div>
+      </dl>
+      <progress id="model-progress" aria-label="Model ağırlıkları yükleniyor" hidden></progress>
+      <p class="model-note">İlk aramada bir kez indirilir, sonraki aramalarda önbellekten gelir.</p>
     </aside>
 
     <div class="results-area">
@@ -604,6 +621,32 @@
         <a href="#nasil-calisir">Arama nasıl çalışır, adım adım görün</a>
       </section>
     </div>
+  </main>
+
+  <main id="data-page" class="data-page wrap" hidden>
+    <section class="panel data-panel" aria-labelledby="data-title">
+      <h2 id="data-title">Kullanılan veri</h2>
+      <p id="source"></p>
+      <div class="stats" aria-hidden="true">
+        <div class="stat"><strong id="stat-records">–</strong><span>kayıt</span></div>
+        <div class="stat"><strong id="stat-faculty">–</strong><span>akademisyen</span></div>
+        <div class="stat"><strong id="stat-publications">–</strong><span>yayın</span></div>
+        <div class="stat"><strong id="stat-theses">–</strong><span>tez</span></div>
+      </div>
+      <p id="count" class="sr-only"></p>
+      <div class="data-actions">
+        <input id="file" type="file" accept=".json,application/json" hidden>
+        <button type="button" id="load-bundled" disabled>Bölüm verisini yükle</button>
+        <button type="button" class="secondary" id="choose" disabled>JSON dosyası seç</button>
+        <button type="button" class="secondary" id="reset" disabled>Yerel veriyi sil</button>
+      </div>
+      <p id="data-status" role="status"></p>
+      <p class="data-help">JSON dosyası, her biri <code>faculty</code> ve <code>title</code> alanı içeren kayıtlardan oluşan bir liste olmalıdır. İsteğe bağlı alanlar: <code>abstract</code>, <code>url</code>, <code>kind</code> (<code>publication</code> veya <code>thesis</code>).</p>
+    </section>
+    <section class="panel faculty-panel" id="faculty-roster" aria-labelledby="faculty-title" hidden>
+      <h2 id="faculty-title">Akademisyenler</h2>
+      <ul id="faculty-list" class="faculty-list"></ul>
+    </section>
   </main>
 
   <main id="architecture-page" class="architecture wrap" hidden>
@@ -640,7 +683,7 @@
           <p>Uygulama, sorguya en yakın kayıtları akademisyene göre gruplar ve sıralar.</p>
         </li>
       </ol>
-      <p class="journey-note">Uygulama ilk açılışta bölümün <code>academics.json</code> dosyasını otomatik yükler. Kendi dosyanızı içe aktarabilir ve “Bölüm verisini yükle” düğmesiyle bölümün kayıtlarına dönebilirsiniz.</p>
+      <p class="journey-note">Uygulama ilk açılışta bölümün <code>academics.json</code> dosyasını otomatik yükler. <a href="#veri">Veri kaynağı</a> sayfasında kendi dosyanızı içe aktarabilir ve “Bölüm verisini yükle” düğmesiyle bölümün kayıtlarına dönebilirsiniz.</p>
     </section>
 
     <!-- The model -->
@@ -888,7 +931,7 @@
         <h2 id="storage-title">Veri nerede tutulur?</h2>
       </header>
       <div class="prose">
-        <p>İçe aktarılan kayıtlar ve hesaplanan kayıt vektörleri tarayıcının yerel veritabanında (IndexedDB) saklanır. Veri veya model sürümü değişince vektörler yeniden hesaplanır. Arama ekranındaki “Yerel veriyi sil” düğmesi bu kayıtları ve vektörleri temizler.</p>
+        <p>İçe aktarılan kayıtlar ve hesaplanan kayıt vektörleri tarayıcının yerel veritabanında (IndexedDB) saklanır. Veri veya model sürümü değişince vektörler yeniden hesaplanır. <a href="#veri">Veri kaynağı</a> sayfasındaki “Yerel veriyi sil” düğmesi bu kayıtları ve vektörleri temizler.</p>
       </div>
     </section>
   </main>
@@ -1075,27 +1118,33 @@
     let hasLocalData = false;
 
     const pages = {
-      search: {
+      '#arama': {
+        id: 'search',
         title: 'Akademik uzmanlık arama',
         lead: 'Bir araştırma konusu yazın; bölümde o konuda yayın veya tez çalışması olan akademisyenleri bulun.',
       },
-      architecture: {
+      '#veri': {
+        id: 'data',
+        title: 'Veri kaynağı',
+        lead: 'Aramada kullanılan yayın ve tez kayıtları. Bölüm verisini kullanabilir veya kendi JSON dosyanızı yükleyebilirsiniz.',
+      },
+      '#nasil-calisir': {
+        id: 'architecture',
         title: 'Arama nasıl çalışır?',
         lead: 'Yayınların nereden geldiğini, yapay zekâ modelinin metinleri nasıl karşılaştırdığını ve sonuçların nasıl sıralandığını adım adım anlatıyoruz.',
       },
     };
 
     function showPage(moveFocus = false) {
-      const architecture = location.hash === '#nasil-calisir';
-      const page = pages[architecture ? 'architecture' : 'search'];
-      $('search-page').hidden = architecture;
-      $('architecture-page').hidden = !architecture;
+      const page = pages[location.hash] ?? pages['#arama'];
+      for (const {id} of Object.values(pages)) {
+        $(id + '-page').hidden = id !== page.id;
+        $(id + '-link').toggleAttribute('aria-current', id === page.id);
+        if (id === page.id) $(id + '-link').setAttribute('aria-current', 'page');
+      }
       $('page-title').textContent = page.title;
       $('page-lead').textContent = page.lead;
       document.title = page.title + ' | Ankara Üniversitesi';
-      $('search-link').removeAttribute('aria-current');
-      $('architecture-link').removeAttribute('aria-current');
-      $(architecture ? 'architecture-link' : 'search-link').setAttribute('aria-current', 'page');
       if (moveFocus) {
         $('page-title').focus({preventScroll: true});
         window.scrollTo(0, 0);
@@ -1108,6 +1157,18 @@
     function setStatus(message, error = false) {
       $('status').textContent = message;
       $('status').dataset.error = String(error);
+    }
+
+    // Data page actions report on the data page and on the search page.
+    function setDataStatus(message, error = false) {
+      $('data-status').textContent = message;
+      $('data-status').dataset.error = String(error);
+      setStatus(message, error);
+    }
+
+    function clearResults() {
+      $('results').replaceChildren();
+      $('fingerprint').hidden = true;
     }
 
     function setModelState(state, loaded, total) {
@@ -1197,13 +1258,29 @@
       const faculty = [...new Set(records.map(record => record.faculty))].sort(facultyOrder.compare);
       const publications = records.filter(record => record.kind === 'publication').length;
       const theses = records.filter(record => record.kind === 'thesis').length;
-      $('source').textContent = hasLocalData ? 'İçe aktarılan dosya' : records.length ? 'Bölüm verisi' : 'Henüz veri yok';
-      $('count').textContent = `${records.length} kayıt · ${faculty.length} akademisyen`;
+      const source = hasLocalData ? 'İçe aktarılan dosya' : records.length ? 'Ankara Üniversitesi Fizik Mühendisliği bölüm verisi' : 'Henüz veri yok';
+      $('source').textContent = source;
+      $('count').textContent = `${records.length} kayıt, ${faculty.length} akademisyen, ${publications} yayın, ${theses} tez`;
       $('stat-records').textContent = formatCount.format(records.length);
       $('stat-faculty').textContent = formatCount.format(faculty.length);
-      $('breakdown').textContent = records.length ? `${formatCount.format(publications)} yayın ve ${formatCount.format(theses)} tez` : '';
+      $('stat-publications').textContent = formatCount.format(publications);
+      $('stat-theses').textContent = formatCount.format(theses);
+      $('data-summary').textContent = records.length
+        ? `${formatCount.format(records.length)} kayıt`
+        : 'Veri yok';
+      const counts = new Map();
+      for (const record of records) {
+        const entry = counts.get(record.faculty) ?? {publication: 0, thesis: 0};
+        if (record.kind === 'thesis') entry.thesis++; else entry.publication++;
+        counts.set(record.faculty, entry);
+      }
       $('faculty-roster').hidden = !faculty.length;
-      $('faculty-list').replaceChildren(...faculty.map(name => element('li', name)));
+      $('faculty-list').replaceChildren(...faculty.map(name => {
+        const {publication, thesis} = counts.get(name);
+        const item = element('li', name);
+        item.append(element('span', thesis ? `${publication} yayın · ${thesis} tez` : `${publication} yayın`));
+        return item;
+      }));
       $('go').disabled = busy || !records.length;
       for (const example of $('examples').querySelectorAll('button')) example.disabled = busy || !records.length;
       $('load-bundled').disabled = busy;
@@ -1219,7 +1296,7 @@
         ? 'Aramaya hazır.'
         : 'Aramak için bir akademik kayıt dosyası (JSON) seçin.');
     } catch (error) {
-      setStatus(error.message, true);
+      setDataStatus(error.message, true);
     }
     update();
 
@@ -1231,10 +1308,10 @@
         await updateStorage(store => store.put('bundled', 'source'));
         records = next;
         hasLocalData = false;
-        $('results').replaceChildren();
-        setStatus(next.length ? 'Bölüm verisi yüklendi. Aramaya hazır.' : 'Bölüm dosyası boş.');
+        clearResults();
+        setDataStatus(next.length ? 'Bölüm verisi yüklendi. Aramaya hazır.' : 'Bölüm dosyası boş.');
       } catch (error) {
-        setStatus(error.message, true);
+        setDataStatus(error.message, true);
       } finally {
         busy = false;
         update();
@@ -1255,10 +1332,10 @@
         });
         records = next;
         hasLocalData = true;
-        $('results').replaceChildren();
-        setStatus(next.length ? 'Dosya yüklendi. Aramaya hazır.' : 'Dosya boş. Aramak için kayıt içeren bir dosya seçin.');
+        clearResults();
+        setDataStatus(next.length ? 'Dosya yüklendi. Aramaya hazır.' : 'Dosya boş. Aramak için kayıt içeren bir dosya seçin.');
       } catch (error) {
-        setStatus(error instanceof SyntaxError ? 'JSON dosyası okunamadı. Geçerli bir dosya seçin.' : error.message, true);
+        setDataStatus(error instanceof SyntaxError ? 'JSON dosyası okunamadı. Geçerli bir dosya seçin.' : error.message, true);
       } finally {
         $('file').value = '';
         busy = false;
@@ -1274,12 +1351,12 @@
         if (hasLocalData) {
           records = [];
           hasLocalData = false;
-          $('results').replaceChildren();
+          clearResults();
           records = await readBundledRecords();
         }
-        setStatus(records.length ? 'Yerel veri silindi. Bölüm verisi aramaya hazır.' : 'Yerel veri silindi.');
+        setDataStatus(records.length ? 'Yerel veri silindi. Bölüm verisi aramaya hazır.' : 'Yerel veri silindi.');
       } catch (error) {
-        setStatus(error.message, true);
+        setDataStatus(error.message, true);
       } finally {
         busy = false;
         update();
@@ -1364,7 +1441,7 @@
               setStatus('Aranıyor…');
               break;
             case 'result':
-              resolve(message.results);
+              resolve(message);
               break;
             case 'error':
               if (!message.modelReady) setModelState('error');
@@ -1376,6 +1453,38 @@
       });
     }
 
+    function drawFingerprint(id, values, color) {
+      const svg = $(id);
+      const sorted = Array.from(values, Math.abs).sort((a, b) => a - b);
+      // Scale by a high percentile so a few large dimensions do not flatten the rest.
+      const scale = sorted[Math.floor(sorted.length * .98)] || 1;
+      const ns = 'http://www.w3.org/2000/svg';
+      const bars = Array.from(values, (value, i) => {
+        const h = Math.max(.5, Math.min(1, Math.abs(value) / scale) * 20);
+        const bar = document.createElementNS(ns, 'rect');
+        bar.setAttribute('x', i);
+        bar.setAttribute('width', .75);
+        bar.setAttribute('y', value > 0 ? 22 - h : 22);
+        bar.setAttribute('height', h);
+        bar.setAttribute('fill', color);
+        return bar;
+      });
+      svg.replaceChildren(...bars);
+    }
+
+    function showFingerprint({queryText, queryVector, match}) {
+      if (!queryVector || !match) return;
+      drawFingerprint('fp-query', queryVector, '#e0a100');
+      drawFingerprint('fp-match', match.vector, '#1b4f9c');
+      const note = $('fp-note');
+      note.replaceChildren(
+        `Model “${queryText}” sorgusunu ${queryVector.length} sayıya çevirdi. Desene en çok benzeyen kayıt: `,
+        element('strong', match.title),
+        ` (benzerlik ${formatScore.format(match.score)}).`,
+      );
+      $('fingerprint').hidden = false;
+    }
+
     $('search').onsubmit = async event => {
       event.preventDefault();
       if (busy || !records.length) return;
@@ -1383,11 +1492,12 @@
       if (!queryText) return;
       busy = true;
       update();
-      $('results').replaceChildren();
+      clearResults();
       setStatus('Arama hazırlanıyor…');
       try {
-        const sorted = await searchInBackground(queryText);
+        const {results: sorted, queryVector, match} = await searchInBackground(queryText);
         $('results').append(...sorted.map(renderResult));
+        showFingerprint({queryText, queryVector, match});
         setStatus(`${sorted.length} akademisyen sıralandı. Skor, sorgu ile kayıtlar arasındaki benzerliği gösterir.`);
       } catch (error) {
         setStatus('Arama başarısız: ' + error.message, true);
