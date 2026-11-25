@@ -340,6 +340,10 @@
     .chat-setup { margin-top: 16px; padding: 14px 16px; border-radius: var(--radius); background: var(--paper); font-size: .95rem; }
     .chat-setup[hidden] { display: none; }
     .chat-setup button { margin-top: 10px; }
+    .chat-models { margin: 0 0 10px; padding: 0; border: 0; display: grid; gap: 6px; }
+    .chat-models label { display: flex; align-items: flex-start; gap: 8px; font-weight: 400; font-size: .93rem; cursor: pointer; padding: 8px 10px; border-radius: 8px; background: #fff; border: 1px solid var(--line); }
+    .chat-models label:has(input:checked) { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+    .chat-models input { margin-top: 3px; accent-color: var(--blue); }
     .chat-load-status { margin-top: 8px; color: var(--muted); font-size: .9rem; }
     .chat-load-status:empty { display: none; }
     .chat-load-status[data-error="true"] { color: var(--red); }
@@ -829,11 +833,16 @@
       <div class="chat-head">
         <div>
           <h2 id="chat-title">Yapay zekâya sor</h2>
-          <p class="chat-model">Qwen3 0.6B · tarayıcınızda çalışır · yalnızca özete göre cevap verir</p>
+          <p class="chat-model"><span id="chat-model-name">Gemma 4</span> · tarayıcınızda çalışır · yalnızca özete göre cevap verir</p>
         </div>
       </div>
       <div class="chat-setup" id="chat-setup">
-        <p id="chat-setup-text">Model ilk kullanımda bir kez indirilir (≈570 MB), sonra tarayıcınızın önbelleğinden gelir.</p>
+        <fieldset class="chat-models" id="chat-models">
+          <legend class="sr-only">Model seçin</legend>
+          <label><input type="radio" name="chat-model" value="e2b" checked><span><strong>Gemma 4 E2B</strong> · daha hızlı · ≈3,1 GB indirilir · en az 8 GB bellek</span></label>
+          <label><input type="radio" name="chat-model" value="e4b"><span><strong>Gemma 4 E4B</strong> · daha iyi cevaplar · ≈4,9 GB indirilir · 16 GB bellek önerilir</span></label>
+        </fieldset>
+        <p id="chat-setup-text">Model ilk kullanımda bir kez indirilir, sonra tarayıcınızın önbelleğinden gelir. Bilgisayarda güncel Chrome veya Edge gerekir; telefonlarda çalışmaz.</p>
         <button type="button" id="chat-load">Modeli yükle ve başla</button>
         <progress id="chat-progress" aria-label="Sohbet modeli yükleniyor" hidden></progress>
         <p id="chat-load-status" class="chat-load-status" role="status"></p>
@@ -1141,7 +1150,7 @@
       </header>
       <div class="prose">
         <p><strong>Özet:</strong> Tezlerin özetleri AVESİS'teki tez sayfalarından alınır. Yayınların özetleri ise yayıncılara ait olduğu için sitede saklanmaz; sayfa açılırken DOI numarasıyla açık akademik veri kaynaklarından (önce OpenAlex, sonra Crossref) alınır.</p>
-        <p><strong>Model:</strong> Sorularınızı Qwen3 0.6B adlı küçük bir dil modeli cevaplar. Model ilk kullanımda bir kez tarayıcınıza indirilir (≈570 MB) ve WebGPU ile cihazınızda çalışır. Sorularınız hiçbir sunucuya gönderilmez.</p>
+        <p><strong>Model:</strong> Sorularınızı Google'ın açık modeli Gemma 4 cevaplar. İki boyut arasından seçebilirsiniz: E2B (≈3,1 GB, en az 8 GB bellek) daha hızlıdır, E4B (≈4,9 GB, 16 GB bellek önerilir) daha iyi cevap verir. Modelin yalnızca metin parçaları ilk kullanımda bir kez tarayıcınıza indirilir ve WebGPU ile cihazınızda çalışır. Bilgisayarda güncel Chrome veya Edge gerekir; telefonlarda çalışmaz. Sorularınız hiçbir sunucuya gönderilmez.</p>
         <p><strong>Sınır:</strong> Modelden yalnızca başlık, anahtar kelimeler ve özete dayanarak cevap vermesi istenir. Özette olmayan bir şey sorulursa “Özette bu bilgi yok” demesi beklenir. Bu boyuttaki modeller yine de hata yapabilir; önemli bilgileri makalenin kendisinden doğrulayın. Özeti bulunamayan kayıtlarda sohbet kapalıdır.</p>
       </div>
     </section>
@@ -1354,6 +1363,7 @@
     let chatWorker;
     let chatState = 'idle';      // idle | loading | ready | busy | error
     const abstracts = new Map(); // doi -> Promise<{text, source} | null>
+    let storedAbstracts;         // Promise of data/abstracts.json, loaded on first use
 
     const pages = {
       '#arama': {
@@ -1936,7 +1946,26 @@
     $('person-filter').addEventListener('input', renderPersonRecords);
 
     // ---------- "Makaleyi sor" ----------
-    const chatModel = 'onnx-community/Qwen3-0.6B-ONNX';
+    const chatModels = {
+      e2b: {id: 'onnx-community/gemma-4-E2B-it-ONNX', name: 'Gemma 4 E2B', minMemory: 8},
+      e4b: {id: 'onnx-community/gemma-4-E4B-it-ONNX', name: 'Gemma 4 E4B', minMemory: 16},
+    };
+    let chatChoice = 'e2b';
+    try {
+      const saved = localStorage.getItem('fzmapp-chat-model');
+      if (saved in chatModels) chatChoice = saved;
+    } catch {
+      // Storage may be unavailable; the default model is used.
+    }
+    for (const radio of document.querySelectorAll('input[name="chat-model"]')) {
+      radio.checked = radio.value === chatChoice;
+      radio.onchange = () => {
+        chatChoice = radio.value;
+        try { localStorage.setItem('fzmapp-chat-model', chatChoice); } catch { /* not remembered */ }
+        $('chat-model-name').textContent = chatModels[chatChoice].name;
+      };
+    }
+    $('chat-model-name').textContent = chatModels[chatChoice].name;
 
     // Abstracts are fetched on demand from open scholarly APIs by DOI; they are not stored in this repository.
     function fetchAbstract(doi) {
@@ -2035,7 +2064,6 @@
     }
 
     // Thesis abstracts collected from AVESIS (data/abstracts.json), loaded the first time an article page opens.
-    let storedAbstracts;
     function readStoredAbstracts() {
       storedAbstracts ??= fetch('./data/abstracts.json', {cache: 'no-cache'})
         .then(response => response.ok ? response.json() : {})
@@ -2063,11 +2091,11 @@
       updateChat();
     }
 
-    async function hasWebGPU() {
+    async function webGPUAdapter() {
       try {
-        return Boolean(navigator.gpu && await navigator.gpu.requestAdapter());
+        return navigator.gpu ? await navigator.gpu.requestAdapter() : null;
       } catch {
-        return false;
+        return null;
       }
     }
 
@@ -2076,6 +2104,7 @@
       const hasAbstract = Boolean(article?.abstract);
       $('chat-setup').hidden = ready || chatState === 'busy';
       $('chat-load').disabled = chatState === 'loading' || !hasAbstract;
+      for (const radio of document.querySelectorAll('input[name="chat-model"]')) radio.disabled = chatState === 'loading';
       $('chat-load').hidden = chatState === 'loading';
       const canAsk = ready && hasAbstract;
       for (const button of $('chat-quick').querySelectorAll('button')) button.disabled = !canAsk;
@@ -2085,7 +2114,7 @@
       if (article && article.abstract === null) {
         $('chat-setup-text').textContent = 'Bu kayıtta özet olmadığı için sohbet kullanılamıyor.';
       } else if (chatState !== 'loading' && chatState !== 'error') {
-        $('chat-setup-text').textContent = 'Model ilk kullanımda bir kez indirilir (≈570 MB), sonra tarayıcınızın önbelleğinden gelir.';
+        $('chat-setup-text').textContent = 'Model ilk kullanımda bir kez indirilir, sonra tarayıcınızın önbelleğinden gelir. Bilgisayarda güncel Chrome veya Edge gerekir; telefonlarda çalışmaz.';
       }
     }
 
@@ -2148,7 +2177,7 @@
       };
     }
 
-    // Qwen3 may still emit an empty <think></think> block; it is not part of the answer.
+    // Thinking is turned off, but a stray <think></think> block would not be part of the answer.
     function cleanAnswer(text) {
       return text.replace(/<think>[\s\S]*?(<\/think>|$)/g, '').trimStart();
     }
@@ -2201,17 +2230,25 @@
     }
 
     $('chat-load').onclick = async () => {
-      if (!(await hasWebGPU())) {
+      const adapter = await webGPUAdapter();
+      if (!adapter) {
         chatState = 'error';
         setChatLoadStatus('Bu özellik WebGPU destekleyen bir tarayıcı gerektirir. Bilgisayarda Chrome veya Edge’in güncel sürümüyle deneyin.', true);
         updateChat();
         return;
       }
+      // q4f16 needs 16-bit float support on the GPU; otherwise the somewhat larger q4 weights are used.
+      const dtype = adapter.features?.has('shader-f16') ? 'q4f16' : 'q4';
+      const choice = chatModels[chatChoice];
       chatState = 'loading';
-      setChatLoadStatus('Model yükleniyor…');
+      // navigator.deviceMemory reports at most 8, so only a clear shortfall is flagged.
+      const lowMemory = navigator.deviceMemory && navigator.deviceMemory < Math.min(choice.minMemory, 8);
+      setChatLoadStatus(lowMemory
+        ? `${choice.name} yükleniyor… Bu cihazın belleği az görünüyor; yükleme başarısız olabilir.`
+        : `${choice.name} yükleniyor…`);
       updateChat();
       if (!chatWorker) startChatWorker();
-      chatWorker.postMessage({type: 'load', model: chatModel, dtype: 'q4f16'});
+      chatWorker.postMessage({type: 'load', model: choice.id, dtype});
     };
     for (const button of $('chat-quick').querySelectorAll('button')) {
       button.onclick = () => ask(button.dataset.prompt);
