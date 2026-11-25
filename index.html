@@ -23,9 +23,15 @@
     }
     .wrap { width: min(1040px, calc(100% - 40px)); margin-inline: auto; }
     .masthead { background: #112840; color: var(--surface); padding: 38px 0 59px; }
-    .institution { margin: 0 0 10px; color: #b6d4ee; font-size: .88rem; font-weight: 650; }
+    .masthead-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px 20px; margin-bottom: 14px; }
+    .institution { margin: 0; color: #b6d4ee; font-size: .88rem; font-weight: 650; }
+    .navigation { display: flex; flex-wrap: wrap; gap: 6px; }
+    .navigation a { color: #dceafa; padding: 6px 10px; border-radius: 6px; font-size: .84rem; font-weight: 650; }
+    .navigation a[aria-current="page"] { background: #29445f; color: white; text-decoration: none; }
     h1 { margin: 0; font-size: clamp(1.95rem, 5vw, 3.1rem); letter-spacing: -.045em; line-height: 1.12; }
+    h1:focus { outline: none; }
     h2 { margin: 0; font-size: 1.15rem; letter-spacing: -.015em; }
+    h3 { margin: 0; font-size: 1rem; }
     .workspace {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 280px;
@@ -73,6 +79,10 @@
     #count { margin: 12px 0 2px; font-size: 1rem; font-weight: 700; }
     #breakdown { margin: 0 0 16px; color: var(--muted); font-size: .87rem; }
     #source { margin-top: 0; }
+    .roster { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 12px; font-size: .87rem; }
+    .roster summary { cursor: pointer; color: var(--blue); font-weight: 650; }
+    .roster ul { margin: 8px 0 0; padding-inline-start: 18px; }
+    .roster li + li { margin-top: 5px; }
     .result-heading, .record-meta { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
     .result-heading { justify-content: space-between; }
     .score { color: var(--muted); font-size: .82rem; font-variant-numeric: tabular-nums; }
@@ -82,24 +92,93 @@
     .record-kind { color: var(--muted); font-size: .78rem; font-weight: 680; }
     .record-title { margin: 3px 0 0; }
     a { color: var(--blue); text-underline-offset: .17em; }
+    .architecture { margin-block: -30px 40px; display: grid; gap: 16px; }
+    .workspace[hidden], .architecture[hidden] { display: none; }
+    .architecture p { max-width: 72ch; margin: 8px 0 0; }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 14px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    .flow li { background: var(--background); border: 1px solid var(--line); border-radius: 10px; padding: 13px; }
+    .flow p { margin-top: 4px; color: var(--muted); font-size: .86rem; }
+    .architecture .model-links { margin-top: 14px; font-size: .87rem; }
+    .model-diagram {
+      background: #eff5fa;
+      border: 1px solid #d8e5f0;
+      border-radius: 12px;
+      margin: 16px 0;
+      padding: 16px;
+    }
+    .model-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .model-diagram h3 { margin-bottom: 10px; }
+    .model-card {
+      min-width: 0;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 11px 12px;
+    }
+    .model-card strong { display: block; color: #245374; font-size: .81rem; }
+    .model-diagram .model-card p { margin-top: 4px; font-size: .9rem; overflow-wrap: anywhere; }
+    .model-connector { color: var(--blue); font-size: 1.15rem; text-align: center; line-height: 1.4; }
+    .model-engine, .model-compare {
+      width: fit-content;
+      max-width: 100%;
+      margin-inline: auto;
+      border-radius: 8px;
+      padding: 8px 15px;
+      text-align: center;
+    }
+    .model-engine { background: #112840; color: white; }
+    .model-engine span, .model-compare span { display: block; font-size: .79rem; }
+    .model-engine span { color: #c3ddf2; }
+    .model-compare { background: #e3f1eb; color: #1e5142; border: 1px solid #cde0d9; }
+    .vector {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(0, 1fr);
+      align-items: end;
+      gap: 4px;
+      height: 25px;
+      margin-top: 5px;
+      color: #1d7390;
+    }
+    .vector-record { color: #455aa5; }
+    .vector span { height: var(--height); background: currentColor; border-radius: 2px 2px 0 0; }
+    .model-diagram figcaption { margin-top: 10px; color: var(--muted); font-size: .79rem; text-align: center; }
+    code { font-size: .88em; overflow-wrap: anywhere; }
     @media (max-width: 720px) {
       .workspace { grid-template-columns: minmax(0, 1fr); grid-template-areas: "search" "data" "results"; gap: 14px; }
+      .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 420px) {
       .wrap { width: calc(100% - 28px); }
       .panel, article { padding: 16px; }
       .search-fields { flex-direction: column; }
+      .model-diagram { padding: 10px; }
+      .model-pair { gap: 7px; }
+      .model-card { padding: 8px; }
     }
   </style>
 </head>
 <body>
   <header class="masthead">
     <div class="wrap">
-      <p class="institution">Ankara Üniversitesi · Fizik Mühendisliği</p>
-      <h1>Akademik uzmanlık arama</h1>
+      <div class="masthead-top">
+        <p class="institution">Ankara Üniversitesi · Fizik Mühendisliği</p>
+        <nav class="navigation" aria-label="Ana gezinme">
+          <a id="search-link" href="#arama" aria-current="page">Arama</a>
+          <a id="architecture-link" href="#nasil-calisir">Nasıl çalışır?</a>
+        </nav>
+      </div>
+      <h1 id="page-title" tabindex="-1">Akademik uzmanlık arama</h1>
     </div>
   </header>
-  <main class="workspace wrap">
+  <main id="search-page" class="workspace wrap">
     <section class="panel search-panel" aria-label="Konu arama">
       <form id="search">
         <label for="q">Araştırma konusu</label>
@@ -117,21 +196,130 @@
       <p id="breakdown"></p>
       <div class="data-actions">
         <input id="file" type="file" accept=".json,application/json" hidden>
-        <button type="button" id="choose" disabled>JSON dosyası seç</button>
+        <button type="button" id="load-bundled" disabled>Bölüm verisini yükle</button>
+        <button type="button" class="secondary" id="choose" disabled>JSON dosyası seç</button>
         <button type="button" class="secondary" id="reset" disabled>Yerel veriyi sil</button>
       </div>
+      <details class="roster" id="faculty-roster" hidden>
+        <summary>Akademisyenleri göster</summary>
+        <ul id="faculty-list"></ul>
+      </details>
     </aside>
     <section id="results" aria-label="Arama sonuçları"></section>
+  </main>
+  <main id="architecture-page" class="architecture wrap" hidden>
+    <section class="panel" aria-labelledby="flow-title">
+      <h2 id="flow-title">Veri akışı</h2>
+      <ol class="flow" role="list">
+        <li>
+          <h3>AVESİS</h3>
+          <p>Toplayıcı, tarama kurallarının izin verdiği herkese açık yayın ve tez sayfalarını okur.</p>
+        </li>
+        <li>
+          <h3>JSON dosyası</h3>
+          <p>Elle başlatılan veri toplama çalıştırması, akademik kayıtları bir dosyaya yazar.</p>
+        </li>
+        <li>
+          <h3>Tarayıcıdaki model</h3>
+          <p>Model, sorguyu ve kayıtların metnini birer sayısal vektöre dönüştürür.</p>
+        </li>
+        <li>
+          <h3>Arama sonuçları</h3>
+          <p>Uygulama, sorguya en yakın kayıtları akademisyene göre gruplar ve sıralar.</p>
+        </li>
+      </ol>
+      <p>Uygulama ilk açılışta bölümün <code>academics.json</code> dosyasını otomatik yükler. Kendi dosyanızı içe aktarabilir ve “Bölüm verisini yükle” düğmesiyle bölümün kayıtlarına dönebilirsiniz.</p>
+    </section>
+    <section class="panel" aria-labelledby="model-title">
+      <h2 id="model-title">Yapay zekâ modeli</h2>
+      <p><strong>Multilingual E5 Small</strong>, farklı dillerdeki metinlerin anlamını ortak bir sayısal temsile dönüştürür. Böylece Türkçe bir sorgu, ilgili bir İngilizce yayını bulabilir.</p>
+      <figure class="model-diagram" aria-labelledby="model-example">
+        <h3 id="model-example">Bir sorgu ve bir yayın nasıl karşılaştırılır?</h3>
+        <div class="model-pair">
+          <div class="model-card">
+            <strong>Türkçe sorgu</strong>
+            <p>GaN transistörleri</p>
+          </div>
+          <div class="model-card">
+            <strong>İngilizce yayın başlığı</strong>
+            <p>Normally-off AlGaN/GaN MIS-HEMT with low gate leakage current…</p>
+          </div>
+        </div>
+        <div class="model-connector" aria-hidden="true">↓</div>
+        <div class="model-engine">
+          <strong>Multilingual E5 Small</strong>
+          <span>Her metin için 384 sayılık vektör</span>
+        </div>
+        <div class="model-connector" aria-hidden="true">↓</div>
+        <div class="model-pair">
+          <div class="model-card">
+            <strong>Sorgu vektörü</strong>
+            <div class="vector" aria-hidden="true">
+              <span style="--height: 32%"></span><span style="--height: 65%"></span>
+              <span style="--height: 87%"></span><span style="--height: 46%"></span>
+              <span style="--height: 53%"></span><span style="--height: 24%"></span>
+              <span style="--height: 71%"></span><span style="--height: 44%"></span>
+            </div>
+          </div>
+          <div class="model-card">
+            <strong>Yayın vektörü</strong>
+            <div class="vector vector-record" aria-hidden="true">
+              <span style="--height: 26%"></span><span style="--height: 55%"></span>
+              <span style="--height: 81%"></span><span style="--height: 54%"></span>
+              <span style="--height: 45%"></span><span style="--height: 32%"></span>
+              <span style="--height: 78%"></span><span style="--height: 37%"></span>
+            </div>
+          </div>
+        </div>
+        <div class="model-connector" aria-hidden="true">↓</div>
+        <div class="model-compare">
+          <strong>Kosinüs benzerliği</strong>
+          <span>Vektörlerin yönleri ne kadar yakınsa skor o kadar yüksek.</span>
+        </div>
+        <figcaption>Çubuklar vektörleri şematik olarak gösterir.</figcaption>
+      </figure>
+      <p>Uygulama araştırma konusunu <code>query:</code>, kayıt başlığını ve varsa özetini <code>passage:</code> önekiyle modele verir.</p>
+      <p>İlk aramada Transformers.js ve model dosyaları indirilir. Modelin 8 bitlik ONNX sürümü WebAssembly ile tarayıcıda çalışır. Arama metni ve yüklediğiniz kayıtlar cihazınızda işlenir.</p>
+      <p class="model-links"><a href="https://huggingface.co/intfloat/multilingual-e5-small">Model kartı</a> · <a href="https://huggingface.co/Xenova/multilingual-e5-small">Tarayıcıda kullanılan ONNX sürümü</a></p>
+    </section>
+    <section class="panel" aria-labelledby="ranking-title">
+      <h2 id="ranking-title">Sonuçlar nasıl sıralanır?</h2>
+      <p>Uygulama, sorgu vektörü ile her kayıt vektörü arasındaki kosinüs benzerliğini hesaplar. Bir akademisyenin skoru, en yakın kaydının skorunun %60’ı ile en yakın en fazla beş kaydının ortalama skorunun %40’ının toplamıdır. Her akademisyenin kartında sorguya en yakın üç kayıt gösterilir.</p>
+    </section>
+    <section class="panel" aria-labelledby="storage-title">
+      <h2 id="storage-title">Veri nerede tutulur?</h2>
+      <p>İçe aktarılan kayıtlar ve hesaplanan kayıt vektörleri tarayıcının yerel veritabanında (IndexedDB) saklanır. Veri veya model sürümü değişince vektörler yeniden hesaplanır. Arama ekranındaki “Yerel veriyi sil” düğmesi bu kayıtları ve vektörleri temizler.</p>
+    </section>
   </main>
 
   <script type="module">
     const $ = id => document.getElementById(id);
     const model = 'Xenova/multilingual-e5-small';
     const version = 'e5-small-q8-v1';
+    const facultyOrder = new Intl.Collator('tr');
     let records = [];
     let pipe;
     let busy = false;
     let hasLocalData = false;
+
+    function showPage(moveFocus = false) {
+      const architecture = location.hash === '#nasil-calisir';
+      const title = architecture ? 'Arama nasıl çalışır?' : 'Akademik uzmanlık arama';
+      $('search-page').hidden = architecture;
+      $('architecture-page').hidden = !architecture;
+      $('page-title').textContent = title;
+      document.title = title + ' | Ankara Üniversitesi';
+      $('search-link').removeAttribute('aria-current');
+      $('architecture-link').removeAttribute('aria-current');
+      $(architecture ? 'architecture-link' : 'search-link').setAttribute('aria-current', 'page');
+      if (moveFocus) {
+        $('page-title').focus({preventScroll: true});
+        window.scrollTo(0, 0);
+      }
+    }
+
+    showPage();
+    window.addEventListener('hashchange', () => showPage(true));
 
     function setStatus(message, error = false) {
       $('status').textContent = message;
@@ -179,28 +367,31 @@
       }));
     }
 
+    async function readBundledRecords() {
+      const response = await fetch('./data/academics.json', {cache: 'no-cache'});
+      if (!response.ok) throw Error('Bölüm verisi yüklenemedi. Tekrar deneyin veya bir JSON dosyası seçin.');
+      return validate(await response.json());
+    }
+
     function update() {
-      const facultyCount = new Set(records.map(record => record.faculty)).size;
+      const faculty = [...new Set(records.map(record => record.faculty))].sort(facultyOrder.compare);
       const publications = records.filter(record => record.kind === 'publication').length;
       const theses = records.filter(record => record.kind === 'thesis').length;
-      $('source').textContent = hasLocalData ? 'İçe aktarılan dosya' : records.length ? 'Başlangıç verisi' : '';
-      $('count').textContent = `${records.length} kayıt · ${facultyCount} akademisyen`;
+      $('source').textContent = hasLocalData ? 'İçe aktarılan dosya' : records.length ? 'Bölüm verisi' : '';
+      $('count').textContent = `${records.length} kayıt · ${faculty.length} akademisyen`;
       $('breakdown').textContent = records.length ? `${publications} yayın · ${theses} tez` : '';
+      $('faculty-roster').hidden = !faculty.length;
+      $('faculty-list').replaceChildren(...faculty.map(name => element('li', name)));
       $('go').disabled = busy || !records.length;
+      $('load-bundled').disabled = busy;
       $('choose').disabled = busy;
-      $('reset').disabled = busy || !hasLocalData;
+      $('reset').disabled = busy;
     }
 
     try {
-      const saved = await read('records');
-      hasLocalData = saved != null;
-      if (hasLocalData) {
-        records = validate(saved);
-      } else {
-        const response = await fetch('./data/academics.json');
-        if (!response.ok) throw Error('Başlangıç verisi yüklenemedi. Bir JSON dosyası seçin.');
-        records = validate(await response.json());
-      }
+      const [saved, source] = await Promise.all([read('records'), read('source')]);
+      hasLocalData = saved != null && source !== 'bundled';
+      records = hasLocalData ? validate(saved) : await readBundledRecords();
       setStatus(records.length
         ? 'Aramaya hazır. İlk aramada model indirilecek.'
         : 'Aramak için bir akademik kayıt dosyası (JSON) seçin.');
@@ -208,6 +399,24 @@
       setStatus(error.message, true);
     }
     update();
+
+    $('load-bundled').onclick = async () => {
+      busy = true;
+      update();
+      try {
+        const next = await readBundledRecords();
+        await updateStorage(store => store.put('bundled', 'source'));
+        records = next;
+        hasLocalData = false;
+        $('results').replaceChildren();
+        setStatus(next.length ? 'Bölüm verisi yüklendi. Aramaya hazır.' : 'Bölüm dosyası boş.');
+      } catch (error) {
+        setStatus(error.message, true);
+      } finally {
+        busy = false;
+        update();
+      }
+    };
 
     $('choose').onclick = () => $('file').click();
     $('file').onchange = async () => {
@@ -217,7 +426,10 @@
       update();
       try {
         const next = validate(JSON.parse(await file.text()));
-        await updateStorage(store => store.put(next, 'records'));
+        await updateStorage(store => {
+          store.put(next, 'records');
+          store.put('imported', 'source');
+        });
         records = next;
         hasLocalData = true;
         $('results').replaceChildren();
@@ -236,10 +448,13 @@
       update();
       try {
         await updateStorage(store => store.clear());
-        records = [];
-        hasLocalData = false;
-        $('results').replaceChildren();
-        setStatus('Yerel veri silindi. Sayfayı yenileyerek başlangıç verisini yükleyebilirsiniz.');
+        if (hasLocalData) {
+          records = [];
+          hasLocalData = false;
+          $('results').replaceChildren();
+          records = await readBundledRecords();
+        }
+        setStatus(records.length ? 'Yerel veri silindi. Bölüm verisi aramaya hazır.' : 'Yerel veri silindi.');
       } catch (error) {
         setStatus(error.message, true);
       } finally {
