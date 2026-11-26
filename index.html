@@ -295,13 +295,52 @@
     .person-tools { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
     .person-tools-right { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; flex: 1; justify-content: flex-end; }
     .sort-label { display: inline-flex; align-items: center; gap: 8px; font-size: .93rem; font-weight: 600; color: var(--muted); }
+    .year-filter { position: relative; }
+    .year-button { display: inline-flex; align-items: center; gap: 7px; background: #fff; color: var(--ink); border: 1.5px solid var(--line-strong); border-radius: 8px; padding: 5px 10px; font-weight: 600; font-size: .95rem; }
+    .year-button:hover:not(:disabled) { background: var(--paper); border-color: var(--line-strong); }
+    .year-button[aria-expanded="true"] { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(27,79,156,.14); }
+    .year-button.is-active { background: var(--blue-soft); border-color: var(--blue); color: var(--blue); }
+    .year-caret { transition: transform .15s; }
+    .year-button[aria-expanded="true"] .year-caret { transform: rotate(180deg); }
+    .year-panel { position: absolute; z-index: 30; top: calc(100% + 8px); right: 0; width: 330px; padding: 16px; background: #fff; border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 22px 48px -18px rgba(15,39,66,.45); }
+    .year-panel[hidden] { display: none; }
+    .year-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+    .year-head span { color: var(--muted); font-size: .88rem; font-variant-numeric: tabular-nums; }
+    .year-histogram { display: flex; align-items: flex-end; gap: 2px; height: 64px; margin-top: 12px; padding: 0 9px; }
+    .year-histogram button { flex: 1; min-width: 0; height: max(3px, var(--h)); padding: 0; border: 0; border-radius: 2px 2px 0 0; background: #d3dce7; cursor: pointer; }
+    .year-histogram button.in-range { background: var(--blue); }
+    .year-histogram button:hover { background: var(--amber); }
+    .year-histogram button:focus-visible { outline-offset: 1px; }
+    .year-slider { position: relative; height: 24px; margin-top: 2px; }
+    .year-track { position: absolute; left: 9px; right: 9px; top: 10px; height: 4px; border-radius: 2px; background: #dfe6ee; }
+    .year-track i { position: absolute; top: 0; bottom: 0; left: var(--from, 0%); right: calc(100% - var(--to, 100%)); border-radius: 2px; background: var(--blue); }
+    .year-slider input[type="range"] { position: absolute; inset: 0; width: 100%; margin: 0; background: none; pointer-events: none; -webkit-appearance: none; appearance: none; }
+    .year-slider input[type="range"]::-webkit-slider-runnable-track { background: none; border: 0; }
+    .year-slider input[type="range"]::-moz-range-track { background: none; border: 0; }
+    .year-slider input[type="range"]::-webkit-slider-thumb { pointer-events: auto; -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2.5px solid var(--blue); box-shadow: 0 1px 3px rgba(15,39,66,.25); cursor: grab; }
+    .year-slider input[type="range"]::-moz-range-thumb { pointer-events: auto; width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 2.5px solid var(--blue); cursor: grab; }
+    .year-slider input[type="range"]:focus-visible { outline: none; }
+    .year-slider input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(79,143,219,.45); }
+    .year-inputs { display: flex; align-items: flex-end; gap: 8px; margin-top: 10px; }
+    .year-inputs label { flex: 1; display: grid; gap: 3px; font-size: .8rem; font-weight: 600; color: var(--muted); }
+    .year-inputs input { width: 100%; font: inherit; font-size: 1rem; font-weight: 600; color: var(--ink); border: 1.5px solid var(--line-strong); border-radius: 8px; padding: 6px 10px; font-variant-numeric: tabular-nums; }
+    .year-inputs input:focus { border-color: var(--blue); outline: none; box-shadow: 0 0 0 3px rgba(27,79,156,.14); }
+    .year-inputs > span { padding-bottom: 8px; color: var(--muted); }
+    .year-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .year-presets button { background: var(--blue-soft); border-color: transparent; color: var(--blue); border-radius: 999px; padding: 3px 11px; font-size: .88rem; }
+    .year-presets button:hover:not(:disabled) { background: #d6e3f4; border-color: transparent; }
+    .year-presets button[aria-pressed="true"] { background: var(--blue); color: #fff; }
+    .year-note { margin-top: 10px; color: var(--muted); font-size: .85rem; }
+    .year-note[hidden] { display: none; }
+    .year-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .year-actions button { padding: 6px 14px; font-size: .93rem; }
     #person-sort { font: inherit; color: var(--ink); border: 1.5px solid var(--line-strong); border-radius: 8px; padding: 5px 8px; background: #fff; }
     .record-year { color: var(--muted); font-size: .88rem; font-variant-numeric: tabular-nums; }
     .segmented { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); }
     .segmented button { background: transparent; border: 0; color: var(--ink); border-radius: 999px; padding: 5px 14px; font-weight: 600; font-size: .93rem; }
     .segmented button:hover:not(:disabled) { background: #e8eef5; }
     .segmented button[aria-pressed="true"] { background: var(--blue); color: #fff; }
-    #person-filter { flex: 1; min-width: 180px; max-width: 320px; border: 1.5px solid var(--line-strong); border-radius: 8px; padding: 6px 12px; font-size: .97rem; }
+    #person-filter { flex: 1 1 100%; min-width: 0; border: 1.5px solid var(--line-strong); border-radius: 8px; padding: 6px 12px; font-size: .97rem; }
     #person-filter:focus { border-color: var(--blue); outline: none; box-shadow: 0 0 0 3px rgba(27,79,156,.14); }
     #person-order { margin-top: 12px; color: var(--muted); font-size: .92rem; }
     #person-order:empty { display: none; }
@@ -696,6 +735,8 @@
       .article-page { grid-template-columns: minmax(0, 1fr); gap: 16px; }
       .person-avatar { width: 120px; height: 150px; font-size: 2.4rem; }
       .faculty-list { grid-template-columns: minmax(0, 1fr); }
+      /* On phones the panel becomes a sheet at the bottom of the screen. */
+      .year-panel { position: fixed; top: auto; left: 12px; right: 12px; bottom: 12px; width: auto; max-height: calc(100vh - 24px); overflow: auto; }
       .model-facts div:nth-child(n+3), .model-links { display: none; }
       .fp-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
       .journey-steps { grid-template-columns: minmax(0, 1fr); gap: 18px; }
@@ -891,8 +932,42 @@
               <option value="oldest">En eski</option>
             </select>
           </label>
-          <input id="person-filter" type="search" placeholder="Başlıklarda ara" aria-label="Bu akademisyenin kayıtlarında ara" autocomplete="off">
+          <div class="year-filter" id="year-filter">
+            <button type="button" class="year-button" id="year-button" aria-haspopup="dialog" aria-expanded="false" aria-controls="year-panel">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+              <span id="year-button-label">Tüm yıllar</span>
+              <svg class="year-caret" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            </button>
+            <div class="year-panel" id="year-panel" role="dialog" aria-label="Yıl aralığı seçin" hidden>
+              <div class="year-head">
+                <strong>Yıl aralığı</strong>
+                <span id="year-count"></span>
+              </div>
+              <div class="year-histogram" id="year-histogram" role="group" aria-label="Yıllara göre kayıt sayısı; bir yılı seçmek için tıklayın"></div>
+              <div class="year-slider" id="year-slider">
+                <div class="year-track"><i></i></div>
+                <input type="range" id="year-from-range" aria-label="Başlangıç yılı">
+                <input type="range" id="year-to-range" aria-label="Bitiş yılı">
+              </div>
+              <div class="year-inputs">
+                <label>Başlangıç<input type="number" id="year-from" inputmode="numeric"></label>
+                <span aria-hidden="true">–</span>
+                <label>Bitiş<input type="number" id="year-to" inputmode="numeric"></label>
+              </div>
+              <div class="year-presets" role="group" aria-label="Hazır aralıklar">
+                <button type="button" data-years="5">Son 5 yıl</button>
+                <button type="button" data-years="10">Son 10 yıl</button>
+                <button type="button" data-years="all">Tüm yıllar</button>
+              </div>
+              <p class="year-note" id="year-note" hidden></p>
+              <div class="year-actions">
+                <button type="button" class="secondary" id="year-clear">Temizle</button>
+                <button type="button" id="year-done">Tamam</button>
+              </div>
+            </div>
+          </div>
         </div>
+        <input id="person-filter" type="search" placeholder="Başlıklarda ara" aria-label="Bu akademisyenin kayıtlarında ara" autocomplete="off">
       </div>
       <p id="person-order"></p>
       <ul id="person-list" class="record-list person-list"></ul>
@@ -1692,6 +1767,8 @@
     let personKind = 'all';
     const failedPhotos = new Set(); // photo URLs that failed to load
     let personSort = null;       // 'relevance' | 'newest' | 'oldest'; null picks a default
+    let yearRange = null;        // {from, to} chosen on the person page; null shows every year
+    let yearBounds = null;       // {min, max} of the current person's years
     let years = new Map();       // record id -> year, from data/years.json
     let personName = null;
     let article = null;          // {id, record, abstract: string|null|undefined, messages: []}
@@ -2263,6 +2340,10 @@
       $('person-filter').value = '';
       personKind = 'all';
       personSort = null;
+      yearRange = null;
+      yearBounds = ownYears.length ? {min: Math.min(...ownYears), max: Math.max(...ownYears)} : null;
+      setupYearFilter();
+      closeYearPanel(false);
       for (const button of $('person-kind').querySelectorAll('button')) {
         button.setAttribute('aria-pressed', String(button.dataset.kind === 'all'));
       }
@@ -2274,9 +2355,16 @@
       const scored = lastSearch?.byFaculty.get(personName);
       const source = scored ?? records.filter(record => record.faculty === personName);
       const filter = $('person-filter').value.trim().toLocaleLowerCase('tr');
+      const ofKind = record => personKind === 'all' || (personKind === 'thesis') === (record.kind === 'thesis');
+      const inYears = record => {
+        if (!yearRange) return true;
+        const year = yearOf(record);
+        return Boolean(year) && year >= yearRange.from && year <= yearRange.to;
+      };
       const shown = source.filter(record =>
-        (personKind === 'all' || (personKind === 'thesis') === (record.kind === 'thesis')) &&
+        ofKind(record) && inYears(record) &&
         (!filter || record.title.toLocaleLowerCase('tr').includes(filter)));
+      updateYearFilter(source.filter(ofKind));
       const relevanceOption = $('person-sort').querySelector('option[value="relevance"]');
       relevanceOption.hidden = relevanceOption.disabled = !scored;
       const sort = personSort === 'relevance' && !scored ? 'newest' : personSort ?? (scored ? 'relevance' : 'newest');
@@ -2297,6 +2385,125 @@
       $('person-list').replaceChildren(...shown.map(record => recordItem(record, Boolean(scored))));
       $('person-empty').hidden = shown.length > 0;
     }
+
+    // ---------- Year range dropdown ----------
+    function yearLabel() {
+      if (!yearRange) return 'Tüm yıllar';
+      return yearRange.from === yearRange.to ? String(yearRange.from) : `${yearRange.from}–${yearRange.to}`;
+    }
+
+    function setupYearFilter() {
+      const button = $('year-button');
+      button.disabled = !yearBounds;
+      if (!yearBounds) return;
+      for (const id of ['year-from-range', 'year-to-range', 'year-from', 'year-to']) {
+        $(id).min = yearBounds.min;
+        $(id).max = yearBounds.max;
+        $(id).step = 1;
+      }
+    }
+
+    // Draws the histogram and syncs every control with yearRange; `records` are the person's records of the chosen kind.
+    function updateYearFilter(kindRecords) {
+      $('year-button-label').textContent = yearLabel();
+      $('year-button').classList.toggle('is-active', Boolean(yearRange));
+      if (!yearBounds) return;
+      const from = yearRange?.from ?? yearBounds.min;
+      const to = yearRange?.to ?? yearBounds.max;
+      $('year-from-range').value = $('year-from').value = from;
+      $('year-to-range').value = $('year-to').value = to;
+      const span = Math.max(1, yearBounds.max - yearBounds.min);
+      const track = $('year-slider').querySelector('.year-track i');
+      track.style.setProperty('--from', ((from - yearBounds.min) / span * 100) + '%');
+      track.style.setProperty('--to', ((to - yearBounds.min) / span * 100) + '%');
+
+      const counts = new Map();
+      let unknown = 0;
+      for (const record of kindRecords) {
+        const year = yearOf(record);
+        if (year) counts.set(year, (counts.get(year) ?? 0) + 1);
+        else unknown++;
+      }
+      const highest = Math.max(1, ...counts.values());
+      const bars = [];
+      let selected = 0;
+      for (let year = yearBounds.min; year <= yearBounds.max; year++) {
+        const count = counts.get(year) ?? 0;
+        const inRange = year >= from && year <= to;
+        if (inRange) selected += count;
+        const bar = element('button', '', inRange ? 'in-range' : '');
+        bar.type = 'button';
+        bar.style.setProperty('--h', (count / highest * 100) + '%');
+        bar.title = `${year}: ${count} kayıt`;
+        bar.setAttribute('aria-label', `${year}, ${count} kayıt`);
+        bar.onclick = () => setYearRange(year, year);
+        bars.push(bar);
+      }
+      $('year-histogram').replaceChildren(...bars);
+      $('year-count').textContent = `${formatCount.format(selected)} kayıt`;
+      $('year-note').hidden = !(yearRange && unknown);
+      $('year-note').textContent = unknown ? `Yılı bilinmeyen ${unknown} kayıt, bir aralık seçiliyken gösterilmez.` : '';
+      for (const preset of $('year-filter').querySelectorAll('.year-presets button')) {
+        const years = preset.dataset.years;
+        const active = years === 'all' ? !yearRange
+          : Boolean(yearRange) && yearRange.to === yearBounds.max && yearRange.from === Math.max(yearBounds.min, yearBounds.max - Number(years) + 1);
+        preset.setAttribute('aria-pressed', String(active));
+      }
+    }
+
+    function setYearRange(from, to) {
+      if (!yearBounds) return;
+      const clamp = value => Math.min(yearBounds.max, Math.max(yearBounds.min, Math.round(value)));
+      let a = clamp(Number.isFinite(from) ? from : yearBounds.min);
+      let b = clamp(Number.isFinite(to) ? to : yearBounds.max);
+      if (a > b) [a, b] = [b, a];
+      yearRange = a === yearBounds.min && b === yearBounds.max ? null : {from: a, to: b};
+      renderPersonRecords();
+    }
+
+    function openYearPanel() {
+      $('year-panel').hidden = false;
+      $('year-button').setAttribute('aria-expanded', 'true');
+      $('year-from').focus();
+    }
+
+    function closeYearPanel(returnFocus = true) {
+      if ($('year-panel').hidden) return;
+      $('year-panel').hidden = true;
+      $('year-button').setAttribute('aria-expanded', 'false');
+      if (returnFocus) $('year-button').focus();
+    }
+
+    $('year-button').onclick = () => ($('year-panel').hidden ? openYearPanel() : closeYearPanel());
+    $('year-done').onclick = () => closeYearPanel();
+    $('year-clear').onclick = () => setYearRange(-Infinity, Infinity);
+    $('year-from-range').addEventListener('input', () => {
+      const to = Number($('year-to-range').value);
+      setYearRange(Math.min(Number($('year-from-range').value), to), to);
+    });
+    $('year-to-range').addEventListener('input', () => {
+      const from = Number($('year-from-range').value);
+      setYearRange(from, Math.max(Number($('year-to-range').value), from));
+    });
+    // Typed years are applied when the field is left or Enter is pressed, so half-typed numbers do not jump around.
+    for (const id of ['year-from', 'year-to']) {
+      $(id).addEventListener('change', () => setYearRange(Number($('year-from').value), Number($('year-to').value)));
+    }
+    for (const preset of $('year-filter').querySelectorAll('.year-presets button')) {
+      preset.onclick = () => {
+        if (preset.dataset.years === 'all' || !yearBounds) setYearRange(-Infinity, Infinity);
+        else setYearRange(yearBounds.max - Number(preset.dataset.years) + 1, yearBounds.max);
+      };
+    }
+    $('year-panel').addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        event.stopPropagation();
+        closeYearPanel();
+      }
+    });
+    document.addEventListener('pointerdown', event => {
+      if (!$('year-panel').hidden && !$('year-filter').contains(event.target)) closeYearPanel(false);
+    });
 
     $('person-sort').onchange = () => {
       personSort = $('person-sort').value;
