@@ -330,6 +330,17 @@
     .year-presets button { background: var(--blue-soft); border-color: transparent; color: var(--blue); border-radius: 999px; padding: 3px 11px; font-size: .88rem; }
     .year-presets button:hover:not(:disabled) { background: #d6e3f4; border-color: transparent; }
     .year-presets button[aria-pressed="true"] { background: var(--blue); color: #fff; }
+    .person-years { margin: 0 0 16px; padding-top: 14px; border-top: 1px solid var(--line); text-align: left; }
+    .person-years[hidden] { display: none; }
+    .person-years .year-histogram { height: 72px; margin-top: 10px; padding: 0; }
+    .person-years-axis { display: flex; justify-content: space-between; margin-top: 4px; color: var(--muted); font-size: .8rem; font-variant-numeric: tabular-nums; }
+    .person-years-facts { margin: 10px 0 0; font-size: .9rem; }
+    .person-years-facts div { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; border-bottom: 1px dashed var(--line); }
+    .person-years-facts dt { color: var(--muted); }
+    .person-years-facts dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+    .person-years-clear { margin-top: 10px; width: 100%; background: var(--blue-soft); border-color: transparent; color: var(--blue); font-size: .9rem; padding: 6px 10px; }
+    .person-years-clear:hover:not(:disabled) { background: #d6e3f4; border-color: transparent; }
+    .person-years-clear[hidden] { display: none; }
     .year-note { margin-top: 10px; color: var(--muted); font-size: .85rem; }
     .year-note[hidden] { display: none; }
     .year-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
@@ -913,6 +924,21 @@
         <div class="stat"><strong id="person-publications">–</strong><span>yayın</span></div>
         <div class="stat"><strong id="person-theses">–</strong><span>tez</span></div>
       </div>
+      <section class="person-years" id="person-years" aria-labelledby="person-years-title" hidden>
+        <div class="year-head">
+          <strong id="person-years-title">Yıllara göre</strong>
+          <span id="person-years-summary"></span>
+        </div>
+        <div class="year-histogram" id="person-histogram" role="group" aria-label="Yıllara göre kayıt sayısı; bir yılı seçmek için tıklayın"></div>
+        <div class="person-years-axis" aria-hidden="true"><span id="person-years-min"></span><span id="person-years-max"></span></div>
+        <dl class="person-years-facts">
+          <div><dt>Bu yıllarda</dt><dd id="person-years-kinds"></dd></div>
+          <div><dt>En yoğun yıl</dt><dd id="person-years-peak"></dd></div>
+          <div><dt>Yıllık ortalama</dt><dd id="person-years-average"></dd></div>
+          <div><dt>Son 5 yıl</dt><dd id="person-years-recent"></dd></div>
+        </dl>
+        <button type="button" class="person-years-clear" id="person-years-clear" hidden>Tüm yıllara dön</button>
+      </section>
       <a id="person-profile" target="_blank" rel="noopener noreferrer" hidden>AVESİS profilini aç</a>
       <a href="#arama">Aramaya dön</a>
     </aside>
@@ -2365,6 +2391,7 @@
         ofKind(record) && inYears(record) &&
         (!filter || record.title.toLocaleLowerCase('tr').includes(filter)));
       updateYearFilter(source.filter(ofKind));
+      updatePersonYears();
       const relevanceOption = $('person-sort').querySelector('option[value="relevance"]');
       relevanceOption.hidden = relevanceOption.disabled = !scored;
       const sort = personSort === 'relevance' && !scored ? 'newest' : personSort ?? (scored ? 'relevance' : 'newest');
@@ -2424,6 +2451,20 @@
         if (year) counts.set(year, (counts.get(year) ?? 0) + 1);
         else unknown++;
       }
+      const selected = drawYearHistogram($('year-histogram'), counts, from, to);
+      $('year-count').textContent = `${formatCount.format(selected)} kayıt`;
+      $('year-note').hidden = !(yearRange && unknown);
+      $('year-note').textContent = unknown ? `Yılı bilinmeyen ${unknown} kayıt, bir aralık seçiliyken gösterilmez.` : '';
+      for (const preset of $('year-filter').querySelectorAll('.year-presets button')) {
+        const years = preset.dataset.years;
+        const active = years === 'all' ? !yearRange
+          : Boolean(yearRange) && yearRange.to === yearBounds.max && yearRange.from === Math.max(yearBounds.min, yearBounds.max - Number(years) + 1);
+        preset.setAttribute('aria-pressed', String(active));
+      }
+    }
+
+    // Draws one clickable bar per year between the person's first and last year; returns the count in [from, to].
+    function drawYearHistogram(container, counts, from, to) {
       const highest = Math.max(1, ...counts.values());
       const bars = [];
       let selected = 0;
@@ -2439,16 +2480,49 @@
         bar.onclick = () => setYearRange(year, year);
         bars.push(bar);
       }
-      $('year-histogram').replaceChildren(...bars);
-      $('year-count').textContent = `${formatCount.format(selected)} kayıt`;
-      $('year-note').hidden = !(yearRange && unknown);
-      $('year-note').textContent = unknown ? `Yılı bilinmeyen ${unknown} kayıt, bir aralık seçiliyken gösterilmez.` : '';
-      for (const preset of $('year-filter').querySelectorAll('.year-presets button')) {
-        const years = preset.dataset.years;
-        const active = years === 'all' ? !yearRange
-          : Boolean(yearRange) && yearRange.to === yearBounds.max && yearRange.from === Math.max(yearBounds.min, yearBounds.max - Number(years) + 1);
-        preset.setAttribute('aria-pressed', String(active));
+      container.replaceChildren(...bars);
+      return selected;
+    }
+
+    // Left card: the person's records per year (all kinds) and counts for the selected years.
+    function updatePersonYears() {
+      const own = records.filter(record => record.faculty === personName);
+      const inRange = record => {
+        if (!yearRange) return true;
+        const year = yearOf(record);
+        return Boolean(year) && year >= yearRange.from && year <= yearRange.to;
+      };
+      // The totals at the top of the card always cover every year; only the section below follows the range.
+      const chosen = own.filter(inRange);
+      const publications = chosen.filter(record => record.kind !== 'thesis').length;
+      $('person-years-kinds').textContent = `${formatCount.format(publications)} yayın · ${formatCount.format(chosen.length - publications)} tez`;
+
+      $('person-years').hidden = !yearBounds;
+      $('person-years-clear').hidden = !yearRange;
+      if (!yearBounds) return;
+      const counts = new Map();
+      for (const record of own) {
+        const year = yearOf(record);
+        if (year) counts.set(year, (counts.get(year) ?? 0) + 1);
       }
+      const from = yearRange?.from ?? yearBounds.min;
+      const to = yearRange?.to ?? yearBounds.max;
+      const selected = drawYearHistogram($('person-histogram'), counts, from, to);
+      $('person-years-min').textContent = yearBounds.min;
+      $('person-years-max').textContent = yearBounds.max;
+      $('person-years-summary').textContent = `${yearLabel()} · ${formatCount.format(selected)} kayıt`;
+      let peakYear = from;
+      let peakCount = 0;
+      for (let year = from; year <= to; year++) {
+        const count = counts.get(year) ?? 0;
+        if (count > peakCount) [peakYear, peakCount] = [year, count];
+      }
+      $('person-years-peak').textContent = peakCount ? `${peakYear} (${peakCount} kayıt)` : '–';
+      const years = to - from + 1;
+      $('person-years-average').textContent = `${new Intl.NumberFormat('tr', {maximumFractionDigits: 1}).format(selected / years)} kayıt`;
+      let recent = 0;
+      for (let year = yearBounds.max - 4; year <= yearBounds.max; year++) recent += counts.get(year) ?? 0;
+      $('person-years-recent').textContent = `${formatCount.format(recent)} kayıt (${yearBounds.max - 4}–${yearBounds.max})`;
     }
 
     function setYearRange(from, to) {
@@ -2477,6 +2551,7 @@
     $('year-button').onclick = () => ($('year-panel').hidden ? openYearPanel() : closeYearPanel());
     $('year-done').onclick = () => closeYearPanel();
     $('year-clear').onclick = () => setYearRange(-Infinity, Infinity);
+    $('person-years-clear').onclick = () => setYearRange(-Infinity, Infinity);
     $('year-from-range').addEventListener('input', () => {
       const to = Number($('year-to-range').value);
       setYearRange(Math.min(Number($('year-from-range').value), to), to);
