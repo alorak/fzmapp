@@ -292,3 +292,190 @@ export async function start() {
   await loadModel();
   update({animate: true});
 }
+
+// ---------- "Nasıl çalışır?" tab: figures drawn from the training record in models/egik-atis.json ----------
+const SUPERSCRIPT = {'-': '⁻', 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹'};
+const power = n => '10' + String(n).split('').map(c => SUPERSCRIPT[c]).join('');
+const scientific = value => {
+  const exponent = Math.floor(Math.log10(value));
+  return `${fmt(value / 10 ** exponent, 1)} × ${power(exponent)}`;
+};
+
+function el(tag, attrs = {}, text) {
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
+  if (text != null) node.textContent = text;
+  return node;
+}
+
+function checkTables(check) {
+  const box = $('pinn-check');
+  const stages = [['Eğitimden önce (rastgele ayarlar)', check.start, 'bad'], ['Eğitimden sonra', check.end, 'good']];
+  box.replaceChildren(...stages.map(([title, data, tone]) => {
+    const stage = el('div', {class: 'pinn-stage'});
+    stage.append(el('h4', {}, title));
+    const table = el('table');
+    table.innerHTML = '<thead><tr><th scope="col">İvme (m/s²)</th><th scope="col">yatay</th><th scope="col">dikey</th></tr></thead>';
+    const body = el('tbody');
+    const diff = data.network.map((value, i) => value - data.physics[i]);
+    for (const [label, values, cls] of [['Ağın tahmininden', data.network], ['Denklemin istediği', data.physics], ['Fark', diff, tone]]) {
+      const row = el('tr');
+      row.append(el('th', {scope: 'row'}, label));
+      for (const value of values) row.append(el('td', cls ? {class: cls} : {}, fmt(value * G, 2)));
+      body.append(row);
+    }
+    table.append(body);
+    stage.append(table);
+    return stage;
+  }));
+}
+
+function lossChart(history) {
+  // Drawn at the box's real width so the labels stay readable on a phone.
+  const W = Math.max(280, Math.round($('pinn-loss').clientWidth) || 460);
+  const H = Math.round(Math.min(260, W * 0.62)), left = 46, right = 12, top = 12, bottom = 40;
+  const steps = history.at(-1)[0];
+  const logs = history.map(([, value]) => Math.log10(value));
+  const lo = Math.floor(Math.min(...logs));
+  const hi = Math.ceil(Math.max(...logs));
+  const sx = step => left + step / steps * (W - left - right);
+  const sy = log => top + (hi - log) / (hi - lo) * (H - top - bottom);
+  const items = [];
+  for (let p = lo; p <= hi; p++) {
+    items.push(svg('line', {class: 'proj-grid', x1: left, x2: W - right, y1: sy(p), y2: sy(p)}));
+    items.push(svg('text', {class: 'pinn-chart-label', x: left - 6, y: sy(p) + 4, 'text-anchor': 'end'}, power(p)));
+  }
+  for (let step = 0; step <= steps; step += 10000) {
+    const anchor = step === 0 ? 'start' : step + 10000 > steps ? 'end' : 'middle';
+    items.push(svg('text', {class: 'pinn-chart-label', x: sx(step), y: H - bottom + 18, 'text-anchor': anchor}, new Intl.NumberFormat('tr').format(step)));
+  }
+  items.push(svg('text', {class: 'pinn-chart-label', x: (left + W - right) / 2, y: H - 2, 'text-anchor': 'middle'}, 'eğitim adımı'));
+  items.push(svg('line', {class: 'proj-ground', x1: left, x2: W - right, y1: H - bottom, y2: H - bottom}));
+  const d = history.map(([step], i) => `${i ? 'L' : 'M'}${sx(step).toFixed(1)} ${sy(logs[i]).toFixed(1)}`).join(' ');
+  items.push(svg('path', {d, fill: 'none', stroke: '#1b4f9c', 'stroke-width': 2.2, 'stroke-linejoin': 'round'}));
+  const first = history[0][1];
+  const last = history.at(-1)[1];
+  const chart = svg('svg', {viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `Fizik kaybı ${fmt(first, 2)} değerinden ${scientific(last)} değerine düştü`});
+  chart.append(...items);
+  $('pinn-loss').replaceChildren(chart, el('p', {class: 'vis-note'}, `İlk 250 adımda ortalama ${fmt(first, 2)} olan kayıp, son adımlarda ${scientific(last)} değerine indi (yaklaşık ${new Intl.NumberFormat('tr').format(Math.round(first / last / 100) * 100)} kat). Her nokta 250 adımın ortalamasıdır.`));
+}
+
+function landed(path) {
+  // Cut the path where it first goes below the ground, like the main page does.
+  const out = [path[0]];
+  for (let i = 1; i < path.length; i++) {
+    const [x, y] = path[i];
+    if (y < 0) {
+      const [px, py] = path[i - 1];
+      const f = py / (py - y);
+      out.push([px + f * (x - px), 0]);
+      return out;
+    }
+    out.push(path[i]);
+  }
+  return out;
+}
+
+function snapshots(data) {
+  const reference = data.runge_kutta_path;
+  const maxX = Math.max(...reference.map(p => p[0])) * 1.3;
+  const maxY = Math.max(...reference.map(p => p[1])) * 1.9;
+  const W = 160, H = 100, pad = 6;
+  const scale = Math.min((W - 2 * pad) / maxX, (H - 2 * pad) / maxY);
+  const sx = x => pad + x * scale;
+  const sy = y => H - pad - y * scale;
+  const line = path => path.map(([x, y], i) => `${i ? 'L' : 'M'}${sx(x).toFixed(1)} ${sy(y).toFixed(1)}`).join(' ');
+  const figures = data.snapshots.map(({step, path}, index) => {
+    const figure = el('figure');
+    const id = `pinn-clip-${index}`;
+    const picture = svg('svg', {viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `${step}. adımda yörünge`});
+    const clip = svg('clipPath', {id});
+    clip.append(svg('rect', {x: 0, y: 0, width: W, height: H - pad}));
+    picture.append(
+      clip,
+      svg('line', {x1: 0, x2: W, y1: sy(0), y2: sy(0), stroke: '#0f2742', 'stroke-width': 1}),
+      svg('path', {d: line(reference), fill: 'none', stroke: 'rgba(27,79,156,.35)', 'stroke-width': 5, 'stroke-linecap': 'round'}),
+      svg('path', {d: line(landed(path)), fill: 'none', stroke: '#e0a100', 'stroke-width': 2.2, 'clip-path': `url(#${id})`, 'stroke-linejoin': 'round'}),
+    );
+    const label = step === 0 ? 'Başlangıç' : `${new Intl.NumberFormat('tr').format(step)}. adım`;
+    figure.append(picture, el('figcaption', {}, index === data.snapshots.length - 1 ? `${label} (son)` : label));
+    return figure;
+  });
+  $('pinn-snapshots').replaceChildren(...figures);
+}
+
+function exampleTable(data) {
+  const {v0} = data.demo;
+  const length = v0 * v0 / G;
+  const time = v0 / G;
+  const table = el('table', {class: 'pinn-example'});
+  table.innerHTML = '<thead><tr><th><i>τ</i></th><th><i>X</i></th><th><i>Y</i></th><th>süre</th><th>uzaklık</th><th>yükseklik</th></tr></thead>';
+  const body = el('tbody');
+  for (const {tau, x, y} of data.example) {
+    const row = el('tr');
+    row.append(el('td', {}, fmt(tau, 2)), el('td', {}, fmt(x, 3)), el('td', {}, fmt(y, 3)),
+      el('td', {class: 'unit'}, `${fmt(tau * time, 2)} s`), el('td', {class: 'unit'}, `${fmt(x * length, 1)} m`),
+      el('td', {class: 'unit'}, y < 0 ? 'yerin altında' : `${fmt(y * length, 1)} m`));
+    body.append(row);
+  }
+  table.append(body);
+  const label = el('p', {class: 'vis-label'}, `Modelin çıktısından birkaç satır (futbol topu, ${fmt(v0, 0)} m/s, ${data.demo.angle_degrees}°)`);
+  label.style.marginBottom = '8px';
+  const note = el('p', {class: 'vis-note'}, 'Mavi sütunlar, modelin boyutsuz çıktısının saniyeye ve metreye çevrilmiş hâlidir.');
+  $('pinn-example').replaceChildren(label, table, note);
+}
+
+function heatColor(share) {
+  const stops = [[227, 241, 235], [246, 230, 168], [224, 161, 0], [160, 36, 44]];
+  const position = Math.min(1, Math.max(0, share)) * (stops.length - 1);
+  const i = Math.min(stops.length - 2, Math.floor(position));
+  const f = position - i;
+  return `rgb(${stops[i].map((c, k) => Math.round(c + f * (stops[i + 1][k] - c))).join(',')})`;
+}
+
+function heatmap(check) {
+  const grid = check.range_grid;
+  const rows = grid.angles_degrees.length;
+  const cols = grid.kappas.length;
+  const width = Math.max(280, Math.round($('pinn-heatmap').clientWidth) || 492);
+  const top = 0, left = 44, cell = Math.min(56, (width - left - 4) / cols), cellH = Math.min(22, cell * 0.7);
+  const W = left + cols * cell + 4, H = top + rows * cellH + 36;
+  const maxValue = Math.max(...grid.percent.flat());
+  const ceiling = Math.max(0.5, Math.ceil(maxValue * 2) / 2);
+  const picture = svg('svg', {viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Açı ve dirence göre menzil hatası haritası'});
+  // Steep throws at the top, like the angle on a protractor.
+  grid.angles_degrees.forEach((angle, r) => {
+    const y = top + (rows - 1 - r) * cellH;
+    if (angle % 15 === 10 || angle === 85) picture.append(svg('text', {class: 'pinn-chart-label', x: left - 6, y: y + cellH - 4, 'text-anchor': 'end'}, `${angle}°`));
+    grid.kappas.forEach((kappa, c) => {
+      const value = grid.percent[r][c];
+      const rect = svg('rect', {x: left + c * cell, y, width: cell - 1, height: cellH - 1, rx: 2, fill: heatColor(value / ceiling)});
+      rect.append(svg('title', {}, `${angle}°, κ = ${fmt(kappa, 2)}: %${fmt(value, 2)}`));
+      picture.append(rect);
+    });
+  });
+  grid.kappas.forEach((kappa, c) => {
+    if (c % 2 === 0) picture.append(svg('text', {class: 'pinn-chart-label', x: left + c * cell + cell / 2, y: top + rows * cellH + 14, 'text-anchor': 'middle'}, fmt(kappa, 1)));
+  });
+  picture.append(svg('text', {class: 'pinn-chart-label', x: left + cols * cell, y: H - 2, 'text-anchor': 'end'}, 'boyutsuz direnç κ'));
+  const key = el('p', {class: 'pinn-heat-key'});
+  key.append(el('span', {}, '%0'), el('i'), el('span', {}, `%${fmt(ceiling, 1)}`));
+  $('pinn-heatmap').replaceChildren(el('p', {class: 'vis-label'}, 'Menzildeki fark (yüzde)'), picture, key);
+
+  let worst = [0, 0];
+  grid.percent.forEach((row, r) => row.forEach((value, c) => {
+    if (value > grid.percent[worst[0]][worst[1]]) worst = [r, c];
+  }));
+  $('pinn-accuracy').textContent = `Eğitimden sonra model, ${rows} açı ve ${cols} direnç düzeyinden oluşan ${check.cases} atışta sınandı. Menzildeki fark ortalama %${fmt(check.range.mean_percent, 2)}; en büyük fark %${fmt(maxValue, 2)} ile ${grid.angles_degrees[worst[0]]}° ve κ = ${fmt(grid.kappas[worst[1]], 1)} atışında. En yüksek noktada ortalama fark %${fmt(check.height.mean_percent, 2)}, uçuş süresinde %${fmt(check.time.mean_percent, 2)}.`;
+}
+
+export async function explain() {
+  const response = await fetch('./models/egik-atis.json', {cache: 'no-cache'});
+  const record = await response.json();
+  const data = record.explanation;
+  checkTables(data.residual_check);
+  lossChart(data.loss_history);
+  snapshots(data);
+  exampleTable(data);
+  heatmap(record.check_against_runge_kutta);
+}
