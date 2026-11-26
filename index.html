@@ -476,6 +476,74 @@
     .phone-reason p { margin-top: 6px; color: var(--ink-2); font-size: .94rem; line-height: 1.5; }
     .phone-icon { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: var(--blue-soft); color: var(--blue); }
 
+    /* Projectile motion page */
+    .projectile { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 24px 28px; align-items: start; margin-block: -64px 64px; }
+    .projectile[hidden] { display: none; }
+    .proj-controls { display: grid; gap: 22px; position: sticky; top: 16px; }
+    .proj-field label { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+    .proj-field output { font: 600 1.15rem/1 var(--serif); font-variant-numeric: lining-nums tabular-nums; color: var(--blue); }
+    .proj-field input[type="range"] { width: 100%; margin: 10px 0 0; accent-color: var(--blue); }
+    .proj-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .proj-presets button { padding: 5px 10px; font-size: .88rem; font-weight: 600; }
+    .proj-presets button[aria-pressed="true"] { background: var(--blue-soft); border-color: var(--blue); color: var(--blue); }
+    .proj-note { margin-top: 10px; font-size: .88rem; line-height: 1.5; color: var(--muted); }
+    .proj-note strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+    #proj-launch { justify-self: start; padding-inline: 26px; }
+    .proj-model-state { font-size: .88rem; color: var(--muted); padding-left: 18px; position: relative; }
+    .proj-model-state::before { content: ''; position: absolute; left: 0; top: .45em; width: 9px; height: 9px; border-radius: 50%; background: var(--line-strong); }
+    .proj-model-state[data-state="ready"]::before { background: var(--green); }
+    .proj-model-state[data-state="error"] { color: var(--red); }
+    .proj-model-state[data-state="error"]::before { background: var(--red); }
+    .proj-stage { min-width: 0; }
+    .proj-stage-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 20px; margin-bottom: 14px; }
+    .proj-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; padding: 0; border: 0; }
+    .proj-legend label { display: inline-flex; align-items: center; gap: 7px; font-size: .9rem; font-weight: 600; color: var(--ink-2); cursor: pointer; }
+    .proj-legend label::after { content: ''; order: -1; width: 22px; height: 0; border-top: 3px solid; }
+    .proj-legend .free::after { border-top: 2px dashed #8a97a6; }
+    .proj-legend .exact::after { border-color: var(--blue); }
+    .proj-legend .net::after { border-color: var(--amber); }
+    .proj-legend input { margin: 0; accent-color: var(--blue); }
+    /* The plot sits on the same millimetre paper as the masthead. */
+    .proj-plot {
+      display: block; width: 100%; height: auto; border-radius: var(--radius);
+      background-color: #fbfcfe;
+      background-image:
+        linear-gradient(rgba(27,79,156,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(27,79,156,.07) 1px, transparent 1px);
+      background-size: 12px 12px;
+    }
+    .proj-grid { stroke: rgba(27,79,156,.16); stroke-width: 1; }
+    .proj-ground { stroke: var(--ink); stroke-width: 1.5; }
+    .proj-tick { font: 12px var(--sans); fill: var(--muted); font-variant-numeric: tabular-nums; }
+    .proj-axis { font: 600 12px var(--sans); fill: var(--ink-2); }
+    .proj-curve { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .proj-curve.free { stroke: #8a97a6; stroke-width: 2; stroke-dasharray: 6 5; }
+    .proj-curve.exact { stroke: var(--blue); stroke-width: 5; stroke-opacity: .35; }
+    .proj-curve.net { stroke: var(--amber); stroke-width: 2.5; }
+    .proj-land { stroke: #fff; stroke-width: 2; }
+    .proj-land.free { fill: #8a97a6; }
+    .proj-land.exact { fill: var(--blue); }
+    .proj-land.net { fill: var(--amber); }
+    .proj-ball { fill: var(--ink); stroke: #fff; stroke-width: 2.5; }
+    .proj-table-wrap { overflow-x: auto; margin-top: 18px; }
+    .proj-table { width: 100%; border-collapse: collapse; font-size: .95rem; font-variant-numeric: lining-nums tabular-nums; }
+    .proj-table th, .proj-table td { padding: 9px 12px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    .proj-table th[scope="row"], .proj-table thead th:first-child { text-align: left; }
+    .proj-table thead th { font-size: .85rem; font-weight: 650; color: var(--muted); }
+    .proj-table td:nth-child(4) { color: var(--amber-ink); font-weight: 650; }
+    .proj-table td:last-child { color: var(--ink); font-weight: 650; }
+    .proj-explain { grid-column: 1 / -1; }
+    .proj-explain-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 36px; margin-top: 18px; }
+    .proj-explain-grid h3 { font-family: var(--serif); font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; }
+    .proj-explain-grid p + p { margin-top: 10px; }
+    .proj-explain-grid p { color: var(--ink-2); }
+    .proj-equation { display: flex; flex-wrap: wrap; gap: 8px 28px; padding: 12px 16px; background: var(--paper); border-radius: var(--radius); font: 1.1rem/1.4 var(--serif); color: var(--ink) !important; }
+    @media (max-width: 900px) {
+      .projectile { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+      .proj-controls { position: static; }
+      .proj-explain-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+
     /* Comparison */
     .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
     .duo-card { padding: 18px; border-radius: var(--radius); background: var(--paper); }
@@ -774,7 +842,13 @@
       .wave-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
       .cloud-col { grid-template-columns: minmax(0, 1fr); }
       .cloud-col .ext:first-child::after, .cloud-col .ext:first-child::before { display: none; }
-      .navigation a { padding-inline: 12px; }
+      .navigation { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+      .navigation::-webkit-scrollbar { display: none; }
+      .navigation a { flex: none; white-space: nowrap; padding-inline: 10px; font-size: .88rem; }
+      .proj-table { font-size: .86rem; }
+      .proj-table th, .proj-table td { padding: 8px 6px; }
+      .proj-table thead th, .proj-table th[scope="row"] { white-space: normal; vertical-align: bottom; }
+      .proj-table th[scope="row"] { min-width: 6.2em; padding-left: 0; vertical-align: middle; }
     }
   </style>
 </head>
@@ -790,6 +864,7 @@
           <a id="search-link" href="#arama" aria-current="page">Arama</a>
           <a id="data-link" href="#veri">Veri kaynağı</a>
           <a id="architecture-link" href="#nasil-calisir">Nasıl çalışır?</a>
+          <a id="projectile-link" href="#egik-atis">Eğik atış</a>
         </nav>
       </div>
       <nav class="crumbs" id="crumbs" aria-label="Konum" hidden>
@@ -1573,6 +1648,86 @@
     </div>
   </main>
 
+  <main id="projectile-page" class="projectile wrap" hidden>
+    <section class="panel proj-controls" aria-labelledby="proj-controls-title">
+      <h2 id="proj-controls-title" class="sr-only">Atış ayarları</h2>
+      <div class="proj-field">
+        <label for="proj-speed">İlk hız <output id="proj-speed-out" for="proj-speed"></output></label>
+        <input id="proj-speed" type="range" min="5" max="40" step="1" value="25">
+      </div>
+      <div class="proj-field">
+        <label for="proj-angle">Atış açısı <output id="proj-angle-out" for="proj-angle"></output></label>
+        <input id="proj-angle" type="range" min="5" max="85" step="1" value="45">
+      </div>
+      <div class="proj-field">
+        <label for="proj-drag">Hava direnci <output id="proj-drag-out" for="proj-drag"></output></label>
+        <input id="proj-drag" type="range" min="0" max="0.02" step="0.0005" value="0.013">
+        <div class="proj-presets" id="proj-presets" role="group" aria-label="Hazır cisimler">
+          <button type="button" class="secondary" data-k="0">Hava yok</button>
+          <button type="button" class="secondary" data-k="0.005">Golf topu</button>
+          <button type="button" class="secondary" data-k="0.013">Futbol topu</button>
+          <button type="button" class="secondary" data-k="0.019">Tenis topu</button>
+        </div>
+        <p class="proj-note">Direnç katsayısı <i>k</i>, ivmeye <i>k</i>·<i>v</i>² kadar fren olarak eklenir. Modelin gördüğü boyutsuz direnç: <strong id="proj-kappa">–</strong> (en çok 3,5).</p>
+      </div>
+      <button type="button" id="proj-launch">Fırlat</button>
+      <p id="proj-model-state" class="proj-model-state" role="status" data-state="loading">Yapay zekâ modeli yükleniyor…</p>
+    </section>
+
+    <section class="panel proj-stage" aria-labelledby="proj-stage-title">
+      <div class="proj-stage-head">
+        <h2 id="proj-stage-title">Yörünge</h2>
+        <fieldset class="proj-legend">
+          <legend class="sr-only">Gösterilen çözümler</legend>
+          <label class="free"><input id="proj-show-free" type="checkbox" checked> Havasız formül</label>
+          <label class="exact"><input id="proj-show-exact" type="checkbox" checked> Sayısal çözüm (RK4)</label>
+          <label class="net"><input id="proj-show-net" type="checkbox" checked> Yapay zekâ (PINN)</label>
+        </fieldset>
+      </div>
+      <svg id="proj-plot" class="proj-plot" viewBox="0 0 820 420" role="img" aria-label="Üç çözümün yörünge grafiği"></svg>
+      <div class="proj-table-wrap">
+        <table class="proj-table">
+          <thead>
+            <tr><th scope="col"></th><th scope="col">Havasız formül</th><th scope="col">Sayısal çözüm</th><th scope="col">Yapay zekâ</th><th scope="col">Hata</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Menzil</th><td id="proj-range-free"></td><td id="proj-range-exact"></td><td id="proj-range-net"></td><td id="proj-range-error"></td></tr>
+            <tr><th scope="row">En yüksek nokta</th><td id="proj-height-free"></td><td id="proj-height-exact"></td><td id="proj-height-net"></td><td id="proj-height-error"></td></tr>
+            <tr><th scope="row">Uçuş süresi</th><td id="proj-time-free"></td><td id="proj-time-exact"></td><td id="proj-time-net"></td><td id="proj-time-error"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="proj-note">Hata, yapay zekânın sonucunun sayısal çözümden yüzde kaç saptığıdır. Sayısal çözüm burada doğru cevap kabul edilir.</p>
+    </section>
+
+    <section class="panel proj-explain" aria-labelledby="proj-explain-title">
+      <h2 id="proj-explain-title">Bu yapay zekâ nasıl öğrendi?</h2>
+      <div class="proj-explain-grid">
+        <div>
+          <h3>Çözülen problem</h3>
+          <p>Hava direnci yokken top bir parabol çizer ve menzil tek bir formülle bulunur. Direnç olunca hız hem yatay hem dikey hareketi frenler; denklemlerin kapalı bir çözümü yoktur. Bu yüzden normalde bilgisayar zamanı küçük adımlara bölerek hesaplar (Runge–Kutta yöntemi).</p>
+          <p class="proj-equation" aria-label="x iki nokta eşittir eksi k çarpı v çarpı x nokta; y iki nokta eşittir eksi g eksi k çarpı v çarpı y nokta">
+            <span><i>ẍ</i> = −<i>k</i>|<i>v</i>|<i>ẋ</i></span>
+            <span><i>ÿ</i> = −<i>g</i> − <i>k</i>|<i>v</i>|<i>ẏ</i></span>
+          </p>
+        </div>
+        <div>
+          <h3>Fizikle eğitilen ağ</h3>
+          <p>Modele hiç örnek yörünge gösterilmedi. Ağ, zamanı, açıyı ve direnci alıp topun konumunu tahmin ediyor. Eğitimde her adımda binlerce rastgele noktada bu tahminin ivmesi hesaplanıp yukarıdaki denkleme ne kadar uymadığı ölçüldü ve ağ bu uyumsuzluğu küçültecek şekilde düzeltildi. Bu yaklaşımın adı fizik bilgili sinir ağı (PINN).</p>
+        </div>
+        <div>
+          <h3>Tek model, her hız</h3>
+          <p>Uzunluk <i>v</i>₀²/<i>g</i>, zaman <i>v</i>₀/<i>g</i> birimiyle ölçülünce ilk hız denklemden kaybolur ve geriye açı ile tek bir boyutsuz direnç sayısı kalır. Böylece aynı küçük ağ her hız için çalışır. Başlangıç noktası ve ilk hız ağın yapısına gömülü olduğu için tam doğru; direnç sıfırken model formülle birebir aynı sonucu verir.</p>
+        </div>
+        <div>
+          <h3>Ne kadar doğru?</h3>
+          <p id="proj-accuracy">Model yüklenince doğruluk bilgisi burada görünecek.</p>
+          <p class="proj-note">Ağ, 3 girişli ve 3 gizli katmanlı (48 nöron) küçük bir modeldir. ONNX biçiminde yaklaşık 20 KB tutar ve tarayıcınızda çalışır. Eğitim kodu: <a href="https://github.com/alorak/fzmapp/blob/main/scripts/projectile/train_pinn.py" target="_blank" rel="noopener">scripts/projectile/train_pinn.py</a>.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
   <footer class="site-footer">
     <div class="wrap">Ankara Üniversitesi Fizik Mühendisliği · Veriler AVESİS’teki herkese açık sayfalardan derlenmiştir.</div>
   </footer>
@@ -1745,6 +1900,7 @@
     const $ = id => document.getElementById(id);
     // Bump when search-worker.js or chat-worker.js changes, so browsers do not keep using a cached copy.
     const workerVersion = '2026-11-26';
+    let projectileLoaded = false;
     for (const link of document.querySelectorAll('a[href^="https://"]')) {
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
@@ -1806,6 +1962,11 @@
         title: 'Arama nasıl çalışır?',
         lead: 'Aramayı yapan model ile “Makaleyi sor” sayfasındaki dil modelinin nasıl çalıştığını adım adım anlatıyoruz.',
       },
+      '#egik-atis': {
+        id: 'projectile',
+        title: 'Eğik atış',
+        lead: 'Hava direnciyle atılan bir topun yolunu fizik denklemleriyle eğitilmiş küçük bir yapay zekâ modeli tahmin ediyor; sonucu klasik sayısal çözümle yan yana görün.',
+      },
     };
 
     const personPrefix = '#akademisyen/';
@@ -1840,8 +2001,8 @@
       const isArticle = isPerson && location.hash.includes(articleSegment);
       const page = isArticle ? {id: 'article'} : isPerson ? {id: 'person'} : pages[location.hash] ?? pages['#arama'];
       if (currentPage === 'search' && page.id !== 'search') searchScroll = window.scrollY;
-      for (const id of ['search', 'data', 'architecture', 'person', 'article']) $(id + '-page').hidden = id !== page.id;
-      for (const id of ['search', 'data', 'architecture']) {
+      for (const id of ['search', 'data', 'architecture', 'projectile', 'person', 'article']) $(id + '-page').hidden = id !== page.id;
+      for (const id of ['search', 'data', 'architecture', 'projectile']) {
         if (id === page.id) $(id + '-link').setAttribute('aria-current', 'page');
         else $(id + '-link').removeAttribute('aria-current');
       }
@@ -1857,6 +2018,13 @@
         $('page-title').textContent = page.title;
         $('page-lead').textContent = page.lead;
         document.title = page.title + ' | Ankara Üniversitesi';
+      }
+      if (page.id === 'projectile' && !projectileLoaded) {
+        projectileLoaded = true;
+        import(`./egik-atis.js?v=${workerVersion}`).then(module => module.start()).catch(error => {
+          $('proj-model-state').dataset.state = 'error';
+          $('proj-model-state').textContent = 'Sayfa yüklenemedi: ' + error.message;
+        });
       }
       const switchingTab = page.id === 'architecture' && currentPage === 'architecture';
       if (page.tab) {

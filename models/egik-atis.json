@@ -1,0 +1,51 @@
+{
+  "model": "egik-atis.onnx",
+  "description": "PINN for projectile motion with quadratic air drag; inputs (tau, theta, kappa), outputs (X, Y) in units of v0^2/g, time in units of v0/g.",
+  "inputs": {
+    "tau": "t * g / v0",
+    "theta": "launch angle in radians",
+    "kappa": "k * v0^2 / g"
+  },
+  "ranges": {
+    "theta_degrees": [
+      5,
+      85
+    ],
+    "kappa": [
+      0,
+      3.5
+    ],
+    "tau": "0 .. 2.1 * sin(theta)"
+  },
+  "layers": [
+    3,
+    48,
+    48,
+    48,
+    2
+  ],
+  "parameters": 4994,
+  "training": {
+    "steps": 40000,
+    "batch": 4096,
+    "loss": "residual of the equations of motion only",
+    "final_physics_loss": 3.765801011468284e-05,
+    "seconds": 375
+  },
+  "check_against_runge_kutta": {
+    "range": {
+      "mean_percent": 0.19407463125145183,
+      "max_percent": 0.8845182232053548
+    },
+    "height": {
+      "mean_percent": 0.22233963930933137,
+      "max_percent": 1.322057689620378
+    },
+    "time": {
+      "mean_percent": 0.19874668156591963,
+      "max_percent": 1.2604404178167508
+    },
+    "cases": 128
+  },
+  "onnx_vs_jax_max_abs_difference": 2.7120113372802734e-06
+}
