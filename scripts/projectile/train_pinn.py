@@ -150,6 +150,34 @@ def model_summary(predict, theta, kappa, steps=2000):
     }
 
 
+# ---------- material for the explanation page ----------
+# A football at 25 m/s and 45 degrees: k = 0.013 1/m gives kappa = 0.013 * 25^2 / 9.81.
+DEMO = {"v0": 25.0, "angle_degrees": 45, "k": 0.013}
+DEMO_THETA = math.radians(DEMO["angle_degrees"])
+DEMO_KAPPA = DEMO["k"] * DEMO["v0"] ** 2 / 9.81
+SNAPSHOT_STEPS = [0, 200, 1000, 4000, 15000]
+
+
+def demo_path(params, points=48):
+    tau = jnp.linspace(0, TAU_SPAN * math.sin(DEMO_THETA), points)
+    xy = jax.vmap(lambda t: position(params, t, DEMO_THETA, DEMO_KAPPA))(tau)
+    return [[round(float(x), 4), round(float(y), 4)] for x, y in np.asarray(xy)]
+
+
+def residual_check(params, tau=0.6):
+    """What the network's acceleration is at one moment of the demo throw, and what physics demands."""
+    f = lambda t: position(params, t, DEMO_THETA, DEMO_KAPPA)
+    velocity = lambda t: jax.jvp(f, (t,), (1.0,))[1]
+    v, a = jax.jvp(velocity, (jnp.float32(tau),), (1.0,))
+    speed = float(jnp.hypot(v[0], v[1]))
+    wanted = [-DEMO_KAPPA * speed * float(v[0]), -1 - DEMO_KAPPA * speed * float(v[1])]
+    return {
+        "tau": tau,
+        "network": [round(float(a[0]), 4), round(float(a[1]), 4)],
+        "physics": [round(wanted[0], 4), round(wanted[1], 4)],
+    }
+
+
 # ---------- ONNX export ----------
 def export_onnx(params, path):
     """Writes the whole model, feature scaling and output formula included, as a small ONNX graph.
@@ -227,11 +255,22 @@ def main():
         return optax.apply_updates(params, updates), state, value
 
     start = time.time()
+    history, window = [], []
+    snapshots = []
+    first_check = residual_check(params)
     for index in range(STEPS):
+        if index in SNAPSHOT_STEPS:
+            snapshots.append({"step": index, "path": demo_path(params)})
         key, sub = jax.random.split(key)
         params, state, value = step(params, state, sub)
+        window.append(float(value))
+        if (index + 1) % 250 == 0:
+            # Mean loss over the last 250 steps, for the learning curve on the explanation page.
+            history.append([index + 1, float(f"{np.mean(window):.4g}")])
+            window = []
         if index % 2000 == 0 or index == STEPS - 1:
             print(f"step {index:6d}  physics loss {float(value):.3e}  {time.time() - start:6.0f}s", flush=True)
+    snapshots.append({"step": STEPS, "path": demo_path(params)})
 
     export_onnx(params, MODEL_PATH)
 
@@ -244,9 +283,11 @@ def main():
     probe = sample(jax.random.PRNGKey(1), 4096)
     gap = float(np.max(np.abs(onnx_predict(*[np.asarray(a) for a in probe]) - np.asarray(jax_predict(*probe)))))
 
+    angles = list(range(10, 86, 5))
+    kappas = [float(k) for k in np.linspace(0, KAPPA_MAX, 8)]
     errors = {"range": [], "height": [], "time": []}
-    for theta_deg in range(10, 86, 5):
-        for kappa in np.linspace(0, KAPPA_MAX, 8):
+    for theta_deg in angles:
+        for kappa in kappas:
             theta = math.radians(theta_deg)
             ref = summary(rk4(theta, kappa))
             got = model_summary(onnx_predict, theta, kappa)
@@ -254,6 +295,26 @@ def main():
                 errors[name].append(abs(got[name] - ref[name]) / ref[name])
     metrics = {name: {"mean_percent": 100 * float(np.mean(v)), "max_percent": 100 * float(np.max(v))} for name, v in errors.items()}
     metrics["cases"] = len(errors["range"])
+    metrics["range_grid"] = {
+        "angles_degrees": angles,
+        "kappas": [round(k, 3) for k in kappas],
+        "percent": [[round(100 * e, 3) for e in errors["range"][i * len(kappas):(i + 1) * len(kappas)]] for i in range(len(angles))],
+    }
+
+    reference = rk4(DEMO_THETA, DEMO_KAPPA)
+    pick = np.linspace(0, len(reference) - 1, 48).round().astype(int)
+    tau_example = [0.0, 0.25, 0.5, 0.75, 1.0, 1.25]
+    example_out = onnx_predict(np.array(tau_example), np.full(6, DEMO_THETA), np.full(6, DEMO_KAPPA))
+    explanation = {
+        "demo": {**DEMO, "kappa": round(DEMO_KAPPA, 4)},
+        "loss_history": history,
+        "snapshots": snapshots,
+        "runge_kutta_path": [[round(float(x), 4), round(float(y), 4)] for _, x, y in reference[pick]],
+        "residual_check": {"start": first_check, "end": residual_check(params)},
+        "example": [
+            {"tau": t, "x": round(float(x), 4), "y": round(float(y), 4)} for t, (x, y) in zip(tau_example, example_out)
+        ],
+    }
     test_loss = float(loss(params, sample(jax.random.PRNGKey(2), 20000)))
 
     meta = {
@@ -266,9 +327,10 @@ def main():
         "training": {"steps": STEPS, "batch": BATCH, "loss": "residual of the equations of motion only", "final_physics_loss": test_loss, "seconds": round(time.time() - start)},
         "check_against_runge_kutta": metrics,
         "onnx_vs_jax_max_abs_difference": gap,
+        "explanation": explanation,
     }
-    META_PATH.write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(json.dumps(meta, indent=2, ensure_ascii=False))
+    META_PATH.write_text(json.dumps(meta, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(json.dumps({k: v for k, v in meta.items() if k != "explanation"}, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":
