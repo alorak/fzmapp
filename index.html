@@ -531,7 +531,9 @@
     }
 
     /* Projectile motion page */
-    .projectile { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 24px 28px; align-items: start; margin-block: -64px 64px; }
+    .projectile { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; margin-block: -64px 64px; }
+    /* The controls stay in view only while the plot is on screen: sticky is bounded by this wrapper. */
+    .proj-workspace { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 24px 28px; align-items: start; }
     .projectile[hidden] { display: none; }
     .proj-controls { display: grid; gap: 22px; position: sticky; top: 16px; }
     .proj-field label { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
@@ -586,14 +588,13 @@
     .proj-table thead th { font-size: .85rem; font-weight: 650; color: var(--muted); }
     .proj-table td:nth-child(4) { color: var(--amber-ink); font-weight: 650; }
     .proj-table td:last-child { color: var(--ink); font-weight: 650; }
-    .proj-explain { grid-column: 1 / -1; }
     .proj-explain-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 36px; margin-top: 18px; }
     .proj-explain-grid h3 { font-family: var(--serif); font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; }
     .proj-explain-grid p + p { margin-top: 10px; }
     .proj-explain-grid p { color: var(--ink-2); }
     .proj-equation { display: flex; flex-wrap: wrap; gap: 8px 28px; padding: 12px 16px; background: var(--paper); border-radius: var(--radius); font: 1.1rem/1.4 var(--serif); color: var(--ink) !important; }
     @media (max-width: 900px) {
-      .projectile { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+      .projectile, .proj-workspace { grid-template-columns: minmax(0, 1fr); gap: 16px; }
       .proj-controls { position: static; }
       .proj-explain-grid { grid-template-columns: minmax(0, 1fr); }
     }
@@ -2125,6 +2126,7 @@
   </main>
 
   <main id="projectile-page" class="projectile wrap" hidden>
+    <div class="proj-workspace">
     <section class="panel proj-controls" aria-labelledby="proj-controls-title">
       <h2 id="proj-controls-title" class="sr-only">Atış ayarları</h2>
       <div class="proj-field">
@@ -2175,6 +2177,7 @@
       </div>
       <p class="proj-note">Hata, yapay zekânın sonucunun sayısal çözümden yüzde kaç saptığıdır. Sayısal çözüm burada doğru cevap kabul edilir.</p>
     </section>
+    </div>
 
     <section class="panel proj-explain" aria-labelledby="proj-explain-title">
       <h2 id="proj-explain-title">Bu yapay zekâ nasıl öğrendi?</h2>
